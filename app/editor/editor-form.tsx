@@ -113,11 +113,21 @@ const formatDescriptionText = (sectionType: CvSectionType, rawText: string) => {
   }
 
   const merged: string[] = [];
-  for (const line of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const nextLine = lines[index + 1] ?? "";
     const bulletBody = line.replace(BULLET_INPUT_RE, "").trim();
     const isBullet = BULLET_INPUT_RE.test(line);
 
     if (isBullet) {
+      if (
+        BULLET_INPUT_RE.test(nextLine) &&
+        isLikelyHeadingLine(bulletBody) &&
+        !/[.!?]$/.test(bulletBody)
+      ) {
+        merged.push(bulletBody);
+        continue;
+      }
       merged.push(`- ${bulletBody}`);
       continue;
     }

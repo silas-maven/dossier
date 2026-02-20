@@ -153,7 +153,18 @@ const parseDescription = (value: string): DescPart[] => {
     const line = lines[index];
     const bullet = line.match(BULLET_RE);
     if (bullet?.[1]) {
-      parts.push({ kind: "bullet", text: bullet[1].trim() });
+      const bulletText = bullet[1].trim();
+      const nextLine = lines[index + 1];
+      if (
+        nextLine &&
+        BULLET_RE.test(nextLine) &&
+        isHeadingLine(stripInlineMarkers(bulletText)) &&
+        !/[.!?]$/.test(stripInlineMarkers(bulletText))
+      ) {
+        parts.push({ kind: "heading", text: stripInlineMarkers(bulletText) });
+      } else {
+        parts.push({ kind: "bullet", text: bulletText });
+      }
       continue;
     }
 

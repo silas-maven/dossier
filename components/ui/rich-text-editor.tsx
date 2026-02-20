@@ -123,11 +123,41 @@ export default function RichTextEditor({
     onChange(htmlToMarkdown(editor));
   };
 
+  const applyInlineFormat = (command: "bold" | "italic") => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+    document.execCommand(command, false);
+    syncFromDom();
+  };
+
   return (
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium">Description</span>
         <span className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => applyInlineFormat("bold")}
+            aria-label="Bold selected text"
+            className="font-semibold"
+          >
+            B
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => applyInlineFormat("italic")}
+            aria-label="Italicize selected text"
+            className="italic"
+          >
+            I
+          </Button>
           {onAutoFormat ? (
             <Button
               type="button"

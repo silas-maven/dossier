@@ -73,7 +73,19 @@ const parseDescriptionParts = (value: string): DescriptionPart[] =>
     .map((line) => line.trim())
     .filter(Boolean) as string[]).map((line, index, allLines) => {
     const bullet = line.match(BULLET_RE);
-    if (bullet?.[1]) return { kind: "bullet", text: bullet[1].trim() } as DescriptionPart;
+    if (bullet?.[1]) {
+      const bulletText = bullet[1].trim();
+      const nextLine = allLines[index + 1];
+      if (
+        nextLine &&
+        BULLET_RE.test(nextLine) &&
+        looksLikeSubheadingLine(stripInlineMarkers(bulletText)) &&
+        !/[.!?]$/.test(stripInlineMarkers(bulletText))
+      ) {
+        return { kind: "heading", text: stripInlineMarkers(bulletText) } as DescriptionPart;
+      }
+      return { kind: "bullet", text: bulletText } as DescriptionPart;
+    }
 
     const cleanedLine = stripInlineMarkers(line);
     const nextLine = allLines[index + 1];
