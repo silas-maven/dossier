@@ -26,3 +26,7 @@ A privacy-focused resume builder for managing multiple profiles and templates.
 2.  **Editor UI:** Section-based editing with drag-and-drop reordering.
 3.  **Template System:** Implement "Modern" and "Classic" templates.
 4.  **Export Pipeline:** PDF rendering.
+
+## Supabase
+- Schema/bootstrap notes: `docs/supabase-setup.md`
+- Migration file: `supabase/migrations/20260219_000001_dossier_core.sql`

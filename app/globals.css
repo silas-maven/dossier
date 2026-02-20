@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 225 22% 7%;
+  --foreground: 210 20% 96%;
+  --card: 226 20% 10%;
+  --card-foreground: 210 20% 96%;
+  --border: 224 16% 24%;
+  --primary: 214 95% 66%;
+  --primary-foreground: 222 47% 11%;
+  --muted: 225 18% 14%;
+  --muted-foreground: 217 14% 72%;
+  --ring: 214 95% 66%;
+  --radius: 1rem;
+}
+
+.dark {
+  --background: 225 22% 7%;
+  --foreground: 210 20% 96%;
+  --card: 226 20% 10%;
+  --card-foreground: 210 20% 96%;
+  --border: 224 16% 24%;
+  --primary: 214 95% 66%;
+  --primary-foreground: 222 47% 11%;
+  --muted: 225 18% 14%;
+  --muted-foreground: 217 14% 72%;
+  --ring: 214 95% 66%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(226 232 240 / 0.35);
+}
+
+.glass-panel {
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background:
+    linear-gradient(140deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02)),
+    rgb(7 10 18 / 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.bento-mask {
+  background-image:
+    radial-gradient(circle at 0 0, rgb(255 255 255 / 0.07), transparent 45%),
+    linear-gradient(rgb(255 255 255 / 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.02) 1px, transparent 1px);
+  background-size: auto, 48px 48px, 48px 48px;
+}
+
+@keyframes loading-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-loading {
+  animation: loading-slide 1.3s ease-in-out infinite alternate;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(33 40 52) rgb(13 18 29);
+}
+
+.scrollbar-dark::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  border-radius: 9999px;
+  background: rgb(13 18 29 / 0.95);
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background: linear-gradient(180deg, rgb(34 41 53 / 0.98), rgb(22 28 40 / 0.98)) padding-box;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgb(46 54 67 / 0.98), rgb(30 37 51 / 0.98)) padding-box;
+}
