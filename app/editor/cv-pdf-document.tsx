@@ -198,7 +198,7 @@ const renderDescriptionParts = (
     parseDescription(description).map((part, index) => {
       if (part.kind === "bullet" && sectionUsesBullets(section)) {
         return (
-          <View key={`${itemId}-b-${index}`} style={pdfStyles.bulletRow}>
+          <View key={`${itemId}-b-${index}`} style={pdfStyles.bulletRow} wrap={false}>
             <Text style={[pdfStyles.bulletGlyph, { fontSize: bodySize }]}>{sectionBulletGlyph(section)}</Text>
             <Text
               style={[
