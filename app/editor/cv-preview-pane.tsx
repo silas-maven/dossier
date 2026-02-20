@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Download } from "lucide-react";
 
@@ -51,6 +51,25 @@ const profileSnapshotHash = (profile: CvProfile) => {
   }
   return (hash >>> 0).toString(16);
 };
+
+type StablePdfViewerProps = {
+  profile: CvProfile;
+  className?: string;
+  viewerClassName?: string;
+};
+
+const StablePdfViewer = memo(function StablePdfViewer({
+  profile,
+  className,
+  viewerClassName
+}: StablePdfViewerProps) {
+  const documentNode = useMemo(() => <CvPdfDocument profile={profile} />, [profile]);
+  return (
+    <div className={className}>
+      <PDFViewer className={viewerClassName ?? "h-full w-full"}>{documentNode}</PDFViewer>
+    </div>
+  );
+});
 
 export default function CvPreviewPane({
   profile,
@@ -160,11 +179,10 @@ export default function CvPreviewPane({
             </div>
             <div className="flex-1 overflow-auto p-4">
               {mode === "pdf" ? (
-                <div className="h-full overflow-hidden rounded-xl border border-white/10 bg-[#0c1220]">
-                  <PDFViewer className="h-full w-full">
-                    <CvPdfDocument profile={previewProfile} />
-                  </PDFViewer>
-                </div>
+                <StablePdfViewer
+                  profile={previewProfile}
+                  className="h-full overflow-hidden rounded-xl border border-white/10 bg-[#0c1220]"
+                />
               ) : (
                 <div className="mx-auto max-w-4xl">
                   <CvLivePreview profile={previewProfile} templateName={templateName} />
@@ -184,9 +202,7 @@ export default function CvPreviewPane({
               : "h-[70vh]"
           )}
         >
-          <PDFViewer className="h-full w-full">
-            <CvPdfDocument profile={previewProfile} />
-          </PDFViewer>
+          <StablePdfViewer profile={previewProfile} className="h-full w-full" />
         </div>
       ) : (
         <CvLivePreview profile={previewProfile} templateName={templateName} />

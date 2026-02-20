@@ -243,6 +243,14 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
             typeof sectionStyle.headingItalic === "boolean"
               ? sectionStyle.headingItalic
               : defaultSection.style.headingItalic,
+          bulletBold:
+            typeof sectionStyle.bulletBold === "boolean"
+              ? sectionStyle.bulletBold
+              : defaultSection.style.bulletBold,
+          bulletItalic:
+            typeof sectionStyle.bulletItalic === "boolean"
+              ? sectionStyle.bulletItalic
+              : defaultSection.style.bulletItalic,
           skillsColumns:
             sectionStyle.skillsColumns === 1 ||
             sectionStyle.skillsColumns === 2 ||

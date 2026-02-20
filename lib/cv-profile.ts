@@ -34,6 +34,8 @@ export type CvSectionStyle = {
   bodyFontSize: number;
   headingBold: boolean;
   headingItalic: boolean;
+  bulletBold: boolean;
+  bulletItalic: boolean;
   skillsColumns: 1 | 2 | 3 | 4;
   textAlign: "left" | "center" | "right" | "justify";
   enableBullets: boolean;
@@ -97,6 +99,8 @@ export const createEmptySection = (type: CvSectionType = "experience"): CvSectio
     bodyFontSize: 9,
     headingBold: true,
     headingItalic: false,
+    bulletBold: false,
+    bulletItalic: false,
     skillsColumns: 4,
     textAlign: "left",
     enableBullets: true,

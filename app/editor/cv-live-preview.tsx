@@ -68,17 +68,21 @@ const looksLikeSubheadingLine = (line: string) => {
 };
 
 const parseDescriptionParts = (value: string): DescriptionPart[] =>
-  (value || "")
+  ((value || "")
     .split("\n")
     .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const bullet = line.match(BULLET_RE);
-      if (bullet?.[1]) return { kind: "bullet", text: bullet[1].trim() } as DescriptionPart;
-      const cleanedLine = stripInlineMarkers(line);
-      if (looksLikeSubheadingLine(cleanedLine)) return { kind: "heading", text: cleanedLine } as DescriptionPart;
-      return { kind: "para", text: cleanedLine } as DescriptionPart;
-    });
+    .filter(Boolean) as string[]).map((line, index, allLines) => {
+    const bullet = line.match(BULLET_RE);
+    if (bullet?.[1]) return { kind: "bullet", text: bullet[1].trim() } as DescriptionPart;
+
+    const cleanedLine = stripInlineMarkers(line);
+    const nextLine = allLines[index + 1];
+    if (nextLine && BULLET_RE.test(nextLine)) {
+      return { kind: "heading", text: cleanedLine } as DescriptionPart;
+    }
+    if (looksLikeSubheadingLine(cleanedLine)) return { kind: "heading", text: cleanedLine } as DescriptionPart;
+    return { kind: "para", text: cleanedLine } as DescriptionPart;
+  });
 
 const bulletGlyph = (style: CvSection["style"]["bulletStyle"]) => {
   if (style === "square") return "■";
@@ -320,6 +324,8 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                                             className="break-words text-muted-foreground"
                                             style={{
                                               fontSize: `${Math.max(11, section.style.bodyFontSize + 3)}px`,
+                                              fontWeight: section.style.bulletBold ? 600 : 400,
+                                              fontStyle: section.style.bulletItalic ? "italic" : "normal",
                                               lineHeight: lineSpacing,
                                               textAlign: section.style.textAlign
                                             }}

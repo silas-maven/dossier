@@ -72,6 +72,10 @@ const sectionSkillsColumns = (section: CvSection) =>
 const sectionTextAlign = (section: CvSection) => section.style?.textAlign ?? "left";
 const sectionUsesBullets = (section: CvSection) =>
   typeof section.style?.enableBullets === "boolean" ? section.style.enableBullets : true;
+const sectionBulletBold = (section: CvSection) =>
+  typeof section.style?.bulletBold === "boolean" ? section.style.bulletBold : false;
+const sectionBulletItalic = (section: CvSection) =>
+  typeof section.style?.bulletItalic === "boolean" ? section.style.bulletItalic : false;
 const sectionBulletGlyph = (section: CvSection) => {
   if (section.style?.bulletStyle === "square") return "■";
   if (section.style?.bulletStyle === "dash") return "-";
@@ -114,13 +118,17 @@ const parseInlineParts = (text: string): InlinePart[] => {
   return out.filter((part) => part.text.length > 0);
 };
 
-const renderInlinePdf = (text: string, keyPrefix: string) =>
+const renderInlinePdf = (
+  text: string,
+  keyPrefix: string,
+  base?: { bold?: boolean; italic?: boolean }
+) =>
   parseInlineParts(text).map((part, index) => (
     <Text
       key={`${keyPrefix}-${index}`}
       style={{
-        fontWeight: part.bold ? (700 as const) : (400 as const),
-        fontStyle: part.italic ? ("italic" as const) : ("normal" as const)
+        fontWeight: part.bold || base?.bold ? (700 as const) : (400 as const),
+        fontStyle: part.italic || base?.italic ? ("italic" as const) : ("normal" as const)
       }}
     >
       {part.text}
@@ -141,15 +149,21 @@ const parseDescription = (value: string): DescPart[] => {
     .map((l) => l.trim())
     .filter(Boolean);
   const parts: DescPart[] = [];
-  for (const line of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     const bullet = line.match(BULLET_RE);
     if (bullet?.[1]) {
       parts.push({ kind: "bullet", text: bullet[1].trim() });
-    } else if (isHeadingLine(stripInlineMarkers(line))) {
-      const cleanedLine = stripInlineMarkers(line);
+      continue;
+    }
+
+    const cleanedLine = stripInlineMarkers(line);
+    const nextLine = lines[index + 1];
+    if (nextLine && BULLET_RE.test(nextLine)) {
+      parts.push({ kind: "heading", text: cleanedLine });
+    } else if (isHeadingLine(cleanedLine)) {
       parts.push({ kind: "heading", text: cleanedLine });
     } else {
-      const cleanedLine = stripInlineMarkers(line);
       parts.push({ kind: "para", text: cleanedLine });
     }
   }
@@ -175,8 +189,21 @@ const renderDescriptionParts = (
         return (
           <View key={`${itemId}-b-${index}`} style={pdfStyles.bulletRow}>
             <Text style={[pdfStyles.bulletGlyph, { fontSize: bodySize }]}>{sectionBulletGlyph(section)}</Text>
-            <Text style={[pdfStyles.bulletText, { fontSize: bodySize, textAlign }]}>
-              {renderInlinePdf(part.text, `${itemId}-b-inline-${index}`)}
+            <Text
+              style={[
+                pdfStyles.bulletText,
+                {
+                  fontSize: bodySize,
+                  textAlign,
+                  fontWeight: sectionBulletBold(section) ? (700 as const) : (400 as const),
+                  fontStyle: sectionBulletItalic(section) ? ("italic" as const) : ("normal" as const)
+                }
+              ]}
+            >
+              {renderInlinePdf(part.text, `${itemId}-b-inline-${index}`, {
+                bold: sectionBulletBold(section),
+                italic: sectionBulletItalic(section)
+              })}
             </Text>
           </View>
         );

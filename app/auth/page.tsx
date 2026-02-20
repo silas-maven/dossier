@@ -9,11 +9,17 @@ import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClientOrNull } from "@/lib/supabase/client";
 
 export default function AuthPage() {
+  const sanitizeNextPath = (value: string | null) => {
+    if (!value) return "/templates?storage=cloud";
+    if (!value.startsWith("/")) return "/templates?storage=cloud";
+    return value;
+  };
+
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [next, setNext] = useState("/templates");
+  const [next, setNext] = useState("/templates?storage=cloud");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -22,7 +28,7 @@ export default function AuthPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const nextParam = params.get("next");
-    if (nextParam) setNext(nextParam);
+    setNext(sanitizeNextPath(nextParam));
     setAuthConfigured(Boolean(createSupabaseBrowserClientOrNull()));
   }, []);
 

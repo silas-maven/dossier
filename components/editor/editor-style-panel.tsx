@@ -306,23 +306,49 @@ export default function EditorStylePanel({
                   </label>
 
                   {selectedSection.style.enableBullets ? (
-                    <label className="space-y-1">
-                      <span className="text-sm font-medium">Bullet style</span>
-                      <select
-                        value={selectedSection.style.bulletStyle}
-                        onChange={(event) =>
-                          onSelectedSectionStyleChange(
-                            "bulletStyle",
-                            event.target.value as CvSectionStyle["bulletStyle"]
-                          )
-                        }
-                        className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <option value="disc">Disc (•)</option>
-                        <option value="square">Square (■)</option>
-                        <option value="dash">Dash (-)</option>
-                      </select>
-                    </label>
+                    <>
+                      <label className="space-y-1">
+                        <span className="text-sm font-medium">Bullet style</span>
+                        <select
+                          value={selectedSection.style.bulletStyle}
+                          onChange={(event) =>
+                            onSelectedSectionStyleChange(
+                              "bulletStyle",
+                              event.target.value as CvSectionStyle["bulletStyle"]
+                            )
+                          }
+                          className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <option value="disc">Disc (•)</option>
+                          <option value="square">Square (■)</option>
+                          <option value="dash">Dash (-)</option>
+                        </select>
+                      </label>
+                      <div className="flex flex-wrap items-end gap-4 rounded-md border bg-muted/20 px-3 py-2">
+                        <label className="inline-flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.style.bulletBold}
+                            onChange={(event) =>
+                              onSelectedSectionStyleChange("bulletBold", event.target.checked)
+                            }
+                            className="h-4 w-4 rounded border"
+                          />
+                          Bullet lines bold
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.style.bulletItalic}
+                            onChange={(event) =>
+                              onSelectedSectionStyleChange("bulletItalic", event.target.checked)
+                            }
+                            className="h-4 w-4 rounded border"
+                          />
+                          Bullet lines italic
+                        </label>
+                      </div>
+                    </>
                   ) : null}
 
                   <label className="inline-flex items-center gap-2 text-sm">
