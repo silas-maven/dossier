@@ -142,7 +142,7 @@ export default function TemplateCarousel({
               style={{
                 transform: `translate(-50%, -50%) translateX(${offset * shiftPercent}%) scale(${isActive ? 1 : 0.86})`,
                 opacity: isVisible ? (isActive ? 1 : 0.72) : 0,
-                zIndex: 100 - absOffset,
+                zIndex: 30 - absOffset,
                 pointerEvents: isVisible ? "auto" : "none"
               }}
               onClick={() => {
