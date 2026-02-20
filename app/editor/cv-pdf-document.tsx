@@ -161,7 +161,7 @@ const parseDescription = (value: string): DescPart[] => {
         isHeadingLine(stripInlineMarkers(bulletText)) &&
         !/[.!?]$/.test(stripInlineMarkers(bulletText))
       ) {
-        parts.push({ kind: "heading", text: stripInlineMarkers(bulletText) });
+        parts.push({ kind: "heading", text: bulletText });
       } else {
         parts.push({ kind: "bullet", text: bulletText });
       }
@@ -171,11 +171,11 @@ const parseDescription = (value: string): DescPart[] => {
     const cleanedLine = stripInlineMarkers(line);
     const nextLine = lines[index + 1];
     if (nextLine && BULLET_RE.test(nextLine)) {
-      parts.push({ kind: "heading", text: cleanedLine });
+      parts.push({ kind: "heading", text: line });
     } else if (isHeadingLine(cleanedLine)) {
-      parts.push({ kind: "heading", text: cleanedLine });
+      parts.push({ kind: "heading", text: line });
     } else {
-      parts.push({ kind: "para", text: cleanedLine });
+      parts.push({ kind: "para", text: line });
     }
   }
   return parts;

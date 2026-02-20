@@ -82,7 +82,7 @@ const parseDescriptionParts = (value: string): DescriptionPart[] =>
         looksLikeSubheadingLine(stripInlineMarkers(bulletText)) &&
         !/[.!?]$/.test(stripInlineMarkers(bulletText))
       ) {
-        return { kind: "heading", text: stripInlineMarkers(bulletText) } as DescriptionPart;
+        return { kind: "heading", text: bulletText } as DescriptionPart;
       }
       return { kind: "bullet", text: bulletText } as DescriptionPart;
     }
@@ -90,10 +90,10 @@ const parseDescriptionParts = (value: string): DescriptionPart[] =>
     const cleanedLine = stripInlineMarkers(line);
     const nextLine = allLines[index + 1];
     if (nextLine && BULLET_RE.test(nextLine)) {
-      return { kind: "heading", text: cleanedLine } as DescriptionPart;
+      return { kind: "heading", text: line } as DescriptionPart;
     }
-    if (looksLikeSubheadingLine(cleanedLine)) return { kind: "heading", text: cleanedLine } as DescriptionPart;
-    return { kind: "para", text: cleanedLine } as DescriptionPart;
+    if (looksLikeSubheadingLine(cleanedLine)) return { kind: "heading", text: line } as DescriptionPart;
+    return { kind: "para", text: line } as DescriptionPart;
   });
 
 const bulletGlyph = (style: CvSection["style"]["bulletStyle"]) => {
