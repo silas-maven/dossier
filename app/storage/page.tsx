@@ -21,11 +21,26 @@ export default function StorageChoicePage() {
     router.push("/templates?storage=local");
   };
 
-  const chooseCloud = () => {
+  const chooseCloud = async () => {
     if (!supabaseConfigured) {
       return;
     }
     setModeCookie("cloud");
+    const supabase = createSupabaseBrowserClientOrNull();
+    if (!supabase) {
+      router.push("/auth?next=%2Ftemplates%3Fstorage%3Dcloud");
+      return;
+    }
+
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      router.push("/templates?storage=cloud");
+      return;
+    }
+
     router.push("/auth?next=%2Ftemplates%3Fstorage%3Dcloud");
   };
 
@@ -70,7 +85,12 @@ export default function StorageChoicePage() {
                 Supabase env vars are missing right now. Configure them before cloud login.
               </p>
             ) : null}
-            <Button type="button" className="mt-5" onClick={chooseCloud} disabled={!supabaseConfigured}>
+            <Button
+              type="button"
+              className="mt-5"
+              onClick={() => void chooseCloud()}
+              disabled={!supabaseConfigured}
+            >
               Continue with cloud
             </Button>
           </section>
