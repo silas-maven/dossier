@@ -41,6 +41,11 @@ import {
   serializeSkillEntries
 } from "@/lib/skill-levels";
 import {
+  normalizeDescriptionPlainText,
+  normalizeDescriptionToHtml,
+  normalizeStoredDescriptionHtml
+} from "@/lib/description-format";
+import {
   getCloudProfileById,
   getCurrentSupabaseUser,
   getLatestCloudProfileByTemplate,
@@ -71,90 +76,26 @@ const tagsFromInput = (value: string) =>
 
 const tagsToInput = (tags: string[]) => tags.join(", ");
 
-const BULLET_INPUT_RE = /^[-•*]\s+/;
-const DATE_RANGE_LINE_RE =
-  /(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}\s*[—-]\s*(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}|Present)|\d{4}\s*[—-]\s*(?:\d{4}|Present))/i;
-const ROLE_TITLE_LINE_RE = /^[A-Z][A-Za-z .,'&/()-]+,\s*[A-Z][A-Za-z .,'&/()-]+$/;
-
-const normalizeInlineSpacing = (value: string) =>
-  value
-    .replace(/\s+/g, " ")
-    .replace(/\s+([,.;:!?])/g, "$1")
-    .trim();
-
-const splitTextLines = (value: string) =>
-  value
-    .replace(/\r/g, "\n")
-    .split("\n")
-    .map((line) => normalizeInlineSpacing(line))
-    .filter(Boolean);
-
-const isLikelyHeadingLine = (line: string) => {
-  if (!line || BULLET_INPUT_RE.test(line)) return false;
-  if (ROLE_TITLE_LINE_RE.test(line) || DATE_RANGE_LINE_RE.test(line)) return true;
-  if (/[.!?]$/.test(line)) return false;
-  if (line.length > 72) return false;
-  return /[A-Za-z]/.test(line);
-};
-
-const shouldAppendToBullet = (line: string) => {
-  if (!line) return false;
-  if (ROLE_TITLE_LINE_RE.test(line) || DATE_RANGE_LINE_RE.test(line)) return false;
-  if (isLikelyHeadingLine(line)) return false;
-  return true;
-};
-
-const formatDescriptionText = (sectionType: CvSectionType, rawText: string) => {
-  const lines = splitTextLines(rawText);
-  if (lines.length === 0) return "";
-
-  if (sectionType !== "experience" && sectionType !== "projects" && sectionType !== "custom") {
-    return lines.join("\n");
-  }
-
-  const merged: string[] = [];
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
-    const nextLine = lines[index + 1] ?? "";
-    const bulletBody = line.replace(BULLET_INPUT_RE, "").trim();
-    const isBullet = BULLET_INPUT_RE.test(line);
-
-    if (isBullet) {
-      if (
-        BULLET_INPUT_RE.test(nextLine) &&
-        isLikelyHeadingLine(bulletBody) &&
-        !/[.!?]$/.test(bulletBody)
-      ) {
-        merged.push(bulletBody);
-        continue;
-      }
-      merged.push(`- ${bulletBody}`);
-      continue;
-    }
-
-    const previous = merged[merged.length - 1];
-    if (previous?.startsWith("- ") && shouldAppendToBullet(line)) {
-      merged[merged.length - 1] = `${previous} ${line}`.replace(/\s+/g, " ").trim();
-      continue;
-    }
-
-    merged.push(line);
-  }
-
-  const output: string[] = [];
-  for (const line of merged) {
-    const isHeading = isLikelyHeadingLine(line);
-    if (isHeading && output.length > 0 && output[output.length - 1] !== "") {
-      output.push("");
-    }
-    output.push(line);
-  }
-
-  return output.join("\n").replace(/\n{3,}/g, "\n\n").trim();
-};
-
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+const sectionTypeLabels: Record<CvSectionType, string> = {
+  custom: "Custom section",
+  experience: "Experience",
+  education: "Education",
+  skills: "Skills",
+  certifications: "Certifications",
+  projects: "Projects"
+};
+const customSectionPresets = [
+  { key: "languages", title: "Languages", hint: "Language list with proficiency notes." },
+  { key: "awards", title: "Awards", hint: "Awards and recognitions." },
+  { key: "volunteering", title: "Volunteering", hint: "Community and volunteer work." },
+  { key: "courses", title: "Courses", hint: "Courses and training completed." },
+  { key: "publications", title: "Publications", hint: "Articles, papers, and publications." },
+  { key: "references", title: "References", hint: "Professional references." },
+  { key: "hobbies", title: "Hobbies", hint: "Interests and personal hobbies." },
+  { key: "conferences", title: "Conferences", hint: "Talks, events, and conferences." }
+] as const;
 
 const asTags = (value: unknown) =>
   Array.isArray(value)
@@ -366,6 +307,7 @@ export default function EditorForm({
     cloudId: string;
     cloudUpdatedAt: string;
   } | null>(null);
+  const [lastExplicitSaveChecksum, setLastExplicitSaveChecksum] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -423,6 +365,7 @@ export default function EditorForm({
 
       if (!active) return;
       setProfile(nextProfile);
+      setLastExplicitSaveChecksum(profileChecksum(nextProfile));
       setProfileMeta(nextMeta);
       setStorageMode(nextMode);
       setIsHydrated(true);
@@ -549,6 +492,7 @@ export default function EditorForm({
       setProfile(cloudProfile);
       const nextMode: ProfileStorageMode = opts?.forceCloud ? "cloud" : storageMode;
       setStorageMode(nextMode);
+      setLastExplicitSaveChecksum(cloudChecksum);
       persistProfileToLocal(cloudProfile, nextMode, {
         cloudId: cloudRecord.id,
         cloudChecksum,
@@ -583,6 +527,7 @@ export default function EditorForm({
 
       setStorageMode("cloud");
       setProfile(normalizedCloud);
+      setLastExplicitSaveChecksum(cloudChecksum);
       persistProfileToLocal(normalizedCloud, "cloud", {
         cloudId: saved.id,
         cloudChecksum,
@@ -600,6 +545,7 @@ export default function EditorForm({
   const saveLocalNow = () => {
     setSyncError(null);
     setSyncMessage("Saved locally.");
+    setLastExplicitSaveChecksum(profileChecksum(profile));
     persistProfileToLocal(profile, "local", {
       mode: "local"
     });
@@ -681,9 +627,14 @@ export default function EditorForm({
       const section = sections[sectionIndex];
       if (!section) return current;
       if (field === "type") {
+        const nextType = value as CvSectionType;
+        const duplicateType =
+          nextType !== "custom" &&
+          sections.some((candidate, candidateIndex) => candidateIndex !== sectionIndex && candidate.type === nextType);
+        if (duplicateType) return current;
         sections[sectionIndex] = {
           ...section,
-          type: value as CvSectionType
+          type: nextType
         };
       } else {
         sections[sectionIndex] = {
@@ -762,13 +713,26 @@ export default function EditorForm({
     updateSectionStyleField(selectedSectionIndex, field, value);
   };
 
-  const addSection = () => {
-    const newSection = createEmptySection("custom");
-    setProfile((current) => ({
-      ...current,
-      sections: [...current.sections, newSection]
-    }));
-    setSelectedSectionId(newSection.id);
+  const addSection = (type: CvSectionType = "custom", titleOverride?: string) => {
+    let newSectionId = "";
+    setProfile((current) => {
+      if (type !== "custom" && current.sections.some((section) => section.type === type)) {
+        return current;
+      }
+      const newSection = createEmptySection(type);
+      if (titleOverride) {
+        newSection.title = titleOverride;
+      }
+      newSectionId = newSection.id;
+      return {
+        ...current,
+        sections: [...current.sections, newSection]
+      };
+    });
+    if (newSectionId) {
+      setSelectedSectionId(newSectionId);
+      setActiveContentTab(`section:${newSectionId}`);
+    }
   };
 
   const removeSection = (sectionIndex: number) => {
@@ -900,20 +864,26 @@ export default function EditorForm({
   };
 
   const autoFormatDescription = (sectionIndex: number, itemIndex: number) => {
-    const section = profile.sections[sectionIndex];
-    const item = section?.items[itemIndex];
-    if (!section || !item) return;
-    const formatted = formatDescriptionText(section.type, item.description);
-    if (formatted === item.description) return;
-    updateItemField(sectionIndex, itemIndex, "description", formatted);
+    setProfile((current) => {
+      const sections = [...current.sections];
+      const section = sections[sectionIndex];
+      if (!section) return current;
+      const items = [...section.items];
+      const item = items[itemIndex];
+      if (!item) return current;
+      const formatted = normalizeDescriptionToHtml(section.type, item.description);
+      if (formatted === normalizeStoredDescriptionHtml(item.description)) return current;
+      items[itemIndex] = { ...item, description: formatted };
+      sections[sectionIndex] = { ...section, items };
+      return { ...current, sections };
+    });
   };
 
   const formatPastedDescription = (sectionIndex: number, itemIndex: number, pasted: string) => {
     const section = profile.sections[sectionIndex];
     const item = section?.items[itemIndex];
     if (!section || !item) return;
-    const formatted = formatDescriptionText(section.type, pasted);
-    return formatted;
+    return normalizeDescriptionPlainText(section.type, pasted);
   };
 
   const contentTabs = useMemo<ContentTabStatus[]>(() => {
@@ -959,6 +929,44 @@ export default function EditorForm({
 
     return tabs;
   }, [profile]);
+
+  const addSectionOptions = useMemo(() => {
+    const existingTypes = new Set(profile.sections.map((section) => section.type));
+    const existingTitles = new Set(
+      profile.sections.map((section) => section.title.trim().toLowerCase()).filter(Boolean)
+    );
+
+    const baseOptions = cvSectionTypes.map((type) => {
+      const isDuplicateType = type !== "custom" && existingTypes.has(type);
+      return {
+        value: type,
+        label: sectionTypeLabels[type],
+        hint: isDuplicateType
+          ? "Already added."
+          : type === "custom"
+            ? "Free-form section with custom title and content."
+            : `Add ${sectionTypeLabels[type].toLowerCase()} section.`,
+        disabled: isDuplicateType
+      };
+    });
+
+    const presetOptions = customSectionPresets.map((preset) => {
+      const isDuplicateTitle = existingTitles.has(preset.title.toLowerCase());
+      return {
+        value: `preset:${preset.key}`,
+        label: preset.title,
+        hint: isDuplicateTitle ? "Already added." : preset.hint,
+        disabled: isDuplicateTitle
+      };
+    });
+
+    return [...baseOptions, ...presetOptions];
+  }, [profile.sections]);
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!isHydrated || !lastExplicitSaveChecksum) return false;
+    return profileChecksum(profile) !== lastExplicitSaveChecksum;
+  }, [isHydrated, lastExplicitSaveChecksum, profile]);
 
   useEffect(() => {
     if (selectedSectionIdSafe !== selectedSectionId) {
@@ -1010,6 +1018,7 @@ export default function EditorForm({
       const cloudChecksum = profileChecksum(conflictState.localProfile);
       setStorageMode("cloud");
       setProfile(conflictState.localProfile);
+      setLastExplicitSaveChecksum(cloudChecksum);
       persistProfileToLocal(conflictState.localProfile, "cloud", {
         cloudId: saved.id,
         cloudChecksum,
@@ -1030,6 +1039,7 @@ export default function EditorForm({
     const cloudChecksum = profileChecksum(conflictState.cloudProfile);
     setStorageMode("cloud");
     setProfile(conflictState.cloudProfile);
+    setLastExplicitSaveChecksum(cloudChecksum);
     persistProfileToLocal(conflictState.cloudProfile, "cloud", {
       cloudId: conflictState.cloudId,
       cloudChecksum,
@@ -1049,6 +1059,7 @@ export default function EditorForm({
     });
     setStorageMode("local");
     setProfile(copy);
+    setLastExplicitSaveChecksum(profileChecksum(copy));
     persistProfileToLocal(copy, "local", {
       cloudId: null,
       cloudChecksum: null,
@@ -1072,6 +1083,14 @@ export default function EditorForm({
       <div className="xl:hidden">
         <EditorMobileTabs activeTab={activePanelTab} onTabChange={setActivePanelTab} />
       </div>
+
+      {hasUnsavedChanges ? (
+        <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2">
+          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-300 shadow-lg shadow-black/40">
+            Editing
+          </span>
+        </div>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[40fr_80fr_60fr] xl:items-start">
         <EditorStylePanel
@@ -1098,6 +1117,16 @@ export default function EditorForm({
             tabs={contentTabs}
             activeTab={activeContentTab}
             onTabChange={handleContentTabChange}
+            addSectionOptions={addSectionOptions}
+            onAddSection={(sectionType) => {
+              if (sectionType.startsWith("preset:")) {
+                const presetKey = sectionType.replace("preset:", "");
+                const preset = customSectionPresets.find((candidate) => candidate.key === presetKey);
+                if (preset) addSection("custom", preset.title);
+                return;
+              }
+              addSection(sectionType as CvSectionType);
+            }}
           >
             {activeContentTab === "import" ? (
               <Card>
@@ -1359,11 +1388,19 @@ export default function EditorForm({
                             }
                             className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
-                            {cvSectionTypes.map((type) => (
-                              <option key={type} value={type}>
-                                {type}
-                              </option>
-                            ))}
+                            {cvSectionTypes.map((type) => {
+                              const duplicateType =
+                                type !== "custom" &&
+                                profile.sections.some(
+                                  (section, sectionIndex) =>
+                                    sectionIndex !== activeContentSectionIndex && section.type === type
+                                );
+                              return (
+                                <option key={type} value={type} disabled={duplicateType}>
+                                  {sectionTypeLabels[type]}
+                                </option>
+                              );
+                            })}
                           </select>
                         </label>
                         <div className="flex items-end gap-2">
@@ -1731,9 +1768,6 @@ export default function EditorForm({
                                     onAutoFormat={() =>
                                       autoFormatDescription(activeContentSectionIndex, itemIndex)
                                     }
-                                    onBlur={() =>
-                                      autoFormatDescription(activeContentSectionIndex, itemIndex)
-                                    }
                                     onPasteText={(pasted) =>
                                       formatPastedDescription(activeContentSectionIndex, itemIndex, pasted) ??
                                       pasted
@@ -1806,7 +1840,7 @@ export default function EditorForm({
                       )}
                     </div>
 
-                    <Button type="button" onClick={addSection}>
+                    <Button type="button" onClick={() => addSection()}>
                       <Plus className="h-4 w-4" />
                       Add section
                     </Button>
@@ -1819,7 +1853,7 @@ export default function EditorForm({
                     <CardDescription>Add a section to continue.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button type="button" onClick={addSection}>
+                    <Button type="button" onClick={() => addSection()}>
                       <Plus className="h-4 w-4" />
                       Add section
                     </Button>

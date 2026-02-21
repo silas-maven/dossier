@@ -3,6 +3,8 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { CvProfile, CvSection } from "@/lib/cv-profile";
 import { contactInline, contactLines } from "@/lib/contact";
 import { formatDateRange } from "@/lib/date-format";
+import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
+import { ensurePdfFonts } from "@/lib/pdf-fonts";
 import { parseSkillEntries } from "@/lib/skill-levels";
 
 type CvPdfDocumentProps = {
@@ -41,17 +43,6 @@ const templateVariant = (templateId: string): TemplateVariant => {
   return "banded-grey";
 };
 
-type DescPart =
-  | { kind: "bullet"; text: string }
-  | { kind: "heading"; text: string }
-  | { kind: "para"; text: string };
-
-type InlinePart = {
-  text: string;
-  bold: boolean;
-  italic: boolean;
-};
-
 const DEFAULT_SECTION_TITLE_SIZE = 10;
 const DEFAULT_SECTION_BODY_SIZE = 9;
 
@@ -86,100 +77,23 @@ const sectionTitleLabel = (section: CvSection) =>
 const sectionShowDivider = (section: CvSection) =>
   typeof section.style?.showDivider === "boolean" ? section.style.showDivider : true;
 
-const stripInlineMarkers = (text: string) =>
-  text
-    .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1");
-
-const parseInlineParts = (text: string): InlinePart[] => {
-  if (!text) return [];
-  const tokenRe = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*]+\*)/g;
-  const out: InlinePart[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = tokenRe.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      out.push({ text: text.slice(lastIndex, match.index), bold: false, italic: false });
-    }
-    const token = match[0];
-    if (token.startsWith("***")) {
-      out.push({ text: token.slice(3, -3), bold: true, italic: true });
-    } else if (token.startsWith("**")) {
-      out.push({ text: token.slice(2, -2), bold: true, italic: false });
-    } else {
-      out.push({ text: token.slice(1, -1), bold: false, italic: true });
-    }
-    lastIndex = match.index + token.length;
-  }
-  if (lastIndex < text.length) {
-    out.push({ text: text.slice(lastIndex), bold: false, italic: false });
-  }
-  return out.filter((part) => part.text.length > 0);
-};
-
 const renderInlinePdf = (
-  text: string,
+  runs: InlineRun[],
   keyPrefix: string,
-  base?: { bold?: boolean; italic?: boolean }
+  base?: { bold?: boolean; italic?: boolean; underline?: boolean }
 ) =>
-  parseInlineParts(text).map((part, index) => (
+  runs.map((run, index) => (
     <Text
       key={`${keyPrefix}-${index}`}
       style={{
-        fontWeight: part.bold || base?.bold ? (700 as const) : (400 as const),
-        fontStyle: part.italic || base?.italic ? ("italic" as const) : ("normal" as const)
+        fontWeight: run.bold || base?.bold ? (700 as const) : (400 as const),
+        fontStyle: run.italic || base?.italic ? ("italic" as const) : ("normal" as const),
+        textDecoration: run.underline || base?.underline ? ("underline" as const) : ("none" as const)
       }}
     >
-      {part.text}
+      {run.text}
     </Text>
   ));
-
-const BULLET_RE = /^[-•*]\s+(.*)$/;
-const isHeadingLine = (line: string) => {
-  if (!line || BULLET_RE.test(line)) return false;
-  if (/[.!?]$/.test(line)) return false;
-  if (line.length > 72) return false;
-  return /[A-Za-z]/.test(line);
-};
-
-const parseDescription = (value: string): DescPart[] => {
-  const lines = value
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-  const parts: DescPart[] = [];
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
-    const bullet = line.match(BULLET_RE);
-    if (bullet?.[1]) {
-      const bulletText = bullet[1].trim();
-      const nextLine = lines[index + 1];
-      if (
-        nextLine &&
-        BULLET_RE.test(nextLine) &&
-        isHeadingLine(stripInlineMarkers(bulletText)) &&
-        !/[.!?]$/.test(stripInlineMarkers(bulletText))
-      ) {
-        parts.push({ kind: "heading", text: bulletText });
-      } else {
-        parts.push({ kind: "bullet", text: bulletText });
-      }
-      continue;
-    }
-
-    const cleanedLine = stripInlineMarkers(line);
-    const nextLine = lines[index + 1];
-    if (nextLine && BULLET_RE.test(nextLine)) {
-      parts.push({ kind: "heading", text: line });
-    } else if (isHeadingLine(cleanedLine)) {
-      parts.push({ kind: "heading", text: line });
-    } else {
-      parts.push({ kind: "para", text: line });
-    }
-  }
-  return parts;
-};
 
 const skillEntriesFromItem = (item: CvSection["items"][number]) => parseSkillEntries(item.description || "");
 
@@ -194,12 +108,23 @@ const renderDescriptionParts = (
   const bodySize = sectionBodySize(section);
   const headingSize = clamp(bodySize + 0.5, 8, 15);
   const textAlign = sectionTextAlign(section);
-  return (description: string) =>
-    parseDescription(description).map((part, index) => {
-      if (part.kind === "bullet" && sectionUsesBullets(section)) {
+  return (description: string) => {
+    const blocks = parseDescriptionBlocks(description);
+    let numberedIndex = 0;
+
+    return blocks.map((block, index) => {
+      if (block.kind === "numbered") {
+        numberedIndex += 1;
+      } else {
+        numberedIndex = 0;
+      }
+
+      if ((block.kind === "bullet" || block.kind === "numbered") && sectionUsesBullets(section)) {
         return (
           <View key={`${itemId}-b-${index}`} style={pdfStyles.bulletRow} wrap={false}>
-            <Text style={[pdfStyles.bulletGlyph, { fontSize: bodySize }]}>{sectionBulletGlyph(section)}</Text>
+            <Text style={[pdfStyles.bulletGlyph, { fontSize: bodySize }]}>
+              {block.kind === "numbered" ? `${numberedIndex}.` : sectionBulletGlyph(section)}
+            </Text>
             <Text
               style={[
                 pdfStyles.bulletText,
@@ -211,7 +136,7 @@ const renderDescriptionParts = (
                 }
               ]}
             >
-              {renderInlinePdf(part.text, `${itemId}-b-inline-${index}`, {
+              {renderInlinePdf(block.runs, `${itemId}-b-inline-${index}`, {
                 bold: sectionBulletBold(section),
                 italic: sectionBulletItalic(section)
               })}
@@ -226,18 +151,22 @@ const renderDescriptionParts = (
           style={[
             pdfStyles.itemDesc,
             {
-              fontSize: part.kind === "heading" ? headingSize : bodySize,
-              fontWeight: part.kind === "heading" && section.style.headingBold ? (700 as const) : (400 as const),
+              fontSize: block.kind === "heading" ? headingSize : bodySize,
+              fontWeight: block.kind === "heading" && section.style.headingBold ? (700 as const) : (400 as const),
               fontStyle:
-                part.kind === "heading" && section.style.headingItalic ? ("italic" as const) : ("normal" as const),
+                block.kind === "heading" && section.style.headingItalic ? ("italic" as const) : ("normal" as const),
               textAlign
             }
           ]}
         >
-          {renderInlinePdf(part.text, `${itemId}-p-inline-${index}`)}
+          {renderInlinePdf(block.runs, `${itemId}-p-inline-${index}`, {
+            bold: block.kind === "heading" && section.style.headingBold,
+            italic: block.kind === "heading" && section.style.headingItalic
+          })}
         </Text>
       );
     });
+  };
 };
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
@@ -272,7 +201,18 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
   };
 
   const fontFamily =
-    style.fontFamily === "serif" ? "Times-Roman" : style.fontFamily === "mono" ? "Courier" : "Helvetica";
+    variant === "sidebar-light" ||
+    variant === "sidebar-icons" ||
+    variant === "sidebar-navy-right" ||
+    variant === "sidebar-tan-dots" ||
+    variant === "boxed-header-dots" ||
+    variant === "skills-right-pink"
+      ? "DossierBody"
+      : style.fontFamily === "serif"
+        ? "Times-Roman"
+        : style.fontFamily === "mono"
+          ? "Courier"
+          : "Helvetica";
 
   const fallbackAccent =
     variant === "blue-rules"
@@ -582,6 +522,7 @@ const contactTwoLine = (profile: CvProfile) => {
 };
 
 export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
+  ensurePdfFonts();
   const variant = templateVariant(profile.templateId);
   const styles = stylesFor(variant, profile.style);
   const sections = visibleSections(profile);
@@ -725,46 +666,71 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const sideSections = sections.filter((s) => s.type === "skills" || s.type === "certifications");
     const mainSections = sections.filter((s) => s.type !== "skills" && s.type !== "certifications");
     const headline = profile.basics.headline?.trim();
+    const headingFont = "DossierHeading";
+    const bodyFont = "DossierBody";
+    const accent = profile.style.accentColor || "#232933";
+    const sidebarBg = profile.style.sidebarColor || "#EEF2F6";
 
     return (
       <Document>
         <Page size="A4" style={styles.page}>
-          <View style={styles.header}>
-            <Text style={[styles.name, { fontSize: 26 }]}>{profile.basics.name || "Your Name"}</Text>
-            {headline ? <Text style={styles.headline}>{headline}</Text> : null}
+          <View style={{ paddingBottom: 8 }}>
+            <Text
+              style={{
+                fontFamily: headingFont,
+                fontSize: 33,
+                fontWeight: 700,
+                letterSpacing: 1.8,
+                textTransform: "uppercase"
+              }}
+            >
+              {profile.basics.name || "Your Name"}
+            </Text>
+            {headline ? (
+              <Text style={{ marginTop: 6, fontFamily: bodyFont, fontSize: 10, color: "#6B7280" }}>{headline}</Text>
+            ) : null}
           </View>
+          <View style={{ height: 1, backgroundColor: "#D1D5DB" }} />
 
-          <View style={styles.execRow}>
-            <View style={styles.execSide}>
-              <Text style={styles.execSideTitle}>Details</Text>
+          <View style={{ marginTop: 12, flexDirection: "row" }}>
+            <View style={{ width: 182, padding: 12, backgroundColor: sidebarBg }}>
+              <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>DETAILS</Text>
               <View style={{ marginTop: 6 }}>
-                <Text style={styles.execSideText}>Address</Text>
-                <Text style={styles.execSideMuted}>{profile.basics.location || ""}</Text>
+                <Text style={{ fontFamily: headingFont, fontSize: 8.5, letterSpacing: 1.1, color: accent }}>ADDRESS</Text>
+                <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8.3, color: "#374151", lineHeight: 1.25 }}>
+                  {profile.basics.location || ""}
+                </Text>
                 <View style={{ height: 8 }} />
-                <Text style={styles.execSideText}>Phone</Text>
-                <Text style={styles.execSideMuted}>{profile.basics.phone || ""}</Text>
+                <Text style={{ fontFamily: headingFont, fontSize: 8.5, letterSpacing: 1.1, color: accent }}>PHONE</Text>
+                <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8.3, color: "#374151", lineHeight: 1.25 }}>
+                  {profile.basics.phone || ""}
+                </Text>
                 <View style={{ height: 8 }} />
-                <Text style={styles.execSideText}>Email</Text>
-                <Text style={styles.execSideMuted}>{profile.basics.email || ""}</Text>
+                <Text style={{ fontFamily: headingFont, fontSize: 8.5, letterSpacing: 1.1, color: accent }}>EMAIL</Text>
+                <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8.3, color: "#374151", lineHeight: 1.25 }}>
+                  {profile.basics.email || ""}
+                </Text>
                 {profile.basics.url ? (
                   <>
                     <View style={{ height: 8 }} />
-                    <Text style={styles.execSideText}>Website</Text>
-                    <Text style={styles.execSideMuted}>{contactLines(profile).find((l) => l.kind === "url")?.value ?? ""}</Text>
+                    <Text style={{ fontFamily: headingFont, fontSize: 8.5, letterSpacing: 1.1, color: accent }}>WEBSITE</Text>
+                    <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8.3, color: "#374151", lineHeight: 1.25 }}>
+                      {contactLines(profile).find((l) => l.kind === "url")?.value ?? ""}
+                    </Text>
                   </>
                 ) : null}
               </View>
 
               {skills.length > 0 ? (
                 <View style={{ marginTop: 14 }}>
-                  <Text style={styles.execSideTitle}>Skills</Text>
+                  <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>SKILLS</Text>
                   {skills.flatMap((section) =>
                     section.items.flatMap((item) => {
                       const out = skillLinesFromItem(item);
                       return out.map((line, index) => (
-                        <View key={`${item.id}-${index}`} style={{ marginTop: 6 }}>
-                          <Text style={styles.execSideText}>{line}</Text>
-                          <View style={{ height: 2, backgroundColor: "#111827", marginTop: 4, opacity: 0.7 }} />
+                        <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
+                          <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
+                          <View style={{ height: 3, backgroundColor: "#111827", marginTop: 3, opacity: 0.9 }} />
                         </View>
                       ));
                     })
@@ -776,15 +742,19 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 .filter((s) => s.type === "certifications")
                 .map((section) => (
                   <View key={section.id} style={{ marginTop: 14 }}>
-                    <Text style={styles.execSideTitle}>{sectionTitleLabel(section)}</Text>
+                    <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>
+                      {sectionTitleLabel(section)}
+                    </Text>
                     {section.items.map((item) => (
                       <View key={item.id} style={{ marginTop: 6 }}>
-                        <Text style={styles.execSideText}>{item.title}</Text>
+                        <Text style={{ fontFamily: bodyFont, fontSize: 8.5, color: "#111827" }}>{item.title}</Text>
                         {item.subtitle ? (
-                          <Text style={styles.execSideText}>{item.subtitle}</Text>
+                          <Text style={{ marginTop: 1, fontFamily: bodyFont, fontSize: 8.3, color: "#374151" }}>{item.subtitle}</Text>
                         ) : null}
                         {item.dateRange ? (
-                          <Text style={styles.execSideMuted}>{fmtDate(item.dateRange)}</Text>
+                          <Text style={{ marginTop: 1, fontFamily: bodyFont, fontSize: 8.1, color: "#6B7280" }}>
+                            {fmtDate(item.dateRange)}
+                          </Text>
                         ) : null}
                       </View>
                     ))}
@@ -792,35 +762,45 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 ))}
             </View>
 
-            <View style={styles.execMain}>
+            <View style={{ width: 15 }} />
+
+            <View style={{ flexGrow: 1, flexShrink: 1, fontFamily: bodyFont }}>
               {profileSummary ? (
                 <View style={styles.section}>
-                  <View style={styles.sectionHeader} minPresenceAhead={96} wrap={false}>
-                    <Text style={styles.sectionTitle}>Profile</Text>
+                  <View minPresenceAhead={96} wrap={false}>
+                    <Text style={{ fontFamily: headingFont, fontSize: 13, letterSpacing: 1.7, color: accent }}>PROFILE</Text>
+                    <View style={{ marginTop: 3, width: 32, height: 2, backgroundColor: accent }} />
                   </View>
-                  <Text style={[styles.itemDesc, { textAlign: summaryAlign }]}>{profileSummary}</Text>
+                  <Text style={[styles.itemDesc, { textAlign: summaryAlign, fontFamily: bodyFont }]}>{profileSummary}</Text>
                 </View>
               ) : null}
 
               {mainSections.map((section) => (
                 <View key={section.id} style={styles.section} minPresenceAhead={160}>
-                  <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
-                    <Text style={styles.sectionTitle}>{sectionTitleLabel(section)}</Text>
+                  <View minPresenceAhead={96} wrap={false}>
+                    <Text style={{ fontFamily: headingFont, fontSize: 13, letterSpacing: 1.7, color: accent }}>
+                      {sectionTitleLabel(section)}
+                    </Text>
+                    <View style={{ marginTop: 3, width: 32, height: 2, backgroundColor: accent }} />
                   </View>
                   {section.items.map((item) => (
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
-                          {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
+                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                          {item.subtitle ? (
+                            <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text>
+                          ) : null}
                         </View>
-                        {item.dateRange ? <Text style={styles.itemDate}>{fmtDate(item.dateRange)}</Text> : null}
+                        {item.dateRange ? (
+                          <Text style={[styles.itemDate, { width: 102, fontFamily: bodyFont }]}>{fmtDate(item.dateRange)}</Text>
+                        ) : null}
                       </View>
                       {item.description ? (
                         <View>{renderDescriptionParts(item.id, section, styles)(item.description)}</View>
                       ) : null}
                       {item.tags.length > 0 ? (
-                        <Text style={styles.tags}>{item.tags.join(" • ")}</Text>
+                        <Text style={[styles.tags, { fontFamily: bodyFont }]}>{item.tags.join(" • ")}</Text>
                       ) : null}
                     </View>
                   ))}
@@ -916,38 +896,58 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
     const url = contactLines(profile).find((l) => l.kind === "url")?.value ?? "";
+    const headingFont = "DossierHeading";
+    const bodyFont = "DossierBody";
+    const accent = profile.style.accentColor || "#1F2937";
+    const sidebarBg = profile.style.sidebarColor || "#F8FAFC";
 
     return (
       <Document>
         <Page size="A4" style={styles.page}>
-          <View style={[styles.header, { alignItems: "center" as const }]}>
-            <Text style={[styles.name, { fontSize: 20 }]}>{profile.basics.name || "Your Name"}</Text>
-            {headline ? <Text style={styles.headline}>{headline}</Text> : null}
-            <Text style={[styles.contact, { marginTop: 6 }]}>
-              {[profile.basics.location, profile.basics.email, profile.basics.phone].filter(Boolean).join(" • ")}
+          <View style={{ alignItems: "center", paddingBottom: 8 }}>
+            <Text style={{ fontFamily: headingFont, fontSize: 34, letterSpacing: 1.8, color: accent }}>
+              {(profile.basics.name || "Your Name").toUpperCase()}
             </Text>
-            {url ? <Text style={styles.contact}>{url}</Text> : null}
+            {headline ? (
+              <Text style={{ marginTop: 4, fontFamily: headingFont, fontSize: 9, letterSpacing: 1.2, color: accent }}>
+                {headline.toUpperCase()}
+              </Text>
+            ) : null}
+            <View style={{ marginTop: 7, flexDirection: "row", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+              {contactLines(profile).map((line) => (
+                <View key={line.kind} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: accent }} />
+                  <Text style={{ fontFamily: bodyFont, fontSize: 8.2, color: "#4B5563" }}>{line.value}</Text>
+                </View>
+              ))}
+            </View>
           </View>
 
-          <View style={{ marginTop: 14, flexDirection: "row" as const }}>
-            <View style={[styles.execSide, { width: 190 }]}>
-              <Text style={styles.execSideTitle}>Details</Text>
+          <View style={{ marginTop: 12, flexDirection: "row" as const }}>
+            <View style={{ width: 182, paddingVertical: 8, paddingHorizontal: 10, backgroundColor: sidebarBg }}>
+              <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>
+                • DETAILS •
+              </Text>
               <View style={{ marginTop: 6 }}>
-                <Text style={styles.execSideMuted}>{profile.basics.location || ""}</Text>
-                <Text style={styles.execSideMuted}>{profile.basics.phone || ""}</Text>
-                <Text style={styles.execSideMuted}>{profile.basics.email || ""}</Text>
-                {url ? <Text style={styles.execSideMuted}>{url}</Text> : null}
+                {[profile.basics.location, profile.basics.phone, profile.basics.email, url].filter(Boolean).map((line, idx) => (
+                  <View key={`${line}-${idx}`} style={{ marginTop: idx === 0 ? 0 : 3, flexDirection: "row", gap: 4, alignItems: "center" }}>
+                    <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: accent }} />
+                    <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#374151" }}>{line}</Text>
+                  </View>
+                ))}
               </View>
 
               {skills.length > 0 ? (
                 <View style={{ marginTop: 14 }}>
-                  <Text style={styles.execSideTitle}>Skills</Text>
+                  <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>
+                    • SKILLS •
+                  </Text>
                   {skills.flatMap((section) =>
                     section.items.flatMap((item) =>
                       skillLinesFromItem(item).map((line, index) => (
-                        <View key={`${item.id}-${index}`} style={{ marginTop: 8 }}>
-                          <Text style={styles.execSideText}>{line}</Text>
-                          <View style={{ height: 2, backgroundColor: "#111827", marginTop: 4, opacity: 0.6 }} />
+                        <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
+                          <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
+                          <View style={{ height: 2, backgroundColor: accent, marginTop: 3, opacity: 0.85 }} />
                         </View>
                       ))
                     )
@@ -956,34 +956,45 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
             </View>
 
-            <View style={{ width: 1, backgroundColor: "#9CA3AF", opacity: 0.5, marginHorizontal: 14 }} />
+            <View style={{ width: 1, backgroundColor: "#9CA3AF", opacity: 0.55, marginHorizontal: 14 }} />
 
-            <View style={{ flexGrow: 1 }}>
+            <View style={{ flexGrow: 1, flexShrink: 1 }}>
               {profileSummary ? (
                 <View style={styles.section}>
-                  <View style={styles.sectionHeader} minPresenceAhead={96} wrap={false}>
-                    <Text style={styles.sectionTitle}>Profile</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }} minPresenceAhead={96} wrap={false}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: accent }} />
+                    <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.6, color: accent }}>
+                      PROFILE
+                    </Text>
                   </View>
-                  <Text style={[styles.itemDesc, { textAlign: summaryAlign }]}>{profileSummary}</Text>
+                  <Text style={[styles.itemDesc, { textAlign: summaryAlign, fontFamily: bodyFont }]}>{profileSummary}</Text>
                 </View>
               ) : null}
 
               {mainSections.map((section) => (
                 <View key={section.id} style={styles.section} minPresenceAhead={160}>
-                  <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
-                    <Text style={styles.sectionTitle}>• {sectionTitleLabel(section)}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }} minPresenceAhead={96} wrap={false}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: accent }} />
+                    <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.6, color: accent }}>
+                      {sectionTitleLabel(section)}
+                    </Text>
                   </View>
                   {section.items.map((item) => (
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
-                          {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
+                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                          {item.subtitle ? <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text> : null}
                         </View>
-                        {item.dateRange ? <Text style={styles.itemDate}>{fmtDate(item.dateRange)}</Text> : null}
+                        {item.dateRange ? (
+                          <Text style={[styles.itemDate, { width: 104, fontFamily: bodyFont }]}>{fmtDate(item.dateRange)}</Text>
+                        ) : null}
                       </View>
                       {item.description ? (
                         <View>{renderDescriptionParts(item.id, section, styles)(item.description)}</View>
+                      ) : null}
+                      {item.tags.length > 0 ? (
+                        <Text style={[styles.tags, { fontFamily: bodyFont }]}>{item.tags.join(" • ")}</Text>
                       ) : null}
                     </View>
                   ))}
@@ -1443,14 +1454,18 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const mainSections = sections.filter((s) => s.type !== "skills");
     const skills = sections.filter((s) => s.type === "skills");
     const accent = profile.style.accentColor || "#F43F5E";
+    const headingFont = "DossierHeading";
+    const bodyFont = "DossierBody";
 
     return (
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={[styles.header, { borderBottomWidth: 0, paddingBottom: 0 }]}>
-            <Text style={[styles.name, { fontSize: 18 }]}>{profile.basics.name || "Your Name"}</Text>
-            {headline ? <Text style={styles.headline}>{headline}</Text> : null}
-            <Text style={[styles.contact, { marginTop: 6 }]}>
+            <Text style={[styles.name, { fontSize: 24, color: accent, fontFamily: headingFont }]}>
+              {profile.basics.name || "Your Name"}
+            </Text>
+            {headline ? <Text style={[styles.headline, { color: accent, fontFamily: bodyFont }]}>{headline}</Text> : null}
+            <Text style={[styles.contact, { marginTop: 6, fontFamily: bodyFont }]}>
               {contactInline(profile, " • ") || "Contact details"}
             </Text>
           </View>
@@ -1460,28 +1475,46 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {profileSummary ? (
                 <View style={styles.section}>
                   <View style={styles.sectionHeader} minPresenceAhead={96} wrap={false}>
-                    <Text style={[styles.sectionTitle, { color: accent }]}>Profile</Text>
+                    <Text style={[styles.sectionTitle, { color: accent, fontFamily: headingFont }]}>Profile</Text>
                   </View>
-                  <Text style={[styles.itemDesc, { textAlign: summaryAlign }]}>{profileSummary}</Text>
+                  <Text style={[styles.itemDesc, { textAlign: summaryAlign, fontFamily: bodyFont }]}>{profileSummary}</Text>
                 </View>
               ) : null}
 
               {mainSections.map((section) => (
                 <View key={section.id} style={styles.section} minPresenceAhead={160}>
-                  <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
-                    <Text style={[styles.sectionTitle, { color: accent }]}>{sectionTitleLabel(section)}</Text>
+                  <View
+                    style={[
+                      styles.sectionHeader,
+                      !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {},
+                      { borderBottomColor: accent }
+                    ]}
+                    minPresenceAhead={96}
+                    wrap={false}
+                  >
+                    <Text
+                      style={[
+                        styles.sectionTitle,
+                        { color: accent, fontSize: sectionTitleSize(section), fontFamily: headingFont }
+                      ]}
+                    >
+                      {sectionTitleLabel(section)}
+                    </Text>
                   </View>
 
                   {section.items.map((item) => (
                     <View key={item.id} style={{ marginTop: 10, flexDirection: "row", gap: 12 }}>
-                      <Text style={{ width: 96, fontSize: 8.5, color: accent }}>
+                      <Text style={{ width: 96, fontSize: 8.7, color: accent, fontFamily: bodyFont }}>
                         {item.dateRange ? fmtDate(item.dateRange) : ""}
                       </Text>
                       <View style={{ flexGrow: 1 }}>
-                        <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
-                        {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
+                        <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                        {item.subtitle ? <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text> : null}
                         {item.description ? (
                           <View>{renderDescriptionParts(item.id, section, styles)(item.description)}</View>
+                        ) : null}
+                        {item.tags.length > 0 ? (
+                          <Text style={[styles.tags, { fontFamily: bodyFont }]}>{item.tags.join(" • ")}</Text>
                         ) : null}
                       </View>
                     </View>
@@ -1493,14 +1526,14 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
             <View style={{ width: 185 }}>
               {skills.map((section) => (
                 <View key={section.id} style={{ marginTop: 14 }}>
-                  <Text style={[styles.sectionTitle, { color: accent }]}>
+                  <Text style={[styles.sectionTitle, { color: accent, fontSize: sectionTitleSize(section), fontFamily: headingFont }]}>
                     {sectionTitleLabel(section) || "Skills"}
                   </Text>
                   <View style={{ marginTop: 10 }}>
                     {section.items.flatMap((item) =>
                       skillEntriesFromItem(item).map((entry, idx) => (
                         <View key={`${item.id}-${idx}`} style={{ marginTop: 10 }}>
-                          <Text style={{ fontSize: 9, color: "#111827" }}>{entry.name}</Text>
+                          <Text style={{ fontSize: 9, color: "#111827", fontFamily: bodyFont }}>{entry.name}</Text>
                           <View style={{ flexDirection: "row", gap: 4, marginTop: 6, flexWrap: "wrap" as const }}>
                             {Array.from({ length: 10 }).map((_, i) => (
                               <View
@@ -1509,7 +1542,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                                   width: 4,
                                   height: 4,
                                   borderRadius: 2,
-                                  backgroundColor: i < entry.level * 2 ? accent : "rgba(244,63,94,0.15)"
+                                  backgroundColor: i < entry.level * 2 ? accent : "rgba(244,63,94,0.18)"
                                 }}
                               />
                             ))}

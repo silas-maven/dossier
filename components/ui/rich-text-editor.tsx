@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 
 import { Button } from "@/components/ui/button";
+import {
+  descriptionToEditorHtml,
+  normalizeStoredDescriptionHtml
+} from "@/lib/description-format";
 import { cn } from "@/lib/utils";
 
 type RichTextEditorProps = {
@@ -14,89 +21,6 @@ type RichTextEditorProps = {
   className?: string;
 };
 
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-const lineToInlineHtml = (value: string) => {
-  const escaped = escapeHtml(value);
-  return escaped
-    .replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
-};
-
-const markdownToHtml = (value: string) => {
-  const lines = value.replace(/\r/g, "\n").split("\n");
-  if (lines.length === 0) return "<div><br></div>";
-
-  return lines
-    .map((rawLine) => {
-      const line = rawLine ?? "";
-      const bulletMatch = line.match(/^[-•*]\s+(.*)$/);
-      if (bulletMatch) {
-        const contentHtml = lineToInlineHtml(bulletMatch[1] || "");
-        return `<div data-bullet="1"><span contenteditable="false">• </span><span data-content="1">${contentHtml || "<br>"}</span></div>`;
-      }
-      return `<div><span data-content="1">${lineToInlineHtml(line) || "<br>"}</span></div>`;
-    })
-    .join("");
-};
-
-const normalizeSpaces = (value: string) =>
-  value.replace(/\u00a0/g, " ").replace(/\s+$/g, "");
-
-const serializeInlineNode = (
-  node: Node,
-  state: { bold: boolean; italic: boolean } = { bold: false, italic: false }
-): string => {
-  if (node.nodeType === Node.TEXT_NODE) {
-    const text = normalizeSpaces(node.textContent || "");
-    if (!text) return "";
-    if (state.bold && state.italic) return `***${text}***`;
-    if (state.bold) return `**${text}**`;
-    if (state.italic) return `*${text}*`;
-    return text;
-  }
-
-  if (node.nodeType !== Node.ELEMENT_NODE) return "";
-  const el = node as HTMLElement;
-  const tag = el.tagName;
-  const nextState = {
-    bold: state.bold || tag === "B" || tag === "STRONG",
-    italic: state.italic || tag === "I" || tag === "EM"
-  };
-
-  return Array.from(el.childNodes)
-    .map((child) => serializeInlineNode(child, nextState))
-    .join("");
-};
-
-const htmlToMarkdown = (root: HTMLElement) => {
-  const blockNodes = Array.from(root.childNodes).filter((node) => {
-    if (node.nodeType === Node.TEXT_NODE) return (node.textContent || "").trim().length > 0;
-    return true;
-  });
-
-  if (blockNodes.length === 0) return "";
-
-  const lines = blockNodes.map((node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return normalizeSpaces(node.textContent || "");
-    }
-    const block = node as HTMLElement;
-    const isBullet = block.dataset.bullet === "1";
-    const target = (block.querySelector("[data-content='1']") as HTMLElement | null) ?? block;
-    const serialized = serializeInlineNode(target).trim();
-    if (!serialized) return "";
-    return isBullet ? `- ${serialized}` : serialized;
-  });
-
-  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd();
-};
-
 export default function RichTextEditor({
   value,
   onChange,
@@ -105,30 +29,49 @@ export default function RichTextEditor({
   onPasteText,
   className
 }: RichTextEditorProps) {
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const htmlValue = useMemo(() => markdownToHtml(value || ""), [value]);
+  const incomingHtml = useMemo(() => descriptionToEditorHtml(value), [value]);
+  const incomingStored = useMemo(
+    () => normalizeStoredDescriptionHtml(incomingHtml),
+    [incomingHtml]
+  );
+
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        blockquote: false,
+        codeBlock: false,
+        horizontalRule: false
+      }),
+      Underline
+    ],
+    content: incomingHtml,
+    editorProps: {
+      attributes: {
+        class:
+          "min-h-24 w-full whitespace-pre-wrap rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5"
+      }
+    },
+    onUpdate: ({ editor: nextEditor }) => {
+      const sanitized = normalizeStoredDescriptionHtml(nextEditor.getHTML());
+      onChange(sanitized);
+    },
+    onBlur: () => {
+      onBlur?.();
+    }
+  });
 
   useEffect(() => {
-    const editor = editorRef.current;
     if (!editor) return;
-    if (document.activeElement === editor) return;
-    if (editor.innerHTML !== htmlValue) {
-      editor.innerHTML = htmlValue;
-    }
-  }, [htmlValue]);
+    const currentStored = normalizeStoredDescriptionHtml(editor.getHTML());
+    if (currentStored === incomingStored) return;
+    editor.commands.setContent(incomingHtml || "<p></p>", { emitUpdate: false });
+  }, [editor, incomingHtml, incomingStored]);
 
-  const syncFromDom = () => {
-    const editor = editorRef.current;
+  const applyCommand = (fn: () => void) => {
     if (!editor) return;
-    onChange(htmlToMarkdown(editor));
-  };
-
-  const applyInlineFormat = (command: "bold" | "italic") => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    editor.focus();
-    document.execCommand(command, false);
-    syncFromDom();
+    fn();
   };
 
   return (
@@ -138,10 +81,10 @@ export default function RichTextEditor({
         <span className="flex items-center gap-2">
           <Button
             type="button"
-            variant="secondary"
+            variant={editor?.isActive("bold") ? "default" : "secondary"}
             size="sm"
             onMouseDown={(event) => event.preventDefault()}
-            onClick={() => applyInlineFormat("bold")}
+            onClick={() => applyCommand(() => editor?.chain().focus().toggleBold().run())}
             aria-label="Bold selected text"
             className="font-semibold"
           >
@@ -149,14 +92,57 @@ export default function RichTextEditor({
           </Button>
           <Button
             type="button"
-            variant="secondary"
+            variant={editor?.isActive("italic") ? "default" : "secondary"}
             size="sm"
             onMouseDown={(event) => event.preventDefault()}
-            onClick={() => applyInlineFormat("italic")}
+            onClick={() => applyCommand(() => editor?.chain().focus().toggleItalic().run())}
             aria-label="Italicize selected text"
             className="italic"
           >
             I
+          </Button>
+          <Button
+            type="button"
+            variant={editor?.isActive("underline") ? "default" : "secondary"}
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => applyCommand(() => editor?.chain().focus().toggleUnderline().run())}
+            aria-label="Underline selected text"
+            className="underline"
+          >
+            U
+          </Button>
+          <Button
+            type="button"
+            variant={editor?.isActive("bulletList") ? "default" : "secondary"}
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => applyCommand(() => editor?.chain().focus().toggleBulletList().run())}
+            aria-label="Toggle bullet list"
+          >
+            • List
+          </Button>
+          <Button
+            type="button"
+            variant={editor?.isActive("orderedList") ? "default" : "secondary"}
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => applyCommand(() => editor?.chain().focus().toggleOrderedList().run())}
+            aria-label="Toggle numbered list"
+          >
+            1. List
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() =>
+              applyCommand(() => editor?.chain().focus().unsetAllMarks().clearNodes().run())
+            }
+            aria-label="Clear formatting"
+          >
+            Clear
           </Button>
           {onAutoFormat ? (
             <Button
@@ -166,7 +152,7 @@ export default function RichTextEditor({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => {
                 onAutoFormat();
-                requestAnimationFrame(() => editorRef.current?.focus());
+                requestAnimationFrame(() => editor?.commands.focus());
               }}
             >
               Auto format
@@ -175,23 +161,16 @@ export default function RichTextEditor({
         </span>
       </div>
 
-      <div
-        ref={editorRef}
-        contentEditable
-        suppressContentEditableWarning
-        className="min-h-24 w-full whitespace-pre-wrap rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        onInput={syncFromDom}
-        onBlur={() => {
-          syncFromDom();
-          onBlur?.();
-        }}
+      <EditorContent
+        editor={editor}
         onPaste={(event) => {
+          if (!editor || !onPasteText) return;
           const pasted = event.clipboardData.getData("text/plain");
           if (!pasted) return;
+          const transformed = onPasteText(pasted);
+          if (transformed === pasted) return;
           event.preventDefault();
-          const text = onPasteText ? onPasteText(pasted) : pasted;
-          document.execCommand("insertText", false, text);
-          syncFromDom();
+          editor.chain().focus().insertContent(transformed.replace(/\r/g, "\n")).run();
         }}
       />
     </div>

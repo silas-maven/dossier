@@ -32,7 +32,7 @@ export const cvTemplates: CvTemplate[] = [
     id: "sidebar-light",
     name: "Sidebar Light",
     category: "Two Column",
-    description: "Light sidebar for details and skills with a clean main content column.",
+    description: "Editorial two-column layout with bold uppercase header and underlined skill tracks.",
     previewImage: "/card-images/sidebar-light.jpg"
   },
   {
@@ -46,7 +46,7 @@ export const cvTemplates: CvTemplate[] = [
     id: "sidebar-icons",
     name: "Sidebar Icons",
     category: "Consulting",
-    description: "Icon-led sidebar with clean separators and a strong vertical rhythm.",
+    description: "Centered heading with icon-led contact row, left skill rail, and vertical split.",
     previewImage: "/card-images/sidebar-icons.jpg"
   },
   {
@@ -74,7 +74,7 @@ export const cvTemplates: CvTemplate[] = [
     id: "skills-right-pink",
     name: "Skills Right (Pink)",
     category: "General",
-    description: "Two-column layout with a skills column and a soft pink accent.",
+    description: "Two-column layout with date gutter and dot-rated skills in the right rail.",
     previewImage: "/card-images/skills-right-pink.jpg"
   }
 ];

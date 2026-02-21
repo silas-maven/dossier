@@ -126,13 +126,13 @@ const defaultStyleForTemplate = (templateId: string): CvStyle => {
   if (templateId === "banded-grey") return { ...base, fontFamily: "serif", accentColor: "#111827", sidebarColor: "#F3F4F6" };
   if (templateId === "gutter-minimal") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
   if (templateId === "blue-rules") return { ...base, fontFamily: "sans", accentColor: "#2563EB", sidebarColor: "#F3F4F6" };
-  if (templateId === "sidebar-light") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
+  if (templateId === "sidebar-light") return { ...base, fontFamily: "sans", accentColor: "#232933", sidebarColor: "#EEF2F6" };
   if (templateId === "sidebar-navy-right") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#0B2F4A" };
-  if (templateId === "sidebar-icons") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
+  if (templateId === "sidebar-icons") return { ...base, fontFamily: "sans", accentColor: "#1F2937", sidebarColor: "#F8FAFC" };
   if (templateId === "sidebar-tan-dots") return { ...base, fontFamily: "sans", accentColor: "#B08968", sidebarColor: "#FAF7F2" };
   if (templateId === "skills-right-red") return { ...base, fontFamily: "serif", accentColor: "#DC2626", sidebarColor: "#FFFFFF" };
   if (templateId === "boxed-header-dots") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
-  if (templateId === "skills-right-pink") return { ...base, fontFamily: "sans", accentColor: "#F43F5E", sidebarColor: "#FFFFFF" };
+  if (templateId === "skills-right-pink") return { ...base, fontFamily: "sans", accentColor: "#F43F5E", sidebarColor: "#FFF1F6" };
   return base;
 };
 

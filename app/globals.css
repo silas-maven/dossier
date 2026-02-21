@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Dossier Body";
+  src: url("/fonts/dossier-lato-400.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dossier Body";
+  src: url("/fonts/dossier-lato-700.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dossier Heading";
+  src: url("/fonts/dossier-barlow-condensed-400.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dossier Heading";
+  src: url("/fonts/dossier-barlow-condensed-700.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: 225 22% 7%;
   --foreground: 210 20% 96%;
