@@ -133,7 +133,11 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
     style: {
       ...fallback.style,
       fontFamily:
-        style.fontFamily === "serif" || style.fontFamily === "mono" || style.fontFamily === "sans"
+        style.fontFamily === "serif" ||
+        style.fontFamily === "mono" ||
+        style.fontFamily === "sans" ||
+        style.fontFamily === "system-native" ||
+        style.fontFamily === "product-modern"
           ? style.fontFamily
           : fallback.style.fontFamily,
       baseFontSize:

@@ -24,6 +24,37 @@ const bulletGlyph = (style: CvSection["style"]["bulletStyle"]) => {
   return "•";
 };
 
+const resolveLiveFontStack = (fontFamily: CvProfile["style"]["fontFamily"]) => {
+  if (fontFamily === "serif") {
+    return {
+      headingFont: "\"Times New Roman\", Times, serif",
+      bodyFont: "Georgia, \"Times New Roman\", Times, serif"
+    };
+  }
+  if (fontFamily === "mono") {
+    return {
+      headingFont: "Menlo, Monaco, Consolas, \"Courier New\", monospace",
+      bodyFont: "Menlo, Monaco, Consolas, \"Courier New\", monospace"
+    };
+  }
+  if (fontFamily === "system-native") {
+    return {
+      headingFont: "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+      bodyFont: "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif"
+    };
+  }
+  if (fontFamily === "product-modern") {
+    return {
+      headingFont: "\"Open Sans\", \"Dossier Body\", \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+      bodyFont: "\"Open Sans\", \"Dossier Body\", \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif"
+    };
+  }
+  return {
+    headingFont: "\"Dossier Heading\", sans-serif",
+    bodyFont: "\"Dossier Body\", sans-serif"
+  };
+};
+
 const templateTone = (templateId: string) => {
   if (templateId === "times-serif") {
     return {
@@ -61,8 +92,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
   const summaryAlign = profile.style.summaryAlign ?? "left";
   const lineSpacing = profile.style.lineSpacing ?? 1.35;
   const accent = profile.style.accentColor || "#F43F5E";
-  const headingFont = "\"Dossier Heading\", sans-serif";
-  const bodyFont = "\"Dossier Body\", sans-serif";
+  const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
 
   const renderRuns = (
     runs: InlineRun[],

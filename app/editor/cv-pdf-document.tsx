@@ -189,6 +189,33 @@ const isDarkHex = (hex: string) => {
   return luma < 0.55;
 };
 
+const usesDossierSansByDefault = (variant: TemplateVariant) =>
+  variant === "sidebar-light" ||
+  variant === "sidebar-icons" ||
+  variant === "sidebar-navy-right" ||
+  variant === "sidebar-tan-dots" ||
+  variant === "boxed-header-dots" ||
+  variant === "skills-right-pink";
+
+const resolvePdfFontPair = (
+  variant: TemplateVariant,
+  fontFamily: CvProfile["style"]["fontFamily"]
+) => {
+  if (fontFamily === "serif") {
+    return { bodyFont: "Times-Roman", headingFont: "Times-Bold" };
+  }
+  if (fontFamily === "mono") {
+    return { bodyFont: "Courier", headingFont: "Courier-Bold" };
+  }
+  if (fontFamily === "system-native" || fontFamily === "product-modern") {
+    return { bodyFont: "Helvetica", headingFont: "Helvetica-Bold" };
+  }
+  if (usesDossierSansByDefault(variant)) {
+    return { bodyFont: "DossierBody", headingFont: "DossierHeading" };
+  }
+  return { bodyFont: "Helvetica", headingFont: "Helvetica-Bold" };
+};
+
 const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
   const pageMargin = clamp(style.pageMarginPx || 42, 12, 96);
   const lineHeight = clamp(style.lineSpacing || 1.35, 1, 2);
@@ -200,19 +227,7 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
     color: "#111827"
   };
 
-  const fontFamily =
-    variant === "sidebar-light" ||
-    variant === "sidebar-icons" ||
-    variant === "sidebar-navy-right" ||
-    variant === "sidebar-tan-dots" ||
-    variant === "boxed-header-dots" ||
-    variant === "skills-right-pink"
-      ? "DossierBody"
-      : style.fontFamily === "serif"
-        ? "Times-Roman"
-        : style.fontFamily === "mono"
-          ? "Courier"
-          : "Helvetica";
+  const { bodyFont } = resolvePdfFontPair(variant, style.fontFamily);
 
   const fallbackAccent =
     variant === "blue-rules"
@@ -235,7 +250,7 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
   return StyleSheet.create({
     page: {
       ...base,
-      fontFamily,
+      fontFamily: bodyFont,
       fontSize: base.fontSize,
       paddingHorizontal: variant === "gutter-minimal" ? Math.max(24, pageMargin - 6) : base.paddingHorizontal
     },
@@ -666,8 +681,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const sideSections = sections.filter((s) => s.type === "skills" || s.type === "certifications");
     const mainSections = sections.filter((s) => s.type !== "skills" && s.type !== "certifications");
     const headline = profile.basics.headline?.trim();
-    const headingFont = "DossierHeading";
-    const bodyFont = "DossierBody";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
     const accent = profile.style.accentColor || "#232933";
     const sidebarBg = profile.style.sidebarColor || "#EEF2F6";
 
@@ -896,8 +910,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
     const url = contactLines(profile).find((l) => l.kind === "url")?.value ?? "";
-    const headingFont = "DossierHeading";
-    const bodyFont = "DossierBody";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
     const accent = profile.style.accentColor || "#1F2937";
     const sidebarBg = profile.style.sidebarColor || "#F8FAFC";
 
@@ -1454,8 +1467,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const mainSections = sections.filter((s) => s.type !== "skills");
     const skills = sections.filter((s) => s.type === "skills");
     const accent = profile.style.accentColor || "#F43F5E";
-    const headingFont = "DossierHeading";
-    const bodyFont = "DossierBody";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
 
     return (
       <Document>

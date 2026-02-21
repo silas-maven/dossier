@@ -54,7 +54,7 @@ export type CvSection = {
 
 export type CvStyle = {
   // Template-specific styling controls (kept intentionally small to stay stable).
-  fontFamily: "sans" | "serif" | "mono";
+  fontFamily: "sans" | "serif" | "mono" | "system-native" | "product-modern";
   baseFontSize: number; // PDF base font size (9-12)
   summaryAlign: "left" | "center" | "right";
   lineSpacing: number;

@@ -63,6 +63,8 @@ export default function EditorStylePanel({
               <option value="sans">Sans</option>
               <option value="serif">Serif</option>
               <option value="mono">Mono</option>
+              <option value="system-native">System Native</option>
+              <option value="product-modern">Open Sans + Menlo</option>
             </select>
           </label>
 
