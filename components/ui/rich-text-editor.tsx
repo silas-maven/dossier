@@ -3,7 +3,6 @@
 import { useEffect, useMemo } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,8 +42,7 @@ export default function RichTextEditor({
         blockquote: false,
         codeBlock: false,
         horizontalRule: false
-      }),
-      Underline
+      })
     ],
     content: incomingHtml,
     editorProps: {

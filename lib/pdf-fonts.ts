@@ -9,7 +9,9 @@ export const ensurePdfFonts = () => {
     family: "DossierBody",
     fonts: [
       { src: "/fonts/dossier-lato-400.woff", fontWeight: 400 },
-      { src: "/fonts/dossier-lato-700.woff", fontWeight: 700 }
+      { src: "/fonts/dossier-lato-400-italic.woff", fontWeight: 400, fontStyle: "italic" },
+      { src: "/fonts/dossier-lato-700.woff", fontWeight: 700 },
+      { src: "/fonts/dossier-lato-700-italic.woff", fontWeight: 700, fontStyle: "italic" }
     ]
   });
 
