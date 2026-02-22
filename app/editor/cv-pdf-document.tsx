@@ -332,6 +332,7 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
     itemMain: {
       flexGrow: 1,
       flexShrink: 1,
+      flexBasis: 0,
       paddingRight: 8
     },
     itemTitle: {
@@ -368,6 +369,7 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
     },
     bulletText: {
       flexGrow: 1,
+      flexShrink: 1,
       fontSize: 9,
       color: "#374151",
       lineHeight
@@ -778,7 +780,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
 
             <View style={{ width: 15 }} />
 
-            <View style={{ flexGrow: 1, flexShrink: 1, fontFamily: bodyFont }}>
+            <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, fontFamily: bodyFont }}>
               {profileSummary ? (
                 <View style={styles.section}>
                   <View minPresenceAhead={96} wrap={false}>
@@ -971,7 +973,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
 
             <View style={{ width: 1, backgroundColor: "#9CA3AF", opacity: 0.55, marginHorizontal: 14 }} />
 
-            <View style={{ flexGrow: 1, flexShrink: 1 }}>
+            <View style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0 }}>
               {profileSummary ? (
                 <View style={styles.section}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }} minPresenceAhead={96} wrap={false}>

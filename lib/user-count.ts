@@ -6,11 +6,13 @@ export const getDossierUserCount = async (): Promise<number | null> => {
 
   const { data, error } = await supabase
     .from("dossier_app_metrics")
-    .select("total_users")
+    .select("total_visitors,total_users")
     .eq("id", 1)
     .maybeSingle();
 
   if (error) return null;
-  if (!data || typeof data.total_users !== "number") return null;
-  return data.total_users;
+  if (!data) return null;
+  if (typeof data.total_visitors === "number") return data.total_visitors;
+  if (typeof data.total_users === "number") return data.total_users;
+  return null;
 };

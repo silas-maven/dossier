@@ -54,19 +54,23 @@ const profileSnapshotHash = (profile: CvProfile) => {
 
 type StablePdfViewerProps = {
   profile: CvProfile;
+  viewerKey: string;
   className?: string;
   viewerClassName?: string;
 };
 
 const StablePdfViewer = memo(function StablePdfViewer({
   profile,
+  viewerKey,
   className,
   viewerClassName
 }: StablePdfViewerProps) {
   const documentNode = useMemo(() => <CvPdfDocument profile={profile} />, [profile]);
   return (
     <div className={className}>
-      <PDFViewer className={viewerClassName ?? "h-full w-full"}>{documentNode}</PDFViewer>
+      <PDFViewer key={viewerKey} className={viewerClassName ?? "h-full w-full"}>
+        {documentNode}
+      </PDFViewer>
     </div>
   );
 });
@@ -84,6 +88,10 @@ export default function CvPreviewPane({
   const [pdfSnapshot, setPdfSnapshot] = useState(() => profileSnapshotHash(profile));
   const nextSnapshot = useMemo(() => profileSnapshotHash(profile), [profile]);
   const previewProfile = mode === "pdf" ? pdfPreviewProfile : htmlPreviewProfile;
+  const viewerKey = useMemo(
+    () => `${previewProfile.templateId}:${profileSnapshotHash(previewProfile)}`,
+    [previewProfile]
+  );
   const isEditorDark = variant === "editorDark";
 
   useEffect(() => {
@@ -181,6 +189,7 @@ export default function CvPreviewPane({
               {mode === "pdf" ? (
                 <StablePdfViewer
                   profile={previewProfile}
+                  viewerKey={viewerKey}
                   className="h-full overflow-hidden rounded-xl border border-white/10 bg-[#0c1220]"
                 />
               ) : (
@@ -202,7 +211,7 @@ export default function CvPreviewPane({
               : "h-[70vh]"
           )}
         >
-          <StablePdfViewer profile={previewProfile} className="h-full w-full" />
+          <StablePdfViewer profile={previewProfile} viewerKey={viewerKey} className="h-full w-full" />
         </div>
       ) : (
         <CvLivePreview profile={previewProfile} templateName={templateName} />

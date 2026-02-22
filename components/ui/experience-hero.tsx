@@ -256,8 +256,8 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               id: "003",
               title: "Community",
               value: userCount !== null && userCount !== undefined ? `${userCount} Users` : "Live Count",
-              detailA: "Total users tracked in DB",
-              detailB: "Cloud is per-user secured"
+              detailA: "Unique visitors (local + cloud)",
+              detailB: "Cloud remains per-user secured"
             }
           ].map((item) => (
             <article key={item.id} className="command-cell glass-panel p-6 sm:p-7">

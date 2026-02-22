@@ -1089,8 +1089,8 @@ export default function EditorForm({
       </div>
 
       {hasUnsavedChanges ? (
-        <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2">
-          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-300 shadow-lg shadow-black/40">
+        <div className="flex justify-center">
+          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-300 shadow-sm shadow-black/20">
             Editing
           </span>
         </div>
