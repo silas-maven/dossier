@@ -31,7 +31,9 @@ export default function VisitorTracker() {
 
     const payload = JSON.stringify({
       visitorId,
-      path: window.location.pathname
+      path: window.location.pathname,
+      search: window.location.search,
+      referrer: document.referrer || ""
     });
 
     if (typeof navigator.sendBeacon === "function") {
