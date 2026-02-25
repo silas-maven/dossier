@@ -24,6 +24,15 @@ const bulletGlyph = (style: CvSection["style"]["bulletStyle"]) => {
   return "•";
 };
 
+const skillLabel = (section: CvSection, value: string, suppressBullets = false) => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (section.style.enableBullets && !suppressBullets) {
+    return `${bulletGlyph(section.style.bulletStyle)} ${trimmed}`;
+  }
+  return trimmed;
+};
+
 const resolveLiveFontStack = (fontFamily: CvProfile["style"]["fontFamily"]) => {
   if (fontFamily === "serif") {
     return {
@@ -245,7 +254,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         .flatMap((item) =>
                           parseSkillEntries(item.description).map((entry, index) => (
                             <div key={`${item.id}-${index}`}>
-                              <p className="text-xs text-foreground">{entry.name}</p>
+                              <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
                               <div className="mt-1 h-[3px] w-full bg-foreground/90" />
                             </div>
                           ))
@@ -401,7 +410,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         .flatMap((item) =>
                           parseSkillEntries(item.description).map((entry, index) => (
                             <div key={`${item.id}-${index}`}>
-                              <p className="text-xs text-foreground">{entry.name}</p>
+                              <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
                               <div className="mt-1 h-[2px] w-full bg-foreground/70" />
                             </div>
                           ))
@@ -560,7 +569,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         .flatMap((item) =>
                           parseSkillEntries(item.description).map((entry, index) => (
                             <div key={`${item.id}-${index}`}>
-                              <p className="text-sm text-foreground">{entry.name}</p>
+                              <p className="text-sm text-foreground">{skillLabel(section, entry.name, true)}</p>
                               <div className="mt-1 flex items-center gap-1">
                                 {Array.from({ length: 10 }).map((_, dotIndex) => (
                                   <span
@@ -659,7 +668,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                                       className="text-muted-foreground"
                                       style={{ fontSize: `${Math.max(11, section.style.bodyFontSize + 3)}px` }}
                                     >
-                                      {entry.name}
+                                      {skillLabel(section, entry.name, usesSkillDots)}
                                     </p>
                                     {usesSkillDots ? (
                                       <div className="mt-1 flex items-center gap-1">
@@ -731,7 +740,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                                 className="break-words text-muted-foreground"
                                 style={{ fontSize: `${Math.max(11, section.style.bodyFontSize + 3)}px` }}
                               >
-                                {entry.name}
+                                {skillLabel(section, entry.name)}
                               </p>
                             ))
                           )}

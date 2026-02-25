@@ -97,8 +97,23 @@ const renderInlinePdf = (
 
 const skillEntriesFromItem = (item: CvSection["items"][number]) => parseSkillEntries(item.description || "");
 
-const skillLinesFromItem = (item: CvSection["items"][number]) =>
-  skillEntriesFromItem(item).map((entry) => entry.name);
+const skillLabel = (section: CvSection, value: string, suppressBullets = false) => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (sectionUsesBullets(section) && !suppressBullets) {
+    return `${sectionBulletGlyph(section)} ${trimmed}`;
+  }
+  return trimmed;
+};
+
+const skillLinesFromItem = (
+  section: CvSection,
+  item: CvSection["items"][number],
+  options?: { suppressBullets?: boolean }
+) =>
+  skillEntriesFromItem(item)
+    .map((entry) => skillLabel(section, entry.name, options?.suppressBullets))
+    .filter(Boolean);
 
 const renderDescriptionParts = (
   itemId: string,
@@ -610,7 +625,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 <View style={{ marginTop: 6 }}>
                   {section.items.map((item) => {
                     const category = (item.title || "").trim();
-                    const skills = skillLinesFromItem(item);
+                    const skills = skillLinesFromItem(section, item);
                     if (skills.length === 0) return null;
                     const bodySize = sectionBodySize(section);
                     const columns = sectionSkillsColumns(section);
@@ -742,7 +757,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>SKILLS</Text>
                   {skills.flatMap((section) =>
                     section.items.flatMap((item) => {
-                      const out = skillLinesFromItem(item);
+                      const out = skillLinesFromItem(section, item);
                       return out.map((line, index) => (
                         <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
                           <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
@@ -890,7 +905,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 <View key={section.id} style={styles.sideBlock}>
                   <Text style={styles.sideLabel}>{sectionTitleLabel(section)}</Text>
                   {section.items.flatMap((item) => {
-                    const out = skillLinesFromItem(item);
+                    const out = skillLinesFromItem(section, item);
                     return out.map((line, index) => (
                       <View key={`${item.id}-${index}`} style={{ marginTop: 6 }}>
                         <Text style={styles.sideText}>{line}</Text>
@@ -959,7 +974,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   </Text>
                   {skills.flatMap((section) =>
                     section.items.flatMap((item) =>
-                      skillLinesFromItem(item).map((line, index) => (
+                      skillLinesFromItem(section, item).map((line, index) => (
                         <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
                           <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
                           <View style={{ height: 2, backgroundColor: accent, marginTop: 3, opacity: 0.85 }} />
@@ -1201,7 +1216,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 <View style={{ marginTop: 6 }}>
                   {section.items.map((item) => {
                     const category = (item.title || "").trim();
-                    const skills = skillLinesFromItem(item);
+                    const skills = skillLinesFromItem(section, item);
                     if (skills.length === 0) return null;
                     const bodySize = sectionBodySize(section);
                     const columns = sectionSkillsColumns(section);
@@ -1327,7 +1342,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   </Text>
                   <View style={{ marginTop: 10 }}>
                     {section.items.flatMap((item) =>
-                      skillLinesFromItem(item).map((line, idx) => (
+                      skillLinesFromItem(section, item).map((line, idx) => (
                         <View key={`${item.id}-${idx}`} style={{ marginTop: 8 }}>
                           <Text style={{ fontSize: 9, color: "#111827" }}>{line}</Text>
                           <View style={{ height: 1, backgroundColor: "#D1D5DB", marginTop: 5 }} />
@@ -1599,7 +1614,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               <View style={{ marginTop: 6 }}>
                 {section.items.map((item) => {
                   const category = (item.title || "").trim();
-                  const skills = skillLinesFromItem(item);
+                  const skills = skillLinesFromItem(section, item);
                   if (skills.length === 0) return null;
                   const bodySize = sectionBodySize(section);
                   const columns = sectionSkillsColumns(section);

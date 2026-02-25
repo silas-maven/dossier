@@ -927,7 +927,9 @@ export default function EditorForm({
       tabs.push({
         key: `section:${section.id}` as EditorContentTab,
         label: section.title.trim() || `Section ${index + 1}`,
-        complete: section.title.trim().length > 0 && hasMeaningfulSectionContent
+        complete: section.title.trim().length > 0 && hasMeaningfulSectionContent,
+        canMovePrev: index > 0,
+        canMoveNext: index < profile.sections.length - 1
       });
     });
 
@@ -1121,6 +1123,13 @@ export default function EditorForm({
             tabs={contentTabs}
             activeTab={activeContentTab}
             onTabChange={handleContentTabChange}
+            onReorderSectionTab={(tab, direction) => {
+              if (!tab.startsWith("section:")) return;
+              const sectionId = tab.replace("section:", "");
+              const sectionIndex = profile.sections.findIndex((section) => section.id === sectionId);
+              if (sectionIndex < 0) return;
+              moveSection(sectionIndex, direction);
+            }}
             addSectionOptions={addSectionOptions}
             onAddSection={(sectionType) => {
               if (sectionType.startsWith("preset:")) {
@@ -1443,6 +1452,45 @@ export default function EditorForm({
                       <div className="mt-4 space-y-3">
                         {activeContentSection.type === "skills" ? (
                           <>
+                            <div className="grid gap-3 rounded-md border bg-background/60 p-3 md:grid-cols-[1fr_180px]">
+                              <label className="inline-flex items-center gap-2 text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={activeContentSection.style.enableBullets}
+                                  onChange={(event) =>
+                                    updateSectionStyleField(
+                                      activeContentSectionIndex,
+                                      "enableBullets",
+                                      event.target.checked
+                                    )
+                                  }
+                                  className="h-4 w-4 rounded border"
+                                />
+                                Show bullet markers for skills
+                              </label>
+                              <label className="space-y-1">
+                                <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                                  Bullet style
+                                </span>
+                                <select
+                                  value={activeContentSection.style.bulletStyle}
+                                  onChange={(event) =>
+                                    updateSectionStyleField(
+                                      activeContentSectionIndex,
+                                      "bulletStyle",
+                                      event.target.value as CvSectionStyle["bulletStyle"]
+                                    )
+                                  }
+                                  disabled={!activeContentSection.style.enableBullets}
+                                  className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  <option value="disc">Disc (•)</option>
+                                  <option value="square">Square (■)</option>
+                                  <option value="dash">Dash (-)</option>
+                                </select>
+                              </label>
+                            </div>
+
                             {activeContentSection.items.length === 0 ? (
                               <Button
                                 type="button"

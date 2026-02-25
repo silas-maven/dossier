@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { CheckCircle2, Circle, Plus } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Circle, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,8 @@ export type ContentTabStatus = {
   label: string;
   complete: boolean;
   disabled?: boolean;
+  canMovePrev?: boolean;
+  canMoveNext?: boolean;
 };
 
 type EditorContentPanelProps = {
@@ -26,6 +28,7 @@ type EditorContentPanelProps = {
     disabled?: boolean;
   }>;
   onAddSection?: (sectionType: string) => void;
+  onReorderSectionTab?: (tab: EditorContentTab, direction: -1 | 1) => void;
   children: ReactNode;
   className?: string;
 };
@@ -36,6 +39,7 @@ export default function EditorContentPanel({
   onTabChange,
   addSectionOptions,
   onAddSection,
+  onReorderSectionTab,
   children,
   className
 }: EditorContentPanelProps) {
@@ -71,29 +75,58 @@ export default function EditorContentPanel({
           >
             {tabs.map((tab) => {
               const isActive = tab.key === activeTab;
+              const isSectionTab = tab.key.startsWith("section:");
               return (
-                <Button
-                  key={tab.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  disabled={tab.disabled}
-                  variant={isActive ? "default" : "secondary"}
-                  size="sm"
-                  className={cn(
-                    "shrink-0 gap-2 rounded-full sm:shrink",
-                    !isActive && "text-muted-foreground",
-                    tab.complete && !isActive && "border-emerald-500/35 bg-emerald-500/10 text-emerald-300"
-                  )}
-                  onClick={() => onTabChange(tab.key)}
-                >
-                  {tab.complete ? (
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                  ) : (
-                    <Circle className="h-3 w-3" />
-                  )}
-                  <span className="max-w-[11rem] truncate">{tab.label}</span>
-                </Button>
+                <div key={tab.key} className="flex shrink-0 items-center gap-1 sm:shrink">
+                  <Button
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    disabled={tab.disabled}
+                    variant={isActive ? "default" : "secondary"}
+                    size="sm"
+                    className={cn(
+                      "gap-2 rounded-full",
+                      !isActive && "text-muted-foreground",
+                      tab.complete && !isActive && "border-emerald-500/35 bg-emerald-500/10 text-emerald-300"
+                    )}
+                    onClick={() => onTabChange(tab.key)}
+                  >
+                    {tab.complete ? (
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    ) : (
+                      <Circle className="h-3 w-3" />
+                    )}
+                    <span className="max-w-[11rem] truncate">{tab.label}</span>
+                  </Button>
+
+                  {onReorderSectionTab && isSectionTab ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={!tab.canMovePrev}
+                        aria-label={`Move ${tab.label} left`}
+                        className="h-8 w-8 rounded-full p-0"
+                        onClick={() => onReorderSectionTab(tab.key, -1)}
+                      >
+                        <ChevronLeft className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={!tab.canMoveNext}
+                        aria-label={`Move ${tab.label} right`}
+                        className="h-8 w-8 rounded-full p-0"
+                        onClick={() => onReorderSectionTab(tab.key, 1)}
+                      >
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </span>
+                  ) : null}
+                </div>
               );
             })}
           </div>
