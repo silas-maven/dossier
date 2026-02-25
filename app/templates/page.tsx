@@ -44,11 +44,9 @@ export default async function TemplatesPage({ searchParams }: TemplatesPageProps
 
   const chosenMode =
     (isDossierStorageMode(storage) ? storage : null) ??
-    (isDossierStorageMode(cookieStorage) ? cookieStorage : null);
+    (isDossierStorageMode(cookieStorage) ? cookieStorage : null) ??
+    "local";
 
-  if (!chosenMode) {
-    redirect("/storage");
-  }
   if (chosenMode === "cloud") {
     if (!hasSupabasePublicEnv()) {
       redirect("/storage");
