@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /storage
+Allow: /templates
+Disallow: /editor
+Disallow: /auth
+Disallow: /api/
+
+Sitemap: https://dossier-black.vercel.app/sitemap.xml
