@@ -19,7 +19,15 @@ const normalizeHost = (value: string | null | undefined) =>
     .split("/")[0]
     .split(":")[0];
 
-const isBlockedHost = (host: string) =>
+const isBlockedRequestHost = (host: string) =>
+  !host ||
+  host === "localhost" ||
+  host === "127.0.0.1" ||
+  host === "0.0.0.0" ||
+  host === "::1" ||
+  host.endsWith(".localhost");
+
+const isBlockedReferrerHost = (host: string) =>
   !host ||
   host === "localhost" ||
   host === "127.0.0.1" ||
@@ -27,8 +35,7 @@ const isBlockedHost = (host: string) =>
   host === "::1" ||
   host.endsWith(".localhost") ||
   host === "vercel.com" ||
-  host.endsWith(".vercel.com") ||
-  host.endsWith(".vercel.app");
+  host.endsWith(".vercel.com");
 
 const normalizeText = (value: unknown, max: number) => {
   if (typeof value !== "string") return null;
@@ -87,7 +94,7 @@ const resolveSource = ({
   }
 
   const ref = parseReferrer(payloadReferrer || headerReferrer);
-  if (ref.host && ref.host !== appHost && !isBlockedHost(ref.host)) {
+  if (ref.host && ref.host !== appHost && !isBlockedReferrerHost(ref.host)) {
     const label = `${ref.host}${ref.path || ""}`.slice(0, 180);
     return {
       sourceKey: `ref:${label}`.slice(0, 180),
@@ -117,7 +124,7 @@ export async function POST(req: NextRequest) {
   }
 
   const requestHost = normalizeHost(req.headers.get("x-forwarded-host") || req.headers.get("host") || req.nextUrl.host);
-  if (isBlockedHost(requestHost)) {
+  if (isBlockedRequestHost(requestHost)) {
     return NextResponse.json({ ok: true, skipped: "non_public_host" }, { status: 202 });
   }
 
