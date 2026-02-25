@@ -3,9 +3,59 @@ import Link from "next/link";
 import VisitorTracker from "@/components/analytics/visitor-tracker";
 import "./globals.css";
 
+const resolveMetadataBase = () => {
+  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (raw) {
+    try {
+      return new URL(raw);
+    } catch {
+      // Fall through to localhost for local/dev safety.
+    }
+  }
+  return new URL("http://localhost:3000");
+};
+
+const metadataBase = resolveMetadataBase();
+
 export const metadata: Metadata = {
-  title: "Dossier",
-  description: "Local-first CV builder"
+  metadataBase,
+  title: {
+    default: "Dossier CV Builder",
+    template: "%s | Dossier CV Builder"
+  },
+  description:
+    "Build ATS-friendly CVs fast with a local-first editor, multiple professional templates, and secure cloud sync.",
+  alternates: {
+    canonical: "/"
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "Dossier CV Builder",
+    title: "Dossier CV Builder",
+    description:
+      "Create and export professional CVs with a fast local-first editor and secure cloud sync options.",
+    images: [
+      {
+        url: "/icon.svg",
+        alt: "Dossier CV Builder"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dossier CV Builder",
+    description:
+      "Free CV builder for fast, structured resume creation with live preview and PDF export.",
+    images: ["/icon.svg"]
+  },
+  keywords: [
+    "cv builder",
+    "resume builder",
+    "ats resume",
+    "free cv generator",
+    "professional resume templates"
+  ]
 };
 
 export default function RootLayout({

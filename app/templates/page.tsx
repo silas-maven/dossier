@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,28 @@ import { hasSupabasePublicEnv } from "@/lib/supabase/env";
 
 type TemplatesPageProps = {
   searchParams: Promise<{ storage?: string }>;
+};
+
+export const metadata: Metadata = {
+  title: "CV Templates",
+  description:
+    "Browse professional CV templates and start editing instantly with live preview and PDF export.",
+  alternates: {
+    canonical: "/templates"
+  },
+  openGraph: {
+    title: "Dossier CV Templates",
+    description: "Compare resume layouts and pick the best template for your role.",
+    url: "/templates",
+    images: ["/icon.svg"],
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dossier CV Templates",
+    description: "Choose from multiple ATS-friendly CV templates.",
+    images: ["/icon.svg"]
+  }
 };
 
 export default async function TemplatesPage({ searchParams }: TemplatesPageProps) {

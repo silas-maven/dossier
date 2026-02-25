@@ -283,6 +283,57 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
           ))}
         </aside>
       </div>
+
+      <section className="relative z-10 border-t border-white/10 bg-[#040814]/95 px-6 py-12 md:px-12 lg:px-16">
+        <div className="mx-auto grid w-full max-w-[1200px] gap-10 lg:grid-cols-[1fr_1fr]">
+          <div className="space-y-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/45">
+              Why Dossier
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
+              A free CV builder focused on speed, structure, and control.
+            </h2>
+            <p className="max-w-xl text-sm text-white/70">
+              Dossier helps job seekers produce ATS-friendly CVs quickly without paywalls. You can edit
+              locally in-browser, switch templates without rewriting content, and export a clean PDF.
+            </p>
+            <p className="max-w-xl text-sm text-white/70">
+              For users who want account-backed sync, cloud mode stores profiles per user. For privacy-first
+              workflows, local mode keeps data in your browser.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/45">FAQ</p>
+            <dl className="space-y-4">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <dt className="text-sm font-semibold text-white">Is Dossier free to use?</dt>
+                <dd className="mt-1 text-sm text-white/70">
+                  Yes. You can build and export CVs without a subscription.
+                </dd>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <dt className="text-sm font-semibold text-white">Can I keep my CV data local?</dt>
+                <dd className="mt-1 text-sm text-white/70">
+                  Yes. Local mode stores your profile data in your browser.
+                </dd>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <dt className="text-sm font-semibold text-white">Does it support cloud sync?</dt>
+                <dd className="mt-1 text-sm text-white/70">
+                  Yes. Cloud mode uses secure account-based storage with per-user access controls.
+                </dd>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <dt className="text-sm font-semibold text-white">Can I export my CV as PDF?</dt>
+                <dd className="mt-1 text-sm text-white/70">
+                  Yes. Every template can be exported as PDF directly from the editor.
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
     </section>
   );
 }
