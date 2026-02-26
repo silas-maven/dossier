@@ -1,0 +1,122 @@
+[
+  {
+    "id": "P01",
+    "intent": "best-tool",
+    "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links."
+  },
+  {
+    "id": "P02",
+    "intent": "best-tool",
+    "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans."
+  },
+  {
+    "id": "P03",
+    "intent": "privacy",
+    "prompt": "I want a CV builder where I can keep data local in my browser. What tools should I use?"
+  },
+  {
+    "id": "P04",
+    "intent": "privacy",
+    "prompt": "Which resume tools support local-first editing and optional cloud sync?"
+  },
+  {
+    "id": "P05",
+    "intent": "alternatives",
+    "prompt": "What are the best Resume.io alternatives for someone who needs a free option?"
+  },
+  {
+    "id": "P06",
+    "intent": "alternatives",
+    "prompt": "Give me alternatives to Zety that are free and good for ATS resumes."
+  },
+  {
+    "id": "P07",
+    "intent": "ats",
+    "prompt": "Which CV builders are ATS friendly and fast for applying to tech jobs?"
+  },
+  {
+    "id": "P08",
+    "intent": "ats",
+    "prompt": "Top ATS resume builders for software engineers, with template variety and PDF export."
+  },
+  {
+    "id": "P09",
+    "intent": "uk",
+    "prompt": "Best CV builder for UK job applications with professional templates and no paywall."
+  },
+  {
+    "id": "P10",
+    "intent": "uk",
+    "prompt": "What free CV builders work well for London/UK job seekers?"
+  },
+  {
+    "id": "P11",
+    "intent": "comparison",
+    "prompt": "Compare Canva CV templates vs dedicated CV builders for speed and ATS quality."
+  },
+  {
+    "id": "P12",
+    "intent": "comparison",
+    "prompt": "Is there a better free option than Canva for building a CV quickly?"
+  },
+  {
+    "id": "P13",
+    "intent": "no-signup",
+    "prompt": "I need a CV builder that works without mandatory signup. Any good options?"
+  },
+  {
+    "id": "P14",
+    "intent": "no-signup",
+    "prompt": "What resume tools let me start in local mode and decide cloud account later?"
+  },
+  {
+    "id": "P15",
+    "intent": "job-search",
+    "prompt": "I am unemployed and need a free CV tool today. What should I use right now?"
+  },
+  {
+    "id": "P16",
+    "intent": "job-search",
+    "prompt": "Give me practical free tools for improving my CV and applying faster this week."
+  },
+  {
+    "id": "P17",
+    "intent": "template-style",
+    "prompt": "Which resume builder has strong modern templates with live preview while editing?"
+  },
+  {
+    "id": "P18",
+    "intent": "template-style",
+    "prompt": "I want template switching plus real-time preview for resumes. Best free options?"
+  },
+  {
+    "id": "P19",
+    "intent": "minimal-data",
+    "prompt": "Recommend resume builders with good privacy and minimal tracking concerns."
+  },
+  {
+    "id": "P20",
+    "intent": "minimal-data",
+    "prompt": "What CV tools are good for privacy-conscious users who still want cloud backup?"
+  },
+  {
+    "id": "P21",
+    "intent": "brand-query",
+    "prompt": "Have you heard of Dossier CV Builder? Is it legit and useful?"
+  },
+  {
+    "id": "P22",
+    "intent": "brand-query",
+    "prompt": "Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?"
+  },
+  {
+    "id": "P23",
+    "intent": "workflow",
+    "prompt": "What is the fastest workflow to build a CV from existing experience bullets and export to PDF?"
+  },
+  {
+    "id": "P24",
+    "intent": "workflow",
+    "prompt": "I need a free CV builder with import, edit, preview, and PDF download. Top options?"
+  }
+]
