@@ -4,6 +4,8 @@ import ExperienceHero from "@/components/ui/experience-hero";
 import { cvTemplates } from "@/lib/templates";
 import { getDossierUserCount } from "@/lib/user-count";
 
+export const dynamic = "force-dynamic";
+
 const resolvePageBase = () => {
   const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (raw) {
