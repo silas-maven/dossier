@@ -33,14 +33,12 @@ export const metadata: Metadata = {
       "Create ATS-friendly resumes with live preview, quick editing, and one-click PDF export.",
     url: "/",
     siteName: "Dossier CV Builder",
-    images: ["/icon.svg"],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "Dossier CV Builder",
     description: "Free local-first CV builder with professional templates and PDF export.",
-    images: ["/icon.svg"]
   }
 };
 

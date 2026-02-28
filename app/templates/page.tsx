@@ -26,14 +26,12 @@ export const metadata: Metadata = {
     title: "Dossier CV Templates",
     description: "Compare resume layouts and pick the best template for your role.",
     url: "/templates",
-    images: ["/icon.svg"],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "Dossier CV Templates",
     description: "Choose from multiple ATS-friendly CV templates.",
-    images: ["/icon.svg"]
   }
 };
 

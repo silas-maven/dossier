@@ -14,14 +14,12 @@ export const metadata: Metadata = {
     description:
       "Pick local mode for browser-only storage or cloud mode for account-based profile sync.",
     url: "/storage",
-    images: ["/icon.svg"],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "Dossier Storage Choice",
     description: "Pick local or cloud mode before choosing your CV template.",
-    images: ["/icon.svg"]
   }
 };
 

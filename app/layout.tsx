@@ -35,19 +35,12 @@ export const metadata: Metadata = {
     title: "Dossier CV Builder",
     description:
       "Create and export professional CVs with a fast local-first editor and secure cloud sync options.",
-    images: [
-      {
-        url: "/icon.svg",
-        alt: "Dossier CV Builder"
-      }
-    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Dossier CV Builder",
     description:
       "Free CV builder for fast, structured resume creation with live preview and PDF export.",
-    images: ["/icon.svg"]
   },
   keywords: [
     "cv builder",
