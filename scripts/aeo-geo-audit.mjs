@@ -7,7 +7,7 @@ const SYSTEM_PROMPT = `You are helping a job seeker choose a CV/resume builder.
 Return exactly 5 ranked recommendations with direct links.
 Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud).`;
 
-const TARGET_DOMAIN = (process.env.AEO_TARGET_DOMAIN || "dossier-black.vercel.app").toLowerCase();
+const TARGET_DOMAIN = (process.env.AEO_TARGET_DOMAIN || "your-dossier.xyz").toLowerCase();
 const OPENAI_MODEL = process.env.AEO_OPENAI_MODEL || "gpt-4.1-mini";
 const USE_WEB_SEARCH = process.env.AEO_WEB_SEARCH !== "false";
 const PROMPTS_PATH =

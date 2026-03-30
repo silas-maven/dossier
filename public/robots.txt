@@ -6,4 +6,4 @@ Disallow: /editor
 Disallow: /auth
 Disallow: /api/
 
-Sitemap: https://dossier-black.vercel.app/sitemap.xml
+Sitemap: https://your-dossier.xyz/sitemap.xml

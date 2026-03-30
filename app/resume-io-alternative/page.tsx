@@ -30,7 +30,7 @@ const jsonLd = {
     "A practical comparison between Dossier and Resume.io covering cost, privacy, ATS readiness, and export speed.",
   author: { "@type": "Person", name: "Hamza Ntwari", url: "https://hntwari.vercel.app" },
   publisher: { "@type": "Organization", name: "Dossier CV Builder" },
-  mainEntityOfPage: { "@type": "WebPage", "@id": "https://dossier-black.vercel.app/resume-io-alternative" },
+  mainEntityOfPage: { "@type": "WebPage", "@id": "https://your-dossier.xyz/resume-io-alternative" },
 };
 
 export default function ResumeIoAlternativePage() {
