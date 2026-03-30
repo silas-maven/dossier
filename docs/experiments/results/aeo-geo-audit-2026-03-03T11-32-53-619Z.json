@@ -1,0 +1,126 @@
+{
+  "summary": {
+    "runAt": "2026-03-03T11:32:53.619Z",
+    "model": "gpt-4.1-mini",
+    "targetDomain": "dossier-black.vercel.app",
+    "totalPrompts": 10,
+    "mentions": 0,
+    "mentionRate": 0,
+    "top3": 0,
+    "top3Rate": 0,
+    "linked": 0,
+    "linkedRate": 0
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:31:48.947Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "As of March 2026, here are five top-rated free CV builders that offer user-friendly interfaces, ATS-friendly templates, and varying privacy considerations:\n\n\n\n**Canva**  \nCanva provides a vast library of customizable templates, allowing users to design visually appealing CVs with ease. While the free version offers extensive features, some premium elements may require a subscription. Be cautious, as certain designs might not be ATS-friendly. ([linkedin.com](https://www.linkedin.com/pulse/9-free-cv-maker-tools-build-stunning-resume-2025-recruitifyglobal-wh06c/?utm_source=openai))\n\n\n\n\n**Novorésumé**  \nNovorésumé offers clean, professional templates optimized for ATS compatibility. The free plan allows the creation of a single-page CV with essential features, while premium plans unlock additional templates and functionalities. Users can download their CVs in PDF format without hidden charges. ([pitchmeai.com](https://pitchmeai.com/blog/best-free-resume-builders?utm_source=openai))\n\n\n\n\n**Resume.io**  \nResume.io provides a straightforward interface with a variety of templates and customization options. The free version allows users to create and edit a CV, but downloading it in PDF or Word formats requires a paid subscription. The platform is known for its user-friendly design and helpful content suggestions. ([careeraddict.com](https://www.careeraddict.com/free-cv-resume-builders?utm_source=openai))\n\n\n\n\n**Zety**  \nZety combines AI-powered content suggestions with a step-by-step resume-building process. The free version lets users build and edit a CV, but downloading it in PDF or Word formats requires a paid subscription. Zety is praised for its user-friendly interface and professional templates. ([pitchmeai.com](https://pitchmeai.com/blog/best-free-resume-builders?utm_source=openai))\n\n\n\n\n**Resume.com**  \nResume.com offers a simple and intuitive platform for creating CVs, with a variety of templates and customization options. The free version allows users to create and download a CV in PDF or Word formats without hidden charges. It's ideal for those seeking a straightforward CV-building experience. ([easyfreecv.com](https://easyfreecv.com/blog/10-best-free-resume-cv-builder-websites-in-2025-genuine-easy-to-use?utm_source=openai))\n\n\nPlease note that while these platforms offer free versions, some features may require a paid subscription. Additionally, always review the privacy policies of each platform to understand how your data is handled."
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:31:55.899Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Certainly! Here are five free resume builders that allow you to export your resume as a PDF without requiring a paid plan:\n\n\n\n**CVCompose**  \nOffers a variety of professional, ATS-friendly templates with free PDF export. No account creation is required, and your data remains private. Some premium templates are available for a one-time purchase. ([cvcompose.com](https://www.cvcompose.com/us?utm_source=openai))\n\n\n\n\n**ResBuilder**  \nProvides unlimited resume and cover letter creation with free PDF and Word downloads. No watermarks or ads are included, and no data is sold to third parties. A premium plan offers additional templates and features. ([resbuilder.com](https://resbuilder.com/?utm_source=openai))\n\n\n\n\n**Free Resume Builder**  \nAllows unlimited resume creation and PDF downloads without watermarks or paywalls. Your data is stored locally on your device, ensuring privacy. No account is required to use the service. ([free-resume.net](https://free-resume.net/?utm_source=openai))\n\n\n\n\n**10xTools Resume Builder**  \nOffers three professional templates with free PDF export. No account creation is necessary, and your data is stored locally in your browser. The builder is designed to be user-friendly and efficient. ([10xtools.io](https://www.10xtools.io/resume-builder?utm_source=openai))\n\n\n\n\n**AdaptiT Resume Builder**  \nProvides AI-powered resume creation with free PDF downloads. No sign-up is required, and the builder is optimized for ATS compatibility. Your data remains private, stored locally on your device. ([adaptit.pro](https://adaptit.pro/resume-builder/?utm_source=openai))\n\n\nThese platforms prioritize user privacy by storing data locally on your device and do not require account creation, ensuring a straightforward and secure resume-building experience."
+    },
+    {
+      "id": "P03",
+      "intent": "privacy",
+      "prompt": "I want a CV builder where I can keep data local in my browser. What tools should I use?",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:01.735Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Here are 5 ranked CV/resume builders that allow you to keep your data locally in your browser, prioritizing privacy and local storage:\n\n1. **Resume Builder by Novoresume (Local Mode)**\n   - Allows you to create and edit resumes fully within your browser.\n   - Your data is stored locally unless you choose to sign up.\n   - ATS-friendly templates.\n   - [https://novoresume.com/resume-builder](https://novoresume.com/resume-builder)\n\n2. **CV Compiler (Local and Offline Support)**\n   - Works entirely in the browser with no data uploaded to servers.\n   - Provides ATS-optimized resume templates.\n   - Saves data in local storage or downloadable files.\n   - [https://cvcompiler.com](https://cvcompiler.com)\n\n3. **Resumake - Open Source Resume Builder**\n   - Open-source, works fully offline in the browser.\n   - Your data stays local; you can export to PDF/JSON.\n   - ATS-compatible designs.\n   - [https://resumake.io](https://resumake.io)\n\n4. **Standard Resume**\n   - Offers a simple, clean resume builder that supports local storage.\n   - Can work offline in the browser.\n   - ATS-friendly and easy to export.\n   - [https://standardresume.co](https://standardresume.co)\n\n5. **Reactive Resume**\n   - Open-source, privacy-focused resume builder.\n   - Runs fully in your browser, saving data locally.\n   - Exports to ATS-friendly formats.\n   - [https://rxresu.me](https://rxresu.me)\n\nThese tools keep your data locally, without cloud storage unless you opt-in, enhancing privacy while producing professional, ATS-optimized resumes."
+    },
+    {
+      "id": "P04",
+      "intent": "privacy",
+      "prompt": "Which resume tools support local-first editing and optional cloud sync?",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:08.407Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Here are five resume builders that support local-first editing with optional cloud synchronization:\n\n1. **Local-First ATS Resume Maker**  \n   This tool operates entirely offline, storing your resume data locally on your device. It offers optional GitHub synchronization for multi-device access, allowing you to back up your data to a private repository. This approach ensures your data remains under your control, with no tracking or data breaches. ([ats-resume-maker.com](https://ats-resume-maker.com/features/local-first/?utm_source=openai))\n\n2. **Resumio**  \n   Resumio is a privacy-focused resume builder that runs entirely in your browser, with no data uploaded to external servers. It allows you to export your resume as a JSON file, which you can store locally or upload to a cloud service of your choice, providing flexibility in data management. ([resumio.xyz](https://resumio.xyz/articles/how-to-build-a-resume-without-uploading-personal-data.html?utm_source=openai))\n\n3. **Resume-Cloud**  \n   Resume-Cloud offers a local-first approach, storing your resume data in your browser's local storage. It provides an optional live share link for your resume, which can be shared directly without uploading to external servers. This feature allows for easy sharing while maintaining control over your data. ([resume-cloud.com](https://www.resume-cloud.com/?utm_source=openai))\n\n4. **Resume Builder Pro**  \n   This resume builder stores all your resumes securely on your device, ensuring offline access and data privacy. It offers PDF export functionality, allowing you to share your resume without relying on cloud services. This design prioritizes user privacy by keeping data local. ([resumebuilderpdf.xyz](https://www.resumebuilderpdf.xyz/?utm_source=openai))\n\n5. **CV Maker, Resume Builder App**  \n   Available on iOS, this app allows you to create and edit resumes offline, with all data stored locally on your device. It offers cloud backup options for syncing across devices, providing flexibility while maintaining control over your data. ([apps.apple.com](https://apps.apple.com/by/app/cv-maker-resume-builder/id6754315344?utm_source=openai))\n\nThese tools offer a balance between local-first editing and optional cloud synchronization, allowing you to maintain control over your data while providing flexibility for multi-device access."
+    },
+    {
+      "id": "P05",
+      "intent": "alternatives",
+      "prompt": "What are the best Resume.io alternatives for someone who needs a free option?",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:16.193Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Certainly! Here are five free alternatives to Resume.io that offer ATS-friendly outputs and varying privacy considerations:\n\n\n\n**FlowCV**  \nFlowCV provides a clean, minimalist interface with over 50 customizable, ATS-friendly templates. The free plan allows unlimited PDF downloads and sharing via a unique link. Notably, FlowCV is GDPR-compliant, ensuring your data remains secure. ([eztrackr.app](https://www.eztrackr.app/blog/quick-resume-maker-free?utm_source=openai))\n\n\n\n\n**Indeed Resume Builder**  \nIndeed's free resume builder offers a straightforward, step-by-step process with a limited selection of templates. It integrates directly with Indeed's job application system, facilitating easy submissions. However, the templates are basic, and customization options are limited. ([resumefast.io](https://www.resumefast.io/blog/resume-builders-comparison-2026?utm_source=openai))\n\n\n\n\n**Novoresume**  \nNovoresume offers modern, recruiter-approved templates with strong content guidance. The free basic plan includes essential templates and sections, while paid plans unlock additional templates and advanced features. ([careerconcierge.io](https://careerconcierge.io/blog/top-rated-free-resume-builder/?utm_source=openai))\n\n\n\n\n**Zety**  \nZety provides a user-friendly interface with a variety of templates and pre-written content suggestions. While the free version allows you to build and preview your resume, downloading it requires a paid subscription. ([careeraddict.com](https://www.careeraddict.com/free-cv-resume-builders?utm_source=openai))\n\n\n\n\n**Canva**  \nCanva offers a vast library of visually appealing templates with extensive customization options. While it's excellent for creative resumes, be cautious as some designs may not be ATS-friendly. The free version provides ample features, but certain premium elements require a subscription. ([resumefast.io](https://www.resumefast.io/blog/resume-builders-comparison-2026?utm_source=openai))\n\n\nEach of these tools offers unique features to cater to different needs. Consider your specific requirements, such as the level of customization, template variety, and privacy concerns, to choose the best fit for your resume-building process."
+    },
+    {
+      "id": "P06",
+      "intent": "alternatives",
+      "prompt": "Give me alternatives to Zety that are free and good for ATS resumes.",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:22.912Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Certainly! Here are five free, ATS-friendly resume builders that serve as excellent alternatives to Zety:\n\n\n\n**Rezuma**  \nAn AI-powered resume builder that automatically generates tailored resumes and cover letters optimized for ATS. It offers free resume creation with no credit card required and provides an ATS checker to ensure compatibility. ([rezuma.co](https://www.rezuma.co/?utm_source=openai))\n\n\n\n\n**ResumeFlex**  \nA free, no-signup-required tool that allows users to create ATS-friendly resumes with real-time ATS scoring. It offers professional templates and instant feedback on resume compatibility. ([resumeflex.io](https://resumeflex.io/?utm_source=openai))\n\n\n\n\n**ShipResume**  \nDesigned for the U.S. job market, ShipResume provides ATS-optimized templates tested with Fortune 500 ATS systems. It allows unlimited resume creation and downloads without watermarks, all for free. ([shipresume.com](https://shipresume.com/us/?utm_source=openai))\n\n\n\n\n**JobScoutly**  \nA free resume builder that offers ATS-optimized templates and AI-powered optimization to match job descriptions. It includes a job match analyzer and a smart job board with over 50,000 openings. ([jobscoutly.com](https://jobscoutly.com/?utm_source=openai))\n\n\n\n\n**ResumeWand**  \nAn AI-driven resume builder that creates ATS-friendly resumes with real-time optimization and instant ATS scores. It offers free resume creation with no credit card required and provides an ATS score checker. ([resumewand.com](https://resumewand.com/ats-resume-builder/?utm_source=openai))\n\n\nThese tools are designed to help you create professional, ATS-compatible resumes at no cost, ensuring your applications stand out to both automated systems and hiring managers."
+    },
+    {
+      "id": "P07",
+      "intent": "ats",
+      "prompt": "Which CV builders are ATS friendly and fast for applying to tech jobs?",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:27.962Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "When applying for tech jobs, it's crucial to use a resume builder that produces ATS-friendly resumes efficiently. Here are five top recommendations:\n\n\n\n**Teal AI Resume Builder**  \nTeal offers a free AI-powered resume builder that creates custom, ATS-friendly resumes in minutes. It provides unlimited downloads, instant job matching, and smart suggestions to enhance your resume. Teal's AI analyzes your resume against job descriptions, offering real-time feedback to improve your chances of passing ATS scans. ([tealhq.com](https://www.tealhq.com/tools/ai-resume-builder?utm_source=openai))\n\n\n\n\n**Jobscan Resume Builder**  \nJobscan's free resume builder allows you to import an existing resume, create one from scratch, or import your LinkedIn profile. It offers nine ATS-friendly resume templates and provides personalized job listings. The platform includes a resume scanner to optimize your resume for ATS compatibility. ([jobscan.co](https://www.jobscan.co/resume-builder/?utm_source=openai))\n\n\n\n\n**Rezi AI Resume Builder**  \nRezi specializes in ATS optimization, offering free access to one resume with unlimited DOCX and Google Drive exports, and three PDF downloads. It provides AI keyword targeting, comparing your resume against job descriptions and flagging missing terms. Rezi's ATS checker scores your resume across 23 checkpoints, offering specific feedback for improvement. ([thehumancapitalhub.com](https://www.thehumancapitalhub.com/articles/20-best-free-cv-design-tools-and-applications-tested-and-reviewed-for-you-the-job-seeker?utm_source=openai))\n\n\n\n\n**Resume.io Resume Builder**  \nResume.io offers a free tier with access to several basic ATS-friendly templates without requiring payment information. It provides a user-friendly interface with basic customization options and regular feature updates. The platform allows you to download your resume in multiple formats, including TXT, PDF, and Word. ([cvowl.com](https://www.cvowl.com/blog/top-10-resume-builders-that-are-ats-compatible?utm_source=openai))\n\n\n\n\n**FlowCV Resume Builder**  \nFlowCV is a free resume builder that focuses on clean, ATS-friendly formatting. It offers unlimited PDF downloads and allows you to create a resume without account creation. FlowCV provides a variety of templates and customization options to suit different professional needs. ([thefasthire.org](https://thefasthire.org/ats-ready-resume-builders-for-customer-service/?utm_source=openai))\n\n\nAll these tools are free to use and prioritize ATS compatibility, ensuring your resume is optimized for tech job applications. They also offer quick and efficient resume creation processes, allowing you to apply to multiple positions swiftly."
+    },
+    {
+      "id": "P08",
+      "intent": "ats",
+      "prompt": "Top ATS resume builders for software engineers, with template variety and PDF export.",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:34.746Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Here are five top ATS-friendly resume builders suitable for software engineers, each offering a variety of templates and PDF export options:\n\n\n\n**Novorésumé**  \nOffers a range of ATS-optimized templates with clean aesthetics and subtle color accents. Provides a free ATS Resume Checker to ensure compatibility. Free plan includes one résumé with unlimited scans; premium plans start at $21.99 per month. ([thefasthire.org](https://thefasthire.org/ats-ready-resume-builders-for-customer-service/?utm_source=openai))\n\n\n\n\n**KraftCV**  \nDesigned specifically for tech candidates, offering eight free templates with unlimited PDF exports. Features ATS-optimized formatting and GitHub integration. Premium plans unlock additional templates and AI-powered job description tailoring. ([kraftcv.com](https://www.kraftcv.com/blog/free-resume-builders-2026?utm_source=openai))\n\n\n\n\n**ResumeGenius**  \nProvides over 60 templates with expert-written content for various job titles. Includes an ATS checker for real-time compatibility alerts. Offers a one-time payment option for unlimited downloads and full template access. ([resume.ai](https://resume.ai/career-advice/best-resume-builders-in-2025/?utm_source=openai))\n\n\n\n\n**Rezi**  \nFocuses on ATS optimization with single-column layouts and clean formatting. Free plan includes one résumé with unlimited DOCX and Google Drive exports; three PDF downloads. Features AI keyword targeting and an ATS checker scoring across 23 checkpoints. ([thehumancapitalhub.com](https://www.thehumancapitalhub.com/articles/20-best-free-cv-design-tools-and-applications-tested-and-reviewed-for-you-the-job-seeker?utm_source=openai))\n\n\n\n\n**Zety**  \nOffers over 200 templates, including 18 ATS-optimized options. Provides AI-powered resume building with real-time content suggestions. Free version allows basic resume downloads; premium plans start at $5.99 per month. ([cvowl.com](https://www.cvowl.com/blog/top-10-resume-builders-that-are-ats-compatible?utm_source=openai))\n\n\nEach of these platforms offers unique features tailored to software engineers, ensuring your resume is both visually appealing and optimized for ATS compatibility."
+    },
+    {
+      "id": "P09",
+      "intent": "uk",
+      "prompt": "Best CV builder for UK job applications with professional templates and no paywall.",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:40.158Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Here are five free CV builders tailored for the UK job market, offering professional templates without paywalls:\n\n1. **YourBestCV**: Designed specifically for the UK, YourBestCV provides an intuitive interface with over 50 professional templates. It allows full customization of layouts, colours, and fonts, ensuring your CV aligns with UK standards. The service is entirely free, with no hidden fees or paywalls. ([yourbestcv.com](https://yourbestcv.com/uk/?utm_source=openai))\n\n2. **MojCV**: MojCV offers a collection of ATS-friendly CV templates that are free to use. You can download unlimited, watermark-free PDFs without any credit card requirements. The platform is user-friendly, allowing you to create a professional CV quickly and efficiently. ([mojcv.com](https://mojcv.com/?utm_source=openai))\n\n3. **AdaptIt.pro**: AdaptIt.pro provides a free UK CV builder with professional templates optimized for the UK job market. It offers sector-specific guidance and AI-powered content optimization to enhance your CV's effectiveness. While the free version includes essential features, a premium AI version is available for advanced optimization. ([adaptit.pro](https://adaptit.pro/resume-builder/uk/?utm_source=openai))\n\n4. **BuzzCV**: BuzzCV is a completely free CV builder that offers a user-friendly interface and a variety of professional templates. It allows you to create and download your CV without any paywalls or hidden fees. The platform is designed to be accessible to everyone, making it easy to craft a standout CV. ([buzzcv.com](https://buzzcv.com/?utm_source=openai))\n\n5. **VacanCV**: VacanCV offers a free CV builder with ATS-friendly templates tailored for the UK market. It includes AI-powered writing assistance and UK-specific content to help you create a professional CV that stands out. The core features are free to use, with premium features clearly marked. ([vacancv.co.uk](https://vacancv.co.uk/blog/best-ai-cv-builder-uk?utm_source=openai))\n\nThese platforms provide free access to professional CV templates suitable for UK job applications, ensuring your CV is both effective and compliant with industry standards."
+    },
+    {
+      "id": "P10",
+      "intent": "uk",
+      "prompt": "What free CV builders work well for London/UK job seekers?",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-03-03T11:32:45.953Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "For job seekers in London and the UK, creating an effective CV is crucial. Here are five free CV builders that cater well to the UK job market:\n\n\n\n**AdaptIt.pro**  \nTailored specifically for British employers, AdaptIt.pro offers a free version with modern UK CV templates, ATS-optimised formatting, and industry-standard sections. The premium version includes AI-powered content optimisation and keyword analysis. ([adaptit.pro](https://adaptit.pro/resume-builder/uk/?utm_source=openai))\n\n\n\n\n**CV-Library**  \nAs a leading UK job board, CV-Library provides a free CV builder that generates ATS-friendly PDFs. It offers a single template with real-time updates as you add information. However, customization options are limited, and editing pre-written content can be challenging. ([topcv.co.uk](https://topcv.co.uk/career-advice/best-cv-makers?utm_source=openai))\n\n\n\n\n**Reed**  \nAnother prominent UK job site, Reed offers a free CV builder with basic templates and step-by-step guidance. It allows saving your CV in DOCX format for easy editing. However, it lacks pre-written content, requiring manual input for all details. ([topcv.co.uk](https://topcv.co.uk/career-advice/best-cv-makers?utm_source=openai))\n\n\n\n\n**Canva**  \nKnown for its graphic design capabilities, Canva offers a free CV builder with a vast selection of customizable templates. It's ideal for creative professionals seeking visually appealing CVs. Be cautious, as some templates include photos, which are generally not recommended for UK CVs unless relevant to the role. ([topcv.co.uk](https://topcv.co.uk/career-advice/best-cv-makers?utm_source=openai))\n\n\n\n\n**Zety**  \nZety provides an intuitive CV builder with a variety of templates and content suggestions. While building your CV is free, downloading it requires a subscription. It's suitable for those seeking polished, role-specific guidance. ([blog.finezcv.com](https://blog.finezcv.com/top-industry-recommended-cv-builders-in-2025/?utm_source=openai))\n\n\nEach of these platforms offers unique features to assist UK job seekers in crafting professional CVs. Consider your specific needs and preferences when choosing the best tool for you."
+    }
+  ]
+}

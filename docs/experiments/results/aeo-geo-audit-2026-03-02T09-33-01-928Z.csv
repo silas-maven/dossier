@@ -1,0 +1,50 @@
+"id","intent","model","mentioned","position","has_domain_link","prompt","response_preview"
+"P01","best-tool","gpt-4.1-mini","no","","no","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","Creating an effective CV is crucial for job seekers in 2026. Here are five top-rated free CV builders that offer user-friendly interfaces, ATS-friendly templates, and varying privacy considerations:
+
+
+
+**Canva Resume Bui"
+"P02","best-tool","gpt-4.1-mini","no","","no","Recommend free resume builders that let me export PDF without forcing paid plans.","Certainly! Here are five free resume builders that allow you to export your resume as a PDF without requiring a paid plan:
+
+
+
+**CVCompose**  
+Offers a variety of professional, ATS-friendly templates with free PDF export."
+"P03","privacy","gpt-4.1-mini","no","","no","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are five ranked recommendations for CV builders that allow you to keep your data local in your browser, ensuring privacy and control over your information:
+
+1. **JSON Resume**
+   - Link: https://jsonresume.org
+   - "
+"P04","privacy","gpt-4.1-mini","no","","no","Which resume tools support local-first editing and optional cloud sync?","Here are five resume builders that support local-first editing with optional cloud synchronization:
+
+1. **ATS Resume Maker**  
+   ATS Resume Maker operates entirely offline, storing your resume data locally in your brows"
+"P05","alternatives","gpt-4.1-mini","no","","no","What are the best Resume.io alternatives for someone who needs a free option?","Certainly! Here are five free resume builders that serve as excellent alternatives to Resume.io:
+
+
+
+**Indeed Resume Builder**  
+A straightforward tool integrated with Indeed's job portal, allowing users to create and app"
+"P06","alternatives","gpt-4.1-mini","no","","no","Give me alternatives to Zety that are free and good for ATS resumes.","Certainly! Here are five free, ATS-friendly resume builders that serve as excellent alternatives to Zety:
+
+
+
+**Rezuma**  
+An AI-powered resume builder that automatically generates tailored resumes and cover letters optim"
+"P07","ats","gpt-4.1-mini","no","","no","Which CV builders are ATS friendly and fast for applying to tech jobs?","Creating an ATS-friendly resume is crucial for tech job applications, as it ensures your resume is parsed correctly by Applicant Tracking Systems. Here are five free, user-friendly resume builders that offer ATS-optimize"
+"P08","ats","gpt-4.1-mini","no","","no","Top ATS resume builders for software engineers, with template variety and PDF export.","Here are five top ATS-friendly resume builders suitable for software engineers, each offering a variety of templates and PDF export options:
+
+
+
+**Novorésumé**  
+Offers a range of ATS-optimized templates with clean aesthe"
+"P09","uk","gpt-4.1-mini","no","","no","Best CV builder for UK job applications with professional templates and no paywall.","Creating a professional CV tailored for the UK job market is essential for standing out to employers. Here are five top-rated, free CV builders that offer professional templates without paywalls:
+
+
+
+**YourBestCV**  
+Offe"
+"P10","uk","gpt-4.1-mini","no","","no","What free CV builders work well for London/UK job seekers?","Here are five free CV builders suitable for job seekers in London and the UK, each offering ATS-friendly templates and varying privacy considerations:
+
+1. **YourBestCV**  
+   Tailored for the UK job market, YourBestCV pr"
