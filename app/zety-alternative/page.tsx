@@ -30,7 +30,7 @@ const jsonLd = {
     "A practical Zety alternative comparison covering free workflows, template control, and PDF export quality.",
   author: { "@type": "Person", name: "Hamza Ntwari", url: "https://hntwari.vercel.app" },
   publisher: { "@type": "Organization", name: "Dossier CV Builder" },
-  mainEntityOfPage: { "@type": "WebPage", "@id": "https://your-dossier.xyz/zety-alternative" },
+  mainEntityOfPage: { "@type": "WebPage", "@id": "https://www.your-dossier.xyz/zety-alternative" },
 };
 
 export default function ZetyAlternativePage() {

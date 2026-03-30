@@ -29,7 +29,7 @@ const jsonLd = {
     "How UK job seekers can build professional, ATS-friendly CVs with local-first editing and PDF export.",
   author: { "@type": "Person", name: "Hamza Ntwari", url: "https://hntwari.vercel.app" },
   publisher: { "@type": "Organization", name: "Dossier CV Builder" },
-  mainEntityOfPage: { "@type": "WebPage", "@id": "https://your-dossier.xyz/free-cv-builder-uk" },
+  mainEntityOfPage: { "@type": "WebPage", "@id": "https://www.your-dossier.xyz/free-cv-builder-uk" },
 };
 
 export default function FreeCvBuilderUkPage() {
