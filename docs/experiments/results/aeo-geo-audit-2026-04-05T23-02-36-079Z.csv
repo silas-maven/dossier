@@ -1,0 +1,113 @@
+"id","intent","model","mentioned","position","has_domain_link","prompt","response_preview"
+"P01","best-tool","gpt-4.1-mini","no","","no","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","Creating an effective CV is crucial for job seekers in 2026. Here are five top-rated free CV builders that offer ATS-friendly templates, user-friendly interfaces, and varying privacy considerations:
+
+
+
+**Indeed Resume Bu"
+"P02","best-tool","gpt-4.1-mini","no","","no","Recommend free resume builders that let me export PDF without forcing paid plans.","Certainly! Here are five free resume builders that allow you to export your resume as a PDF without requiring a paid plan:
+
+
+
+**Resumake**  
+An open-source, privacy-focused resume builder that offers five export formats "
+"P03","privacy","gpt-4.1-mini","no","","no","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are 5 ranked CV/resume builders that allow you to keep data local in your browser, focusing on privacy and ease of use:
+
+1. **Reactive Resume**  
+   - Link: https://rxresu.me/  
+   - Description: Reactive Resume is "
+"P04","privacy","gpt-4.1-mini","no","","no","Which resume tools support local-first editing and optional cloud sync?","Here are five resume builders that support local-first editing with optional cloud synchronization:
+
+1. **Resumori**: Offers a clean editor with instant preview and professional templates. You can download a print-ready "
+"P05","alternatives","gpt-4.1-mini","no","","no","What are the best Resume.io alternatives for someone who needs a free option?","If you're seeking free alternatives to Resume.io for building an ATS-friendly resume, here are five top recommendations:
+
+
+
+**Indeed Resume Builder**  
+A straightforward, free tool offering clean, modern templates. It al"
+"P06","alternatives","gpt-4.1-mini","no","","no","Give me alternatives to Zety that are free and good for ATS resumes.","Certainly! Here are five free, ATS-friendly resume builders that serve as excellent alternatives to Zety:
+
+
+
+**EasyTeX**  
+EasyTeX offers a LaTeX-powered platform that combines elegant design with ATS optimization. It bo"
+"P07","ats","gpt-4.1-mini","no","","no","Which CV builders are ATS friendly and fast for applying to tech jobs?","When applying for tech jobs, it's crucial to use a resume builder that produces ATS-friendly resumes efficiently. Here are five top recommendations:
+
+
+
+**Indeed Resume Builder**  
+A completely free tool offering simple, "
+"P08","ats","gpt-4.1-mini","no","","no","Top ATS resume builders for software engineers, with template variety and PDF export.","Creating an ATS-friendly resume is crucial for software engineers aiming to pass automated screenings and catch the attention of recruiters. Below are five top-rated resume builders that offer a variety of templates, sup"
+"P09","uk","gpt-4.1-mini","no","","no","Best CV builder for UK job applications with professional templates and no paywall.","Creating a professional CV is crucial for UK job applications. Here are five top-rated, free CV builders that offer professional templates without paywalls:
+
+
+
+**YourBestCV**  
+Tailored for the UK job market, YourBestCV "
+"P10","uk","gpt-4.1-mini","no","","no","What free CV builders work well for London/UK job seekers?","Here are five free CV builders suitable for job seekers in London and the UK:
+
+1. **TracJobs® UK**: Tailored for NHS and healthcare professionals, TracJobs® offers a free, AI-powered CV builder that transforms your exist"
+"P11","comparison","gpt-4.1-mini","no","","no","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.","Here's a comparison between Canva CV templates and dedicated CV builders focusing on speed and ATS (Applicant Tracking System) quality:
+
+1. **Canva CV Templates**
+
+   - **Speed**: Canva offers a quick and easy way to cre"
+"P12","comparison","gpt-4.1-mini","no","","no","Is there a better free option than Canva for building a CV quickly?","Certainly! If you're seeking free alternatives to Canva for quickly building an ATS-friendly CV, here are five top recommendations:
+
+
+
+**JobJourney**  
+JobJourney offers a comprehensive free tier that includes AI-powered"
+"P13","no-signup","gpt-4.1-mini","no","","no","I need a CV builder that works without mandatory signup. Any good options?","Certainly! Here are five free CV builders that allow you to create professional, ATS-friendly resumes without mandatory sign-up:
+
+
+
+**CV Studio**  
+A 100% free resume builder that requires no sign-up. It offers ATS-optim"
+"P14","no-signup","gpt-4.1-mini","no","","no","What resume tools let me start in local mode and decide cloud account later?","Here are five resume builders that allow you to start in local mode and decide to enable cloud synchronization later:
+
+
+
+**DuckResume**  
+A free CV maker app available on Android and iOS, DuckResume lets you create, edit"
+"P15","job-search","gpt-4.1-mini","no","","no","I am unemployed and need a free CV tool today. What should I use right now?","Creating a professional CV is crucial in your job search. Here are five free CV builders that offer ATS-friendly outputs and varying privacy considerations:
+
+
+
+**FlowCV**  
+FlowCV provides a 100% free, user-friendly plat"
+"P16","job-search","gpt-4.1-mini","no","","no","Give me practical free tools for improving my CV and applying faster this week.","To enhance your CV and expedite your job applications this week, consider the following free, user-friendly, and ATS-compatible resume builders:
+
+
+
+**JobJourney**  
+Offers a comprehensive free tier with AI-driven resume "
+"P17","template-style","gpt-4.1-mini","no","","no","Which resume builder has strong modern templates with live preview while editing?","Based on your criteria for a resume builder with strong modern templates and live preview functionality, here are five top recommendations:
+
+
+
+**Resumy**  
+Resumy offers a free AI-powered resume builder with a variety of"
+"P18","template-style","gpt-4.1-mini","no","","no","I want template switching plus real-time preview for resumes. Best free options?","Based on your requirements for a free resume builder that offers template switching and real-time preview, here are five top recommendations:
+
+1. **FlowCV**  
+   FlowCV provides over 50 professional, ATS-friendly templat"
+"P19","minimal-data","gpt-4.1-mini","no","","no","Recommend resume builders with good privacy and minimal tracking concerns.","When selecting a resume builder that prioritizes privacy and minimizes tracking, it's essential to consider platforms that offer local-only processing and do not require account creation. Here are five top recommendation"
+"P20","minimal-data","gpt-4.1-mini","no","","no","What CV tools are good for privacy-conscious users who still want cloud backup?","For privacy-conscious users seeking cloud backup options for their CVs, here are five recommended tools that balance privacy with cloud storage:
+
+
+
+**PrivateCV**  
+An open-source, browser-based resume builder that priori"
+"P21","brand-query","gpt-4.1-mini","yes","","no","Have you heard of Dossier CV Builder? Is it legit and useful?","I couldn't find specific information about a CV builder named ""Dossier."" It's possible that it may be a lesser-known or new tool, or perhaps there is some confusion with other similarly named services.
+
+However, there ar"
+"P22","brand-query","gpt-4.1-mini","yes","","no","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?","The website you've provided, [dossier-black.vercel.app](https://dossier-black.vercel.app/), appears to be a CV builder hosted on the Vercel platform. However, there is limited publicly available information regarding its"
+"P23","workflow","gpt-4.1-mini","no","","no","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?","The fastest workflow to build a CV from existing experience bullets and export to PDF generally involves the following steps:
+
+1. Choose a CV/resume builder that allows quick import or manual entry of experience bullets."
+"P24","workflow","gpt-4.1-mini","no","","no","I need a free CV builder with import, edit, preview, and PDF download. Top options?","Here are five free CV builders that offer import, editing, preview, and PDF download features, along with their privacy considerations:
+
+
+
+**CVEngine**  
+A free, no-signup-required CV builder that allows you to write in "
