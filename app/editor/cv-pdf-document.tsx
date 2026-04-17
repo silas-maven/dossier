@@ -6,6 +6,7 @@ import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
 import { ensurePdfFonts } from "@/lib/pdf-fonts";
 import { parseSkillEntries } from "@/lib/skill-levels";
+import { resolveTemplateVariant, type TemplateVariant } from "@/lib/templates";
 
 type CvPdfDocumentProps = {
   profile: CvProfile;
@@ -13,35 +14,6 @@ type CvPdfDocumentProps = {
 
 const isSummarySection = (section: CvSection) =>
   section.type === "custom" && section.title.trim().toLowerCase() === "summary";
-
-type TemplateVariant =
-  | "banded-grey"
-  | "gutter-minimal"
-  | "blue-rules"
-  | "sidebar-light"
-  | "sidebar-navy-right"
-  | "sidebar-icons"
-  | "sidebar-tan-dots"
-  | "skills-right-red"
-  | "boxed-header-dots"
-  | "skills-right-pink";
-
-const templateVariant = (templateId: string): TemplateVariant => {
-  const known: TemplateVariant[] = [
-    "banded-grey",
-    "gutter-minimal",
-    "blue-rules",
-    "sidebar-light",
-    "sidebar-navy-right",
-    "sidebar-icons",
-    "sidebar-tan-dots",
-    "skills-right-red",
-    "boxed-header-dots",
-    "skills-right-pink"
-  ];
-  if (known.includes(templateId as TemplateVariant)) return templateId as TemplateVariant;
-  return "banded-grey";
-};
 
 const DEFAULT_SECTION_TITLE_SIZE = 10;
 const DEFAULT_SECTION_BODY_SIZE = 9;
@@ -555,7 +527,7 @@ const contactTwoLine = (profile: CvProfile) => {
 
 export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
   ensurePdfFonts();
-  const variant = templateVariant(profile.templateId);
+  const variant = resolveTemplateVariant(profile.templateId);
   const styles = stylesFor(variant, profile.style);
   const sections = visibleSections(profile);
 

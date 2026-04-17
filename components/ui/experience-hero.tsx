@@ -248,7 +248,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
             {
               id: "002",
               title: "Import + Export",
-              value: "DOCX In / PDF Out",
+              value: "PDF + DOCX In",
               detailA: "Auto-map into sections",
               detailB: "Editable before export"
             },

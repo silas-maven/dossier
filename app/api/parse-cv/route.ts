@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import mammoth from "mammoth";
+import { PDFParse } from "pdf-parse";
 
 import { parseCvMarkdown, parseCvText, profileFromParsedCv } from "@/lib/cv-import";
 
@@ -23,26 +24,44 @@ export async function POST(req: NextRequest) {
     const isDocx =
       fileName.endsWith(".docx") ||
       file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const isPdf = fileName.endsWith(".pdf") || file.type === "application/pdf";
 
-    if (!isDocx) {
+    if (!isDocx && !isPdf) {
       return Response.json(
-        { error: "Only DOCX is supported for import (PDF import is disabled)." },
+        { error: "Only DOCX and text-based PDF files are supported for import." },
         { status: 415 }
       );
     }
 
-    const markdownResult = await (
-      mammoth as unknown as {
-        convertToMarkdown?: (input: { buffer: Buffer }) => Promise<{ value: string }>;
+    let text = "";
+    let markdown = "";
+
+    if (isDocx) {
+      const markdownResult = await (
+        mammoth as unknown as {
+          convertToMarkdown?: (input: { buffer: Buffer }) => Promise<{ value: string }>;
+        }
+      ).convertToMarkdown?.({ buffer: buf });
+      markdown = markdownResult?.value?.trim() ?? "";
+      text = (await mammoth.extractRawText({ buffer: buf })).value.trim();
+    }
+
+    if (isPdf) {
+      const parser = new PDFParse({ data: buf });
+      try {
+        const result = await parser.getText();
+        text = result.text.trim();
+      } finally {
+        await parser.destroy();
       }
-    ).convertToMarkdown?.({ buffer: buf });
-    const markdown = markdownResult?.value?.trim() ?? "";
-    const text = (await mammoth.extractRawText({ buffer: buf })).value.trim();
+    }
 
     if (!markdown && !text) {
       return Response.json(
         {
-          error: "No extractable text found in this DOCX."
+          error: isPdf
+            ? "No extractable text found in this PDF. Try a text-based export instead of a scanned PDF."
+            : "No extractable text found in this DOCX."
         },
         { status: 422 }
       );
@@ -63,6 +82,6 @@ export async function POST(req: NextRequest) {
         ? { name: err.name, message: err.message }
         : { name: "Unknown", message: "Non-Error thrown" };
     console.error("parse-cv failed", details);
-    return Response.json({ error: "Failed to parse CV DOCX." }, { status: 500 });
+    return Response.json({ error: "Failed to parse CV file." }, { status: 500 });
   }
 }

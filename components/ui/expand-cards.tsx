@@ -39,9 +39,16 @@ const PDFViewer = dynamic(
 const sampleTemplates: CvTemplate[] = [
   {
     id: "sample-classic",
+    variant: "banded-grey",
     name: "Sample Classic",
     category: "Sample",
+    industry: "General",
     description: "Starter preset for immediate editing.",
+    atsFit: "Strong",
+    layout: "Single Column",
+    bestFor: ["Quick preview"],
+    guidance: ["Starter preset for immediate editing."],
+    recommendedFormat: "DOCX or text-based PDF",
     previewImage:
       "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=1400&q=80"
   }

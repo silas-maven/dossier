@@ -5,6 +5,7 @@ import { contactInline, contactLines } from "@/lib/contact";
 import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
 import { parseSkillEntries } from "@/lib/skill-levels";
+import { resolveTemplateVariant } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 type CvLivePreviewProps = {
@@ -86,18 +87,19 @@ const templateTone = (templateId: string) => {
 };
 
 export default function CvLivePreview({ profile, templateName }: CvLivePreviewProps) {
-  const tone = templateTone(profile.templateId);
-  const isSkillsRightPink = profile.templateId === "skills-right-pink";
+  const variant = resolveTemplateVariant(profile.templateId);
+  const tone = templateTone(variant);
+  const isSkillsRightPink = variant === "skills-right-pink";
   const isSidebarTemplate =
-    profile.templateId === "sidebar-light" ||
-    profile.templateId === "sidebar-navy-right" ||
-    profile.templateId === "sidebar-icons" ||
-    profile.templateId === "sidebar-tan-dots" ||
-    profile.templateId === "boxed-header-dots";
+    variant === "sidebar-light" ||
+    variant === "sidebar-navy-right" ||
+    variant === "sidebar-icons" ||
+    variant === "sidebar-tan-dots" ||
+    variant === "boxed-header-dots";
   const profileSummary = (profile.basics.summary || "").trim();
   const usesSkillDots =
-    profile.templateId === "sidebar-tan-dots" ||
-    profile.templateId === "boxed-header-dots";
+    variant === "sidebar-tan-dots" ||
+    variant === "boxed-header-dots";
   const summaryAlign = profile.style.summaryAlign ?? "left";
   const lineSpacing = profile.style.lineSpacing ?? 1.35;
   const accent = profile.style.accentColor || "#F43F5E";
@@ -188,7 +190,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
     );
   };
 
-  if (profile.templateId === "sidebar-light") {
+  if (variant === "sidebar-light") {
     const headline = (profile.basics.headline || "").trim();
     const summary = (profile.basics.summary || "").trim();
     const mainSections = profile.sections
@@ -327,7 +329,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
     );
   }
 
-  if (profile.templateId === "sidebar-icons") {
+  if (variant === "sidebar-icons") {
     const headline = (profile.basics.headline || "").trim();
     const summary = (profile.basics.summary || "").trim();
     const mainSections = profile.sections

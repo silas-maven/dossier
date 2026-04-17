@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import DossierLogoLink from "@/components/navigation/dossier-logo-link";
@@ -16,8 +15,6 @@ type TemplatesPickClientProps = {
 
 export default function TemplatesPickClient({ storageMode }: TemplatesPickClientProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
 
   const handleSelect = (template: CvTemplate) => {
     router.push(`/editor?template=${template.id}&storage=${storageMode}`);
@@ -45,24 +42,12 @@ export default function TemplatesPickClient({ storageMode }: TemplatesPickClient
           <AuthStatusButton nextPath={`/templates?storage=${storageMode}`} />
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Compare layouts, preview each style, and pick the one you want to edit. You can swap styles
-          later without rewriting your content.
+          Compare ATS-safe and human-first layouts, filter by industry, and pick the style you want to
+          edit. You can still swap templates later without rewriting your content.
         </p>
 
         <div className="mt-8">
-          <TemplateCarousel
-            templates={cvTemplates}
-            loading={loading}
-            error={error}
-            onRetry={() => {
-              setLoading(true);
-              setTimeout(() => {
-                setError(false);
-                setLoading(false);
-              }, 500);
-            }}
-            onSelect={handleSelect}
-          />
+          <TemplateCarousel templates={cvTemplates} onSelect={handleSelect} />
         </div>
       </div>
     </main>

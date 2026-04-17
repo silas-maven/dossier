@@ -437,7 +437,7 @@ export default function EditorForm({
       const message =
         err instanceof Error && err.message
           ? err.message
-          : "Could not import this DOCX.";
+          : "Could not import this file.";
       setImportError(message);
     } finally {
       setImportLoading(false);
@@ -1157,7 +1157,7 @@ export default function EditorForm({
                         onClick={startImportClick}
                         disabled={importLoading}
                       >
-                        {importLoading ? "Importing..." : "Import DOCX"}
+                        {importLoading ? "Importing..." : "Import CV File"}
                       </Button>
                     </span>
                   </CardTitle>
@@ -1256,7 +1256,7 @@ export default function EditorForm({
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+                    accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
                     className="hidden"
                     onChange={(event) => {
                       const f = event.target.files?.[0];
@@ -1281,6 +1281,9 @@ export default function EditorForm({
                       ? "Cloud mode active. Local snapshot is still kept for conflict recovery."
                       : "Local mode active. Data stays in your browser unless you sync to cloud."}
                     {!isHydrated ? " (loading...)" : ""}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Import accepts DOCX and text-based PDF files. DOCX is usually the safest ATS format.
                   </p>
                   {importError ? <p className="text-xs text-red-700">{importError}</p> : null}
                   {undoProfile ? (

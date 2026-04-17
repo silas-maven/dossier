@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CvProfile, CvSectionStyle, CvStyle } from "@/lib/cv-profile";
+import { resolveTemplateVariant } from "@/lib/templates";
 
 type EditorStylePanelProps = {
   templateId: string;
@@ -27,20 +28,21 @@ export default function EditorStylePanel({
   onSelectedSectionStyleChange,
   className
 }: EditorStylePanelProps) {
+  const variant = resolveTemplateVariant(templateId);
   const showAccentColor = new Set([
     "banded-grey",
     "blue-rules",
     "skills-right-red",
     "skills-right-pink",
     "sidebar-tan-dots"
-  ]).has(templateId);
+  ]).has(variant);
   const showSidebarColor = new Set([
     "sidebar-light",
     "sidebar-navy-right",
     "sidebar-icons",
     "sidebar-tan-dots",
     "boxed-header-dots"
-  ]).has(templateId);
+  ]).has(variant);
 
   const selectedSection =
     sections.find((section) => section.id === selectedSectionId) ?? sections[0] ?? null;
