@@ -1256,7 +1256,7 @@ export default function EditorForm({
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+                    accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,text/plain,.txt,text/markdown,.md,.markdown,application/rtf,text/rtf,.rtf"
                     className="hidden"
                     onChange={(event) => {
                       const f = event.target.files?.[0];
@@ -1283,7 +1283,7 @@ export default function EditorForm({
                     {!isHydrated ? " (loading...)" : ""}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Import accepts DOCX and text-based PDF files. DOCX is usually the safest ATS format.
+                    Import accepts PDF, DOCX, TXT, Markdown, and RTF. DOCX is usually the safest ATS format.
                   </p>
                   {importError ? <p className="text-xs text-red-700">{importError}</p> : null}
                   {undoProfile ? (

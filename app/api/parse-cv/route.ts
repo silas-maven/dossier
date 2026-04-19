@@ -1,10 +1,104 @@
 import type { NextRequest } from "next/server";
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
 
 import { parseCvMarkdown, parseCvText, profileFromParsedCv } from "@/lib/cv-import";
 
 export const runtime = "nodejs";
+
+const textDecoder = new TextDecoder("utf-8");
+
+declare global {
+  // pdfjs reads this global when it falls back to main-thread parsing.
+  var pdfjsWorker:
+    | {
+        WorkerMessageHandler: unknown;
+      }
+    | undefined;
+}
+
+const joinPdfLine = (parts: string[]) => parts.join(" ").replace(/\s+/g, " ").trim();
+
+const extractPdfText = async (buf: Buffer) => {
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  if (!globalThis.pdfjsWorker?.WorkerMessageHandler) {
+    const workerModule = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
+    globalThis.pdfjsWorker = {
+      WorkerMessageHandler: workerModule.WorkerMessageHandler
+    };
+  }
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buf),
+    useWorkerFetch: false,
+    isEvalSupported: false
+  });
+
+  try {
+    const pdf = await loadingTask.promise;
+    const pages: string[] = [];
+
+    for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex += 1) {
+      const page = await pdf.getPage(pageIndex);
+      const content = await page.getTextContent();
+      const lines: string[] = [];
+      let currentBaseline: number | null = null;
+      let currentLine: string[] = [];
+
+      const flushLine = () => {
+        const nextLine = joinPdfLine(currentLine);
+        if (nextLine) lines.push(nextLine);
+        currentLine = [];
+      };
+
+      for (const item of content.items) {
+        if (!("str" in item) || typeof item.str !== "string") continue;
+
+        const fragment = item.str.replace(/\s+/g, " ").trim();
+        if (!fragment) continue;
+
+        const baseline = Array.isArray(item.transform) && typeof item.transform[5] === "number" ? item.transform[5] : 0;
+        const startsNewLine = currentBaseline !== null && Math.abs(baseline - currentBaseline) > 4;
+
+        if (startsNewLine) {
+          flushLine();
+        }
+
+        currentLine.push(fragment);
+        currentBaseline = baseline;
+
+        if ("hasEOL" in item && item.hasEOL) {
+          flushLine();
+          currentBaseline = null;
+        }
+      }
+
+      flushLine();
+      page.cleanup();
+
+      if (lines.length > 0) {
+        pages.push(lines.join("\n"));
+      }
+    }
+
+    return pages.join("\n\n").trim();
+  } finally {
+    await loadingTask.destroy();
+  }
+};
+
+const decodeTextFile = (buf: Buffer) => textDecoder.decode(buf).replace(/\u0000/g, "").trim();
+
+const stripRtf = (value: string) =>
+  value
+    .replace(/\\par[d]?/g, "\n")
+    .replace(/\\tab/g, "\t")
+    .replace(/\\'[0-9a-fA-F]{2}/g, (match) => String.fromCharCode(Number.parseInt(match.slice(2), 16)))
+    .replace(/\\u-?\d+\??/g, " ")
+    .replace(/\\[a-z]+-?\d* ?/gi, " ")
+    .replace(/[{}]/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,10 +119,15 @@ export async function POST(req: NextRequest) {
       fileName.endsWith(".docx") ||
       file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     const isPdf = fileName.endsWith(".pdf") || file.type === "application/pdf";
+    const isMarkdown =
+      fileName.endsWith(".md") || fileName.endsWith(".markdown") || file.type === "text/markdown";
+    const isPlainText = fileName.endsWith(".txt") || file.type === "text/plain";
+    const isRtf =
+      fileName.endsWith(".rtf") || file.type === "application/rtf" || file.type === "text/rtf";
 
-    if (!isDocx && !isPdf) {
+    if (!isDocx && !isPdf && !isMarkdown && !isPlainText && !isRtf) {
       return Response.json(
-        { error: "Only DOCX and text-based PDF files are supported for import." },
+        { error: "Supported imports: PDF, DOCX, TXT, Markdown, and RTF." },
         { status: 415 }
       );
     }
@@ -47,13 +146,20 @@ export async function POST(req: NextRequest) {
     }
 
     if (isPdf) {
-      const parser = new PDFParse({ data: buf });
-      try {
-        const result = await parser.getText();
-        text = result.text.trim();
-      } finally {
-        await parser.destroy();
-      }
+      text = await extractPdfText(buf);
+    }
+
+    if (isMarkdown) {
+      markdown = decodeTextFile(buf);
+      text = markdown;
+    }
+
+    if (isPlainText) {
+      text = decodeTextFile(buf);
+    }
+
+    if (isRtf) {
+      text = stripRtf(decodeTextFile(buf));
     }
 
     if (!markdown && !text) {
@@ -61,7 +167,7 @@ export async function POST(req: NextRequest) {
         {
           error: isPdf
             ? "No extractable text found in this PDF. Try a text-based export instead of a scanned PDF."
-            : "No extractable text found in this DOCX."
+            : "No extractable text found in this file."
         },
         { status: 422 }
       );
