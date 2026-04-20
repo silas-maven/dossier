@@ -1,4 +1,5 @@
 import { getTemplateById } from "@/lib/templates";
+import { getTemplateGuidanceProfile } from "@/lib/template-guidance";
 import EditorForm from "@/app/editor/editor-form";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -72,6 +73,7 @@ export default async function EditorPage({ searchParams }: EditorPageProps) {
   }
 
   const selectedTemplate = getTemplateById(template);
+  const guidanceProfile = getTemplateGuidanceProfile(selectedTemplate.guidanceProfileId);
   const backHref = `/templates?storage=${requestedMode}`;
 
   return (
@@ -97,9 +99,11 @@ export default async function EditorPage({ searchParams }: EditorPageProps) {
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Build your CV</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Template selected: {selectedTemplate.name} ({selectedTemplate.atsFit} ATS fit, {selectedTemplate.layout}).
+            Template selected: {selectedTemplate.name} ({selectedTemplate.layout}, {selectedTemplate.atsMode} mode).
           </p>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{selectedTemplate.guidance[0]}</p>
+          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            {guidanceProfile.label}: {selectedTemplate.guidance[0]}
+          </p>
         </div>
         <EditorForm
           templateId={selectedTemplate.id}

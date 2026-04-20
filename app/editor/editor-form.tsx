@@ -25,6 +25,7 @@ import {
   createEmptyItem,
   createEmptyProfile,
   createEmptySection,
+  defaultSectionTitle,
   cvSectionTypes,
   type CvBasics,
   type CvProfile,
@@ -33,6 +34,9 @@ import {
   type CvSectionType
 } from "@/lib/cv-profile";
 import { seedExampleProfile } from "@/lib/cv-seed";
+import { getTemplateGuidanceProfile } from "@/lib/template-guidance";
+import { getSummarySuggestionPack, getSectionSuggestionPack } from "@/lib/template-suggestions";
+import { normalizeProfileForTemplate, sanitizeStyleForTemplate } from "@/lib/template-profile";
 import {
   DEFAULT_SKILL_LEVEL,
   MAX_SKILL_LEVEL,
@@ -58,6 +62,7 @@ import {
   type ProfileStorageMode,
   type StoredProfileMeta
 } from "@/lib/profile-store";
+import { getTemplateById } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { type DossierStorageMode } from "@/lib/storage-mode";
 import { createSupabaseBrowserClientOrNull } from "@/lib/supabase/client";
@@ -114,7 +119,7 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
   const style = (source.style ?? {}) as Partial<CvProfile["style"]>;
   const sectionList = Array.isArray(source.sections) ? source.sections : fallback.sections;
 
-  return {
+  const normalizedProfile: CvProfile = {
     ...fallback,
     ...source,
     id: asString(source.id) || fallback.id,
@@ -179,7 +184,10 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
         ...section,
         id: asString(section.id) || defaultSection.id,
         type,
-        title: asString(section.title) || defaultSection.title,
+        title:
+          typeof section.title === "string"
+            ? section.title
+            : defaultSectionTitle(type),
         style: {
           ...defaultSection.style,
           titleFontSize:
@@ -257,6 +265,8 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
       };
     })
   };
+
+  return normalizeProfileForTemplate(normalizedProfile, templateId);
 };
 
 const buildMeta = (input: {
@@ -289,6 +299,11 @@ export default function EditorForm({
 }: EditorFormProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cloudConfigured = useMemo(() => Boolean(createSupabaseBrowserClientOrNull()), []);
+  const selectedTemplate = useMemo(() => getTemplateById(templateId), [templateId]);
+  const guidanceProfile = useMemo(
+    () => getTemplateGuidanceProfile(selectedTemplate.guidanceProfileId),
+    [selectedTemplate.guidanceProfileId]
+  );
 
   const [profile, setProfile] = useState<CvProfile>(() => createEmptyProfile(templateId));
   const [isHydrated, setIsHydrated] = useState(false);
@@ -398,7 +413,7 @@ export default function EditorForm({
   const startSeed = () => {
     setImportError(null);
     setUndoProfile(profile);
-    setProfile(seedExampleProfile(templateId));
+    setProfile(normalizeProfileForTemplate(seedExampleProfile(templateId), templateId));
     setImportCandidate(null);
   };
 
@@ -618,10 +633,13 @@ export default function EditorForm({
 
     setProfile((current) => ({
       ...current,
-      style: {
-        ...current.style,
-        [field]: normalizedValue
-      }
+      style: sanitizeStyleForTemplate(
+        {
+          ...current.style,
+          [field]: normalizedValue
+        },
+        templateId
+      )
     }));
   };
 
@@ -640,6 +658,7 @@ export default function EditorForm({
           ...section,
           type: nextType
         };
+        return normalizeProfileForTemplate({ ...current, sections }, templateId);
       } else {
         sections[sectionIndex] = {
           ...section,
@@ -717,6 +736,10 @@ export default function EditorForm({
     updateSectionStyleField(selectedSectionIndex, field, value);
   };
 
+  const reapplyRecommendedSectionOrder = () => {
+    setProfile((current) => normalizeProfileForTemplate(current, templateId));
+  };
+
   const addSection = (type: CvSectionType = "custom", titleOverride?: string) => {
     let newSectionId = "";
     setProfile((current) => {
@@ -728,10 +751,10 @@ export default function EditorForm({
         newSection.title = titleOverride;
       }
       newSectionId = newSection.id;
-      return {
+      return normalizeProfileForTemplate({
         ...current,
         sections: [...current.sections, newSection]
-      };
+      }, templateId);
     });
     if (newSectionId) {
       setSelectedSectionId(newSectionId);
@@ -740,10 +763,15 @@ export default function EditorForm({
   };
 
   const removeSection = (sectionIndex: number) => {
-    setProfile((current) => ({
-      ...current,
-      sections: current.sections.filter((_, idx) => idx !== sectionIndex)
-    }));
+    setProfile((current) =>
+      normalizeProfileForTemplate(
+        {
+          ...current,
+          sections: current.sections.filter((_, idx) => idx !== sectionIndex)
+        },
+        templateId
+      )
+    );
   };
 
   const moveSection = (sectionIndex: number, direction: -1 | 1) => {
@@ -1083,6 +1111,70 @@ export default function EditorForm({
   const activeContentSectionIndex = activeContentSection
     ? profile.sections.findIndex((section) => section.id === activeContentSection.id)
     : -1;
+  const summarySuggestions = useMemo(
+    () => getSummarySuggestionPack(templateId, profile),
+    [profile, templateId]
+  );
+  const activeSectionSuggestionPack = useMemo(
+    () =>
+      activeContentSection
+        ? getSectionSuggestionPack(templateId, profile, activeContentSection.type)
+        : null,
+    [activeContentSection, profile, templateId]
+  );
+
+  const applySummarySuggestion = (content: string) => {
+    updateBasics("summary", content);
+  };
+
+  const applySectionStarter = (content: string) => {
+    if (!activeContentSection || activeContentSectionIndex < 0) return;
+
+    if (activeContentSection.type === "skills") {
+      setProfile((current) => {
+        const sections = [...current.sections];
+        const section = sections[activeContentSectionIndex];
+        if (!section) return current;
+        sections[activeContentSectionIndex] = {
+          ...section,
+          items: [...section.items, { ...createEmptyItem(), title: content }]
+        };
+        return { ...current, sections };
+      });
+      return;
+    }
+
+    if (activeContentSection.type === "custom" && !activeContentSection.title.trim()) {
+      updateSectionField(activeContentSectionIndex, "title", content);
+      return;
+    }
+
+    if (activeContentSection.type === "certifications") {
+      setProfile((current) => {
+        const sections = [...current.sections];
+        const section = sections[activeContentSectionIndex];
+        if (!section) return current;
+        sections[activeContentSectionIndex] = {
+          ...section,
+          items: [...section.items, { ...createEmptyItem(), title: content }]
+        };
+        return { ...current, sections };
+      });
+      return;
+    }
+
+    if (activeContentSection.items.length === 0) {
+      ensureOneItem(activeContentSectionIndex);
+      updateItemField(activeContentSectionIndex, 0, "description", content);
+      return;
+    }
+
+    const targetIndex = activeContentSection.items.findIndex((item) => item.visible);
+    const itemIndex = targetIndex >= 0 ? targetIndex : 0;
+    const currentDescription = activeContentSection.items[itemIndex]?.description?.trim() ?? "";
+    const nextDescription = currentDescription ? `${currentDescription}\n${content}` : content;
+    updateItemField(activeContentSectionIndex, itemIndex, "description", nextDescription);
+  };
 
   return (
     <div className="space-y-4">
@@ -1166,6 +1258,27 @@ export default function EditorForm({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <div className="rounded-lg border border-border/70 bg-muted/10 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Template system
+                    </p>
+                    <p className="mt-2 text-sm text-foreground">
+                      {selectedTemplate.family.replace(/-/g, " ")} · {selectedTemplate.atsMode} mode
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Recommended order: {guidanceProfile.suggestedSectionOrder.join(" → ")}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="mt-3"
+                      onClick={reapplyRecommendedSectionOrder}
+                    >
+                      Reapply recommended section order
+                    </Button>
+                  </div>
+
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span>Template ID:</span>
                     <code className="rounded bg-muted px-2 py-1 text-[11px] text-foreground">
@@ -1305,6 +1418,32 @@ export default function EditorForm({
                   <CardDescription>Core identity details used across all templates.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 md:grid-cols-2">
+                  <div className="rounded-lg border border-border/70 bg-muted/10 p-3 md:col-span-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Summary guidance
+                    </p>
+                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                      {guidanceProfile.summaryAdvice.map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/70" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {summarySuggestions.map((suggestion) => (
+                        <Button
+                          key={suggestion.label}
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => applySummarySuggestion(suggestion.content)}
+                        >
+                          {suggestion.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                   <label className="space-y-1 md:col-span-2">
                     <span className="text-sm font-medium">Full name</span>
                     <input
@@ -1382,6 +1521,42 @@ export default function EditorForm({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {activeSectionSuggestionPack ? (
+                      <div className="rounded-lg border border-border/70 bg-muted/10 p-4">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                              {activeSectionSuggestionPack.heading}
+                            </p>
+                            <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                              {activeSectionSuggestionPack.advice.map((item) => (
+                                <li key={item} className="flex gap-2">
+                                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/70" />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <Button type="button" variant="secondary" size="sm" onClick={reapplyRecommendedSectionOrder}>
+                            Reapply section order
+                          </Button>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {activeSectionSuggestionPack.starters.map((starter) => (
+                            <Button
+                              key={starter.label}
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => applySectionStarter(starter.content)}
+                            >
+                              {starter.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
                     <div className="rounded-xl border border-primary/70 bg-primary/5 p-4 ring-1 ring-primary/30">
                       <div className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
                         <label className="space-y-1">
@@ -1488,7 +1663,9 @@ export default function EditorForm({
                                   className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                   <option value="disc">Disc (•)</option>
-                                  <option value="square">Square (■)</option>
+                                  <option value="square" disabled={selectedTemplate.atsMode === "safe"}>
+                                    Square (■)
+                                  </option>
                                   <option value="dash">Dash (-)</option>
                                 </select>
                               </label>
@@ -1605,7 +1782,9 @@ export default function EditorForm({
                                     ))}
 
                                     <p className="text-xs text-muted-foreground">
-                                      Dot-based templates read this level directly. Range: 1 to 5.
+                                      {selectedTemplate.capabilities.ratings
+                                        ? "Supported human-first layouts can render these levels visually. Range: 1 to 5."
+                                        : "This template stores levels but renders skills as text-first lists."}
                                     </p>
                                   </div>
                                 </div>

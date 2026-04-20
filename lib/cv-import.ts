@@ -62,6 +62,20 @@ const cleanHeading = (heading: string) =>
     .replace(/[:–—-]+$/g, "")
     .trim();
 
+const prettifyHeadingTitle = (heading: string) => {
+  const cleaned = cleanHeading(heading);
+  const alpha = cleaned.replace(/[^A-Za-z]/g, "");
+  if (!alpha) return cleaned;
+  const upperRatio = alpha.replace(/[^A-Z]/g, "").length / alpha.length;
+  if (upperRatio < 0.75) return cleaned;
+  return cleaned
+    .toLowerCase()
+    .replace(/\b(api|saas|sql|uk|gmt|bst|crm|erp|bi|aml)\b/g, (token) => token.toUpperCase())
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\b(And|Or|For|Of|The|To|In|On|At)\b/g, (word) => word.toLowerCase())
+    .replace(/\b(Api|Saas|Sql|Uk|Gmt|Bst|Crm|Erp|Bi|Aml)\b/g, (token) => token.toUpperCase());
+};
+
 const headingToSection = (heading: string): { type: CvSectionType; title: string } | null => {
   const h = cleanHeading(heading).toLowerCase();
   if (
@@ -76,12 +90,31 @@ const headingToSection = (heading: string): { type: CvSectionType; title: string
   if (["courses", "coursework", "certificates", "certifications", "certification", "training"].includes(h)) {
     return { type: "certifications", title: "Certificates" };
   }
-  if (["projects", "project", "selected projects"].includes(h)) return { type: "projects", title: "Projects" };
+  if (["projects", "project", "selected projects", "project highlights", "highlighted projects"].includes(h)) {
+    return { type: "projects", title: "Projects" };
+  }
   if (h.includes("missing") && h.includes("custom") && h.includes("translation")) {
     return { type: "projects", title: "Projects" };
   }
   if (["summary", "profile", "about"].includes(h)) return { type: "custom", title: "Summary" };
   return null;
+};
+
+const customHeadingToSection = (heading: string): { type: CvSectionType; title: string } | null => {
+  const title = prettifyHeadingTitle(heading);
+  if (!title) return null;
+  return {
+    type: "custom",
+    title
+  };
+};
+
+const looksLikeCustomSectionHeading = (line: string) => {
+  const cleaned = cleanHeading(line);
+  const alpha = cleaned.replace(/[^A-Za-z]/g, "");
+  if (alpha.length < 4) return false;
+  const upperRatio = alpha.replace(/[^A-Z]/g, "").length / alpha.length;
+  return upperRatio > 0.75;
 };
 
 const looksLikeHeading = (line: string) => {
@@ -107,6 +140,33 @@ const splitBlocks = (lines: string[]) => {
   }
   if (buf.length > 0) blocks.push(buf.join("\n"));
   return blocks.map((b) => b.trim()).filter(Boolean);
+};
+
+const splitExperienceBlocks = (lines: string[]) => {
+  const blocks: string[] = [];
+  let buf: string[] = [];
+  let seenBullet = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const isBullet = /^[-•*]\s+/.test(line);
+    const startsNewRole = buf.length > 0 && seenBullet && !isBullet && looksLikeHeading(line);
+
+    if (startsNewRole) {
+      blocks.push(buf.join("\n"));
+      buf = [line];
+      seenBullet = false;
+      continue;
+    }
+
+    buf.push(line);
+    if (isBullet) seenBullet = true;
+  }
+
+  if (buf.length > 0) blocks.push(buf.join("\n"));
+  return blocks.map((block) => block.trim()).filter(Boolean);
 };
 
 export const parseCvText = (text: string): ParsedCv => {
@@ -180,9 +240,9 @@ export const parseCvText = (text: string): ParsedCv => {
         if (EMAIL_RE.test(l) || PHONE_RE.test(l) || URL_RE.test(l)) return false;
         if (looksLikeHeading(l) && headingToSection(l)) return false;
         if (l.length < 4 || l.length > 60) return false;
-        return /^[A-Za-z][A-Za-z &/.'-]+$/.test(l);
+        return /^[A-Za-z][A-Za-z0-9 &,/|().' -]+$/.test(l);
       });
-      if (next) basics.headline = next;
+      if (next) basics.headline = next.split("|")[0]?.trim() ?? next;
     }
   }
 
@@ -190,28 +250,33 @@ export const parseCvText = (text: string): ParsedCv => {
   const sections: ParsedCv["sections"] = [];
   let current: ParsedCv["sections"][number] | null = null;
   let currentLines: string[] = [];
+  let preambleLines: string[] = [];
 
   const flush = () => {
     if (!current) return;
-    const blocks = splitBlocks(currentLines);
+    const blocks = current.type === "experience" ? splitExperienceBlocks(currentLines) : splitBlocks(currentLines);
     sections.push({ ...current, blocks });
     current = null;
     currentLines = [];
   };
 
-  for (const line of lines) {
+  for (const [index, line] of lines.entries()) {
     if (looksLikeHeading(line)) {
-      const mapped = headingToSection(line);
-      if (mapped) {
+      const mapped =
+        headingToSection(line) ??
+        (index >= 3 && looksLikeCustomSectionHeading(line) ? customHeadingToSection(line) : null);
+      if (mapped && (index >= 3 || mapped.title === "Summary")) {
         flush();
+        currentLines = [];
         current = { ...mapped, blocks: [] };
         continue;
       }
     }
-    if (!current) {
+
+    if (current) {
       currentLines.push(line);
     } else {
-      currentLines.push(line);
+      preambleLines.push(line);
     }
   }
   flush();
@@ -221,9 +286,10 @@ export const parseCvText = (text: string): ParsedCv => {
     const firstHeadingIndex = lines.findIndex((l) => looksLikeHeading(l) && !!headingToSection(l));
     const introCutoff =
       firstHeadingIndex >= 0 ? firstHeadingIndex : Math.min(lines.length, 18);
-    const preHeading = lines.slice(0, introCutoff);
+    const preHeading = (preambleLines.length > 0 ? preambleLines : lines.slice(0, introCutoff)).slice(0, introCutoff);
     const summaryLines = preHeading.filter((l) => {
       if (l === basics.name) return false;
+      if (basics.headline && (l === basics.headline || l.startsWith(`${basics.headline} |`))) return false;
       if (EMAIL_RE.test(l) || PHONE_RE.test(l) || URL_RE.test(l)) return false;
       if (looksLikeHeading(l) && headingToSection(l)) return false;
       return l.length > 20;
@@ -366,7 +432,7 @@ export const parseCvMarkdown = (markdown: string): ParsedCv => {
     if (t.startsWith("### ")) {
       flush();
       const heading = normalizeMarkdownLine(t.slice(4));
-      const mapped = headingToSection(heading);
+      const mapped = headingToSection(heading) ?? customHeadingToSection(heading);
       current = mapped ? { ...mapped, blocks: [] } : null;
       continue;
     }
@@ -408,10 +474,40 @@ const splitDateTail = (value: string) => {
   }
   const main = text
     .slice(0, match.index)
-    .replace(/[,\s–—-]+$/, "")
+    .replace(/[|,\s–—-]+$/, "")
     .trim();
   const dateRange = match[1].replace(/\s*[–—-]\s*/g, " — ");
   return { main, dateRange };
+};
+
+const stripListMarker = (value: string) => value.replace(/^[-•*]\s+/, "").trim();
+
+const collapseBulletLines = (lines: string[]) => {
+  const merged: string[] = [];
+  let current = "";
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    const isBullet = /^[-•*]\s+/.test(line);
+    const content = stripListMarker(line);
+    if (!content) continue;
+
+    if (isBullet) {
+      if (current) merged.push(current);
+      current = content;
+      continue;
+    }
+
+    if (current) {
+      current = `${current} ${content}`.replace(/\s+/g, " ").trim();
+    } else {
+      current = content;
+    }
+  }
+
+  if (current) merged.push(current);
+  return merged;
 };
 
 const splitTitleSubtitle = (value: string) => {
@@ -426,6 +522,53 @@ const splitTitleSubtitle = (value: string) => {
   };
 };
 
+const parseExperienceHeader = (lines: string[]) => {
+  const first = stripListMarker(lines[0] ?? "");
+  const second = stripListMarker(lines[1] ?? "");
+
+  if (second && !/^[-•*]\s+/.test(lines[1] ?? "")) {
+    const secondSplit = splitDateTail(second);
+    if (secondSplit.dateRange) {
+      return {
+        title: first,
+        subtitle: secondSplit.main,
+        dateRange: secondSplit.dateRange,
+        detailStartIndex: 2
+      };
+    }
+  }
+
+  const firstSplit = splitDateTail(first);
+  const firstParts = splitTitleSubtitle(firstSplit.main);
+  return {
+    title: firstParts.title,
+    subtitle: second || firstParts.subtitle,
+    dateRange: firstSplit.dateRange,
+    detailStartIndex: second && second !== firstParts.subtitle ? 2 : 1
+  };
+};
+
+const parseCustomBlock = (block: string) => {
+  const lines = collapseBulletLines(block.split("\n"));
+  const text = lines.join(" ").trim();
+  if (!text) {
+    return { title: "", description: "" };
+  }
+
+  const dividerIndex = text.indexOf(":");
+  if (dividerIndex > 0 && dividerIndex < 36) {
+    return {
+      title: text.slice(0, dividerIndex).trim(),
+      description: text.slice(dividerIndex + 1).trim()
+    };
+  }
+
+  return {
+    title: "",
+    description: text
+  };
+};
+
 export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvProfile => {
   const profile = createEmptyProfile(templateId);
   profile.name = "Imported CV";
@@ -434,20 +577,25 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
     ...parsed.basics
   };
 
-  // Avoid duplicating summary: if we already inferred basics.summary, drop an explicit Summary section.
-  const normalizedSections = parsed.sections.filter((section) => {
-    if (section.type !== "custom") return true;
-    if (section.title.toLowerCase() !== "summary") return true;
-    return !profile.basics.summary;
-  });
-
   // If there is a Summary section but basics.summary is empty, use its first block as summary.
   const summarySection = parsed.sections.find(
     (s) => s.type === "custom" && s.title.toLowerCase() === "summary"
   );
   if (!profile.basics.summary && summarySection?.blocks?.[0]) {
     profile.basics.summary = summarySection.blocks[0].replace(/\n+/g, " ").trim();
+  } else if (summarySection?.blocks?.[0]) {
+    const explicitSummary = summarySection.blocks[0].replace(/\n+/g, " ").trim();
+    if (explicitSummary.length > profile.basics.summary.length + 20) {
+      profile.basics.summary = explicitSummary;
+    }
   }
+
+  // Avoid duplicating summary: once promoted into basics.summary, hide the custom section.
+  const normalizedSections = parsed.sections.filter((section) => {
+    if (section.type !== "custom") return true;
+    if (section.title.toLowerCase() !== "summary") return true;
+    return !profile.basics.summary;
+  });
 
   const sections = normalizedSections.map((section) => {
     const s = createEmptySection(section.type);
@@ -466,15 +614,31 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
           if (!mapped) return true;
           return mapped.type === "skills";
         });
-      const filteredText = filteredLines.join("\n").trim();
-      const item = createEmptyItem();
-      item.title = "Skills";
-      item.description = filteredText;
-      item.subtitle = "";
-      item.dateRange = "";
-      item.tags = [];
-      item.visible = true;
-      s.items = filteredText ? [item] : [];
+      const groupedItems = filteredLines
+        .map((line) => stripListMarker(line))
+        .map((line) => {
+          const dividerIndex = line.indexOf(":");
+          if (dividerIndex <= 0 || dividerIndex >= 42) {
+            return { title: "", description: line.trim() };
+          }
+          return {
+            title: line.slice(0, dividerIndex).trim(),
+            description: line.slice(dividerIndex + 1).trim()
+          };
+        })
+        .filter((entry) => entry.description);
+
+      s.style.skillsColumns = groupedItems.some((entry) => entry.title) ? 2 : 1;
+      s.items = groupedItems.map((entry) => {
+        const item = createEmptyItem();
+        item.title = entry.title;
+        item.description = entry.description;
+        item.subtitle = "";
+        item.dateRange = "";
+        item.tags = [];
+        item.visible = true;
+        return item;
+      });
       return s;
     }
 
@@ -482,16 +646,11 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 40).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const header = lines[0] ?? "";
-        const { main, dateRange } = splitDateTail(header);
-        const ts = splitTitleSubtitle(main);
-        item.title = ts.title;
-        item.subtitle = ts.subtitle;
-        item.dateRange = dateRange;
-        const bullets = lines
-          .slice(1)
-          .map((l) => l.replace(/^[-•*]\s+/, "").trim())
-          .filter(Boolean);
+        const parsedHeader = parseExperienceHeader(lines);
+        item.title = parsedHeader.title;
+        item.subtitle = parsedHeader.subtitle;
+        item.dateRange = parsedHeader.dateRange;
+        const bullets = collapseBulletLines(lines.slice(parsedHeader.detailStartIndex));
         item.description = bullets.map((l) => `- ${l}`).join("\n");
         item.tags = [];
         item.visible = true;
@@ -504,11 +663,11 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 20).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const header = lines[0] ?? "";
+        const header = stripListMarker(lines[0] ?? "");
         const { main, dateRange } = splitDateTail(header);
         const ts = splitTitleSubtitle(main);
         item.title = ts.title;
-        item.subtitle = lines[1] || ts.subtitle;
+        item.subtitle = stripListMarker(lines[1] || ts.subtitle);
         item.dateRange = dateRange;
         item.description = lines.slice(item.subtitle ? 2 : 1).join("\n");
         item.visible = true;
@@ -521,7 +680,7 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 30).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const header = lines[0] ?? "";
+        const header = stripListMarker(lines[0] ?? "");
         const { main, dateRange } = splitDateTail(header);
         const ts = splitTitleSubtitle(main);
         item.title = ts.title;
@@ -537,11 +696,11 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
     if (section.type === "projects") {
       s.items = section.blocks.slice(0, 30).map((block) => {
         const item = createEmptyItem();
-        const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        item.title = lines[0] ?? "";
+        const lines = collapseBulletLines(block.split("\n"));
+        item.title = lines.join(" ").trim();
         item.subtitle = "";
         item.dateRange = "";
-        item.description = lines.slice(1).join("\n");
+        item.description = "";
         item.tags = [];
         item.visible = true;
         return item;
@@ -551,10 +710,10 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
 
     s.items = section.blocks.slice(0, 30).map((block) => {
       const item = createEmptyItem();
-      const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-      item.title = lines[0] ?? "";
-      item.subtitle = lines[1] ?? "";
-      item.description = lines.slice(2).join("\n");
+      const parsedBlock = parseCustomBlock(block);
+      item.title = parsedBlock.title;
+      item.subtitle = "";
+      item.description = parsedBlock.description ? `- ${parsedBlock.description}` : "";
       item.visible = true;
       return item;
     });

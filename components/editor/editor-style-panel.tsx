@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CvProfile, CvSectionStyle, CvStyle } from "@/lib/cv-profile";
-import { resolveTemplateVariant } from "@/lib/templates";
+import { getTemplateById, resolveTemplateVariant, templateFamilyDefinitions } from "@/lib/templates";
 
 type EditorStylePanelProps = {
   templateId: string;
@@ -28,6 +28,7 @@ export default function EditorStylePanel({
   onSelectedSectionStyleChange,
   className
 }: EditorStylePanelProps) {
+  const template = getTemplateById(templateId);
   const variant = resolveTemplateVariant(templateId);
   const showAccentColor = new Set([
     "banded-grey",
@@ -46,6 +47,8 @@ export default function EditorStylePanel({
 
   const selectedSection =
     sections.find((section) => section.id === selectedSectionId) ?? sections[0] ?? null;
+  const isAtsSafe = template.atsMode === "safe";
+  const familyMeta = templateFamilyDefinitions[template.family];
 
   return (
     <div className={className}>
@@ -55,6 +58,14 @@ export default function EditorStylePanel({
           <CardDescription>Controls for this template. Affects PDF export and preview output.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
+          <div className="rounded-md border bg-muted/20 px-3 py-2 text-sm">
+            <p className="font-medium text-foreground">{familyMeta.label}</p>
+            <p className="mt-1 text-muted-foreground">{familyMeta.focus}</p>
+            <p className="mt-2 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              {template.atsMode} mode
+            </p>
+          </div>
+
           <label className="space-y-1">
             <span className="text-sm font-medium">Font</span>
             <select
@@ -64,10 +75,15 @@ export default function EditorStylePanel({
             >
               <option value="sans">Sans</option>
               <option value="serif">Serif</option>
-              <option value="mono">Mono</option>
+              <option value="mono" disabled={isAtsSafe}>Mono</option>
               <option value="system-native">System Native</option>
-              <option value="product-modern">Open Sans + Menlo</option>
+              <option value="product-modern" disabled={isAtsSafe}>Open Sans + Menlo</option>
             </select>
+            {isAtsSafe ? (
+              <p className="text-xs text-muted-foreground">
+                ATS-safe templates limit decorative font choices.
+              </p>
+            ) : null}
           </label>
 
           <label className="space-y-1">
@@ -91,9 +107,14 @@ export default function EditorStylePanel({
               className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="left">Left</option>
-              <option value="center">Center</option>
-              <option value="right">Right</option>
+              <option value="center" disabled={isAtsSafe}>Center</option>
+              <option value="right" disabled={isAtsSafe}>Right</option>
             </select>
+            {isAtsSafe ? (
+              <p className="text-xs text-muted-foreground">
+                Left-aligned summaries are enforced for ATS-safe templates.
+              </p>
+            ) : null}
           </label>
 
           {showAccentColor ? (
@@ -203,6 +224,13 @@ export default function EditorStylePanel({
 
               {selectedSection ? (
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
+                  {selectedSection.type === "skills" ? (
+                    <div className="rounded-md border bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                      {template.capabilities.ratings
+                        ? "This family can render skill levels visually in supported layouts."
+                        : "This family renders skills as text-first lists. Levels are stored but visual ratings are suppressed."}
+                    </div>
+                  ) : null}
                   <label className="space-y-1">
                     <span className="text-sm font-medium">Section title size (PDF)</span>
                     <input
@@ -291,8 +319,8 @@ export default function EditorStylePanel({
                       className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <option value="left">Left</option>
-                      <option value="center">Center</option>
-                      <option value="right">Right</option>
+                      <option value="center" disabled={isAtsSafe}>Center</option>
+                      <option value="right" disabled={isAtsSafe}>Right</option>
                       <option value="justify">Justify</option>
                     </select>
                   </label>
@@ -324,7 +352,7 @@ export default function EditorStylePanel({
                           className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <option value="disc">Disc (•)</option>
-                          <option value="square">Square (■)</option>
+                          <option value="square" disabled={isAtsSafe}>Square (■)</option>
                           <option value="dash">Dash (-)</option>
                         </select>
                       </label>

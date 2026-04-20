@@ -1,4 +1,11 @@
-import { resolveTemplateVariant } from "@/lib/templates";
+import {
+  resolveTemplateFamily,
+  resolveTemplateTheme
+} from "@/lib/templates";
+import type {
+  TemplateFamily,
+  TemplateTheme
+} from "@/lib/templates";
 
 export const cvSectionTypes = [
   "experience",
@@ -92,10 +99,16 @@ export const createEmptyItem = (): CvItem => ({
   visible: true
 });
 
+export const defaultSectionTitle = (type: CvSectionType): string => {
+  if (type === "certifications") return "Certificates";
+  if (type === "custom") return "";
+  return type[0].toUpperCase() + type.slice(1);
+};
+
 export const createEmptySection = (type: CvSectionType = "experience"): CvSection => ({
   id: createId(),
   type,
-  title: type === "certifications" ? "Certificates" : type[0].toUpperCase() + type.slice(1),
+  title: defaultSectionTitle(type),
   style: {
     titleFontSize: 10,
     bodyFontSize: 9,
@@ -113,6 +126,76 @@ export const createEmptySection = (type: CvSectionType = "experience"): CvSectio
   items: [createEmptyItem()]
 });
 
+const familyStylePresets: Record<TemplateFamily, Partial<CvStyle>> = {
+  "classic-single-column": {
+    fontFamily: "serif",
+    pageMarginPx: 42,
+    lineSpacing: 1.35,
+    summaryAlign: "left"
+  },
+  "structured-single-column": {
+    fontFamily: "sans",
+    pageMarginPx: 40,
+    lineSpacing: 1.35,
+    summaryAlign: "left"
+  },
+  "hybrid-header-two-zone": {
+    fontFamily: "sans",
+    pageMarginPx: 38,
+    lineSpacing: 1.3,
+    summaryAlign: "left"
+  },
+  "sidebar-human-first": {
+    fontFamily: "sans",
+    pageMarginPx: 36,
+    lineSpacing: 1.3,
+    summaryAlign: "left"
+  }
+};
+
+const themeStylePresets: Record<TemplateTheme, Partial<CvStyle>> = {
+  "classic-ink": {
+    fontFamily: "serif",
+    accentColor: "#111827",
+    sidebarColor: "#F3F4F6"
+  },
+  "modern-slate": {
+    fontFamily: "sans",
+    accentColor: "#111827",
+    sidebarColor: "#F3F4F6"
+  },
+  "professional-blue": {
+    fontFamily: "sans",
+    accentColor: "#2563EB",
+    sidebarColor: "#F3F4F6"
+  },
+  "editorial-light": {
+    fontFamily: "sans",
+    accentColor: "#232933",
+    sidebarColor: "#EEF2F6"
+  },
+  "navy-contrast": {
+    fontFamily: "sans",
+    accentColor: "#111827",
+    sidebarColor: "#0B2F4A"
+  },
+  "warm-neutral": {
+    fontFamily: "sans",
+    accentColor: "#B08968",
+    sidebarColor: "#FAF7F2"
+  },
+  "impact-red": {
+    fontFamily: "serif",
+    accentColor: "#DC2626",
+    sidebarColor: "#FFFFFF"
+  },
+  "soft-rose": {
+    fontFamily: "sans",
+    accentColor: "#F43F5E",
+    sidebarColor: "#FFF1F6"
+  }
+};
+
 const defaultStyleForTemplate = (templateId: string): CvStyle => {
   const base: CvStyle = {
     fontFamily: "sans",
@@ -125,19 +208,14 @@ const defaultStyleForTemplate = (templateId: string): CvStyle => {
     sidebarColor: "#0B2F4A"
   };
 
-  const variant = resolveTemplateVariant(templateId);
+  const family = resolveTemplateFamily(templateId);
+  const theme = resolveTemplateTheme(templateId);
 
-  if (variant === "banded-grey") return { ...base, fontFamily: "serif", accentColor: "#111827", sidebarColor: "#F3F4F6" };
-  if (variant === "gutter-minimal") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
-  if (variant === "blue-rules") return { ...base, fontFamily: "sans", accentColor: "#2563EB", sidebarColor: "#F3F4F6" };
-  if (variant === "sidebar-light") return { ...base, fontFamily: "sans", accentColor: "#232933", sidebarColor: "#EEF2F6" };
-  if (variant === "sidebar-navy-right") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#0B2F4A" };
-  if (variant === "sidebar-icons") return { ...base, fontFamily: "sans", accentColor: "#1F2937", sidebarColor: "#F8FAFC" };
-  if (variant === "sidebar-tan-dots") return { ...base, fontFamily: "sans", accentColor: "#B08968", sidebarColor: "#FAF7F2" };
-  if (variant === "skills-right-red") return { ...base, fontFamily: "serif", accentColor: "#DC2626", sidebarColor: "#FFFFFF" };
-  if (variant === "boxed-header-dots") return { ...base, fontFamily: "sans", accentColor: "#111827", sidebarColor: "#F3F4F6" };
-  if (variant === "skills-right-pink") return { ...base, fontFamily: "sans", accentColor: "#F43F5E", sidebarColor: "#FFF1F6" };
-  return base;
+  return {
+    ...base,
+    ...familyStylePresets[family],
+    ...themeStylePresets[theme]
+  };
 };
 
 export const createEmptyProfile = (templateId: string): CvProfile => ({

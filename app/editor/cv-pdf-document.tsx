@@ -6,7 +6,12 @@ import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
 import { ensurePdfFonts } from "@/lib/pdf-fonts";
 import { parseSkillEntries } from "@/lib/skill-levels";
-import { resolveTemplateVariant, type TemplateVariant } from "@/lib/templates";
+import {
+  resolveTemplateFamily,
+  resolveTemplateVariant,
+  type TemplateFamily,
+  type TemplateVariant
+} from "@/lib/templates";
 
 type CvPdfDocumentProps = {
   profile: CvProfile;
@@ -203,7 +208,11 @@ const resolvePdfFontPair = (
   return { bodyFont: "Helvetica", headingFont: "Helvetica-Bold" };
 };
 
-const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
+const stylesFor = (
+  variant: TemplateVariant,
+  family: TemplateFamily,
+  style: CvProfile["style"]
+) => {
   const pageMargin = clamp(style.pageMarginPx || 42, 12, 96);
   const lineHeight = clamp(style.lineSpacing || 1.35, 1, 2);
   const base = {
@@ -233,6 +242,11 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
   const sidebarLabel = sidebarIsDark ? "#E2E8F0" : "#111827";
   const sidebarText = sidebarIsDark ? "#F1F5F9" : "#1F2937";
   const sidebarMuted = sidebarIsDark ? "#CBD5E1" : "#374151";
+  const usesSectionRule =
+    family === "structured-single-column" ||
+    family === "hybrid-header-two-zone" ||
+    variant === "sidebar-light" ||
+    variant === "sidebar-icons";
 
   return StyleSheet.create({
     page: {
@@ -274,38 +288,13 @@ const stylesFor = (variant: TemplateVariant, style: CvProfile["style"]) => {
       fontSize: 10,
       letterSpacing: variant === "gutter-minimal" ? 1.8 : 1.3,
       textTransform: "none" as const,
-      color:
-        variant === "banded-grey" ||
-        variant === "gutter-minimal" ||
-        variant === "blue-rules" ||
-        variant === "skills-right-red" ||
-        variant === "skills-right-pink"
-          ? accent
-          : "#111827",
+      color: family === "sidebar-human-first" ? "#111827" : accent,
       fontWeight: 700 as const
     },
     sectionHeader: {
       paddingBottom: 3,
-      borderBottomWidth:
-        variant === "gutter-minimal" ||
-        variant === "blue-rules" ||
-        variant === "sidebar-light" ||
-        variant === "sidebar-navy-right" ||
-        variant === "sidebar-icons" ||
-        variant === "skills-right-red" ||
-        variant === "skills-right-pink"
-          ? 1
-          : 0,
-      borderBottomColor:
-        variant === "gutter-minimal" ||
-        variant === "blue-rules" ||
-        variant === "sidebar-light" ||
-        variant === "sidebar-navy-right" ||
-        variant === "sidebar-icons" ||
-        variant === "skills-right-red" ||
-        variant === "skills-right-pink"
-          ? accent
-          : "transparent",
+      borderBottomWidth: usesSectionRule ? 1 : 0,
+      borderBottomColor: usesSectionRule ? accent : "transparent",
       borderBottomStyle: "solid"
     },
     item: {
@@ -528,14 +517,15 @@ const contactTwoLine = (profile: CvProfile) => {
 export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
   ensurePdfFonts();
   const variant = resolveTemplateVariant(profile.templateId);
-  const styles = stylesFor(variant, profile.style);
+  const family = resolveTemplateFamily(profile.templateId);
+  const styles = stylesFor(variant, family, profile.style);
   const sections = visibleSections(profile);
 
   const profileSummary = (profile.basics.summary || "").trim();
   const summaryAlign = profile.style.summaryAlign ?? "left";
   const fmtDate = (value: string) => formatDateRange(value, profile.style.dateFormat);
 
-  if (variant === "banded-grey") {
+  if (family === "classic-single-column") {
     const email = profile.basics.email?.trim();
     const phone = profile.basics.phone?.trim();
     const location = profile.basics.location?.trim();
@@ -634,7 +624,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
                           <Text style={[styles.itemTitle, { fontSize: clamp(sectionBodySize(section) + 1, 8, 16) }]}>
-                            {item.title || "Title"}
+                            {item.title || ""}
                           </Text>
                           {item.subtitle ? (
                             <Text style={[styles.itemSubtitle, { fontSize: sectionBodySize(section) }]}>
@@ -665,7 +655,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "sidebar-light") {
+  if (family === "sidebar-human-first" && variant === "sidebar-light") {
     const skills = sections.filter((s) => s.type === "skills");
     const sideSections = sections.filter((s) => s.type === "skills" || s.type === "certifications");
     const mainSections = sections.filter((s) => s.type !== "skills" && s.type !== "certifications");
@@ -790,7 +780,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || ""}</Text>
                           {item.subtitle ? (
                             <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text>
                           ) : null}
@@ -816,7 +806,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "sidebar-navy-right") {
+  if (family === "hybrid-header-two-zone" && variant === "sidebar-navy-right") {
     const skills = sections.filter((s) => s.type === "skills");
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
@@ -846,7 +836,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
+                          <Text style={styles.itemTitle}>{item.title || ""}</Text>
                           {item.subtitle ? (
                             <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
                           ) : null}
@@ -894,7 +884,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "sidebar-icons") {
+  if (family === "sidebar-human-first" && variant === "sidebar-icons") {
     const skills = sections.filter((s) => s.type === "skills");
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
@@ -985,7 +975,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                          <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || ""}</Text>
                           {item.subtitle ? <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text> : null}
                         </View>
                         {item.dateRange ? (
@@ -1009,7 +999,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "sidebar-tan-dots") {
+  if (family === "sidebar-human-first" && variant === "sidebar-tan-dots") {
     const skills = sections.filter((s) => s.type === "skills");
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
@@ -1086,7 +1076,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
+                          <Text style={styles.itemTitle}>{item.title || ""}</Text>
                           {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
                         </View>
                         {item.dateRange ? <Text style={styles.itemDate}>{fmtDate(item.dateRange)}</Text> : null}
@@ -1105,7 +1095,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "gutter-minimal") {
+  if (family === "structured-single-column" && variant === "gutter-minimal") {
     const c = contactTwoLine(profile);
     const headline = profile.basics.headline?.trim();
     return (
@@ -1138,7 +1128,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 <View key={item.id} style={styles.pmRow}>
                   <Text style={styles.pmDate}>{item.dateRange ? fmtDate(item.dateRange) : ""}</Text>
                   <View style={styles.pmBody}>
-                    <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
+                    <Text style={styles.itemTitle}>{item.title || ""}</Text>
                     {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
                     {item.description ? (
                       <View>{renderDescriptionParts(item.id, section, styles)(item.description)}</View>
@@ -1153,7 +1143,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "blue-rules") {
+  if (family === "structured-single-column" && variant === "blue-rules") {
     const headline = profile.basics.headline?.trim();
     const contact = contactTwoLine(profile);
     return (
@@ -1226,7 +1216,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View style={styles.itemTop}>
                       <View style={styles.itemMain}>
                         <Text style={[styles.itemTitle, { fontSize: clamp(sectionBodySize(section) + 1, 8, 16) }]}>
-                          {item.title || "Title"}
+                          {item.title || ""}
                         </Text>
                         {item.subtitle ? (
                           <Text style={[styles.itemSubtitle, { fontSize: sectionBodySize(section) }]}>
@@ -1253,7 +1243,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "skills-right-red") {
+  if (family === "hybrid-header-two-zone" && variant === "skills-right-red") {
     const headline = profile.basics.headline?.trim();
     const mainSections = sections.filter((s) => s.type !== "skills");
     const skills = sections.filter((s) => s.type === "skills");
@@ -1292,7 +1282,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View style={styles.itemMain}>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
+                          <Text style={styles.itemTitle}>{item.title || ""}</Text>
                           {item.subtitle ? <Text style={styles.itemSubtitle}>{item.subtitle}</Text> : null}
                         </View>
                         {item.dateRange ? <Text style={styles.itemDate}>{fmtDate(item.dateRange)}</Text> : null}
@@ -1331,7 +1321,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "boxed-header-dots") {
+  if (family === "sidebar-human-first" && variant === "boxed-header-dots") {
     const skills = sections.filter((s) => s.type === "skills");
     const mainSections = sections.filter((s) => s.type !== "skills");
     const headline = profile.basics.headline?.trim();
@@ -1426,7 +1416,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     <View key={item.id} style={styles.item}>
                       <View style={styles.itemTop}>
                         <View>
-                          <Text style={styles.itemTitle}>{item.title || "Title"}</Text>
+                          <Text style={styles.itemTitle}>{item.title || ""}</Text>
                           {item.subtitle ? (
                             <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
                           ) : null}
@@ -1451,7 +1441,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
-  if (variant === "skills-right-pink") {
+  if (family === "hybrid-header-two-zone" && variant === "skills-right-pink") {
     const headline = profile.basics.headline?.trim();
     const mainSections = sections.filter((s) => s.type !== "skills");
     const skills = sections.filter((s) => s.type === "skills");
@@ -1509,7 +1499,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                         {item.dateRange ? fmtDate(item.dateRange) : ""}
                       </Text>
                       <View style={{ flexGrow: 1 }}>
-                        <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || "Title"}</Text>
+                        <Text style={[styles.itemTitle, { fontFamily: bodyFont }]}>{item.title || ""}</Text>
                         {item.subtitle ? <Text style={[styles.itemSubtitle, { fontFamily: bodyFont }]}>{item.subtitle}</Text> : null}
                         {item.description ? (
                           <View>{renderDescriptionParts(item.id, section, styles)(item.description)}</View>
@@ -1624,7 +1614,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   <View style={styles.itemTop}>
                     <View style={styles.itemMain}>
                       <Text style={[styles.itemTitle, { fontSize: clamp(sectionBodySize(section) + 1, 8, 16) }]}>
-                        {item.title || "Title"}
+                        {item.title || ""}
                       </Text>
                       {item.subtitle ? (
                         <Text style={[styles.itemSubtitle, { fontSize: sectionBodySize(section) }]}>
