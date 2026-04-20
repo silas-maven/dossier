@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ExperienceHero from "@/components/ui/experience-hero";
-import { cvTemplates } from "@/lib/templates";
+import { publicCvTemplates } from "@/lib/templates";
 import { getDossierUserCount } from "@/lib/user-count";
 
 export const dynamic = "force-dynamic";
@@ -119,7 +119,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ExperienceHero ctaHref="/storage" templateCount={cvTemplates.length} userCount={userCount} />
+      <ExperienceHero ctaHref="/storage" templateCount={publicCvTemplates.length} userCount={userCount} />
       <section className="border-t border-white/10 bg-[#03050b] px-6 py-12 md:px-12 lg:px-16">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-xl font-semibold text-white md:text-2xl">Compare CV builder options</h2>

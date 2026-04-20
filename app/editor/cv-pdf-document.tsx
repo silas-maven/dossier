@@ -8,6 +8,7 @@ import { ensurePdfFonts } from "@/lib/pdf-fonts";
 import { parseSkillEntries } from "@/lib/skill-levels";
 import {
   resolveTemplateFamily,
+  resolveTemplateTheme,
   resolveTemplateVariant,
   type TemplateFamily,
   type TemplateVariant
@@ -518,6 +519,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
   ensurePdfFonts();
   const variant = resolveTemplateVariant(profile.templateId);
   const family = resolveTemplateFamily(profile.templateId);
+  const theme = resolveTemplateTheme(profile.templateId);
   const styles = stylesFor(variant, family, profile.style);
   const sections = visibleSections(profile);
 
@@ -663,25 +665,45 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
     const accent = profile.style.accentColor || "#232933";
     const sidebarBg = profile.style.sidebarColor || "#EEF2F6";
+    const usesSkillPills = theme === "operational-emerald";
 
     return (
       <Document>
         <Page size="A4" style={styles.page}>
-          <View style={{ paddingBottom: 8 }}>
-            <Text
+          <View style={{ paddingBottom: 8, flexDirection: "row", gap: 10 }}>
+            <View
               style={{
-                fontFamily: headingFont,
-                fontSize: 33,
-                fontWeight: 700,
-                letterSpacing: 1.8,
-                textTransform: "uppercase"
+                width: 5,
+                borderRadius: 999,
+                backgroundColor: accent,
+                opacity: usesSkillPills ? 1 : 0.55
               }}
-            >
-              {profile.basics.name || "Your Name"}
-            </Text>
-            {headline ? (
-              <Text style={{ marginTop: 6, fontFamily: bodyFont, fontSize: 10, color: "#6B7280" }}>{headline}</Text>
-            ) : null}
+            />
+            <View style={{ flexGrow: 1, flexShrink: 1 }}>
+              <Text
+                style={{
+                  fontFamily: headingFont,
+                  fontSize: 33,
+                  fontWeight: 700,
+                  letterSpacing: 1.8,
+                  textTransform: "uppercase"
+                }}
+              >
+                {profile.basics.name || "Your Name"}
+              </Text>
+              {headline ? (
+                <Text
+                  style={{
+                    marginTop: 6,
+                    fontFamily: bodyFont,
+                    fontSize: 10,
+                    color: usesSkillPills ? accent : "#6B7280"
+                  }}
+                >
+                  {headline}
+                </Text>
+              ) : null}
+            </View>
           </View>
           <View style={{ height: 1, backgroundColor: "#D1D5DB" }} />
 
@@ -717,17 +739,60 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {skills.length > 0 ? (
                 <View style={{ marginTop: 14 }}>
                   <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.7, color: accent }}>SKILLS</Text>
-                  {skills.flatMap((section) =>
-                    section.items.flatMap((item) => {
-                      const out = skillLinesFromItem(section, item);
-                      return out.map((line, index) => (
-                        <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
-                          <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
-                          <View style={{ height: 3, backgroundColor: "#111827", marginTop: 3, opacity: 0.9 }} />
-                        </View>
-                      ));
-                    })
-                  )}
+                  {usesSkillPills
+                    ? skills.flatMap((section) =>
+                        section.items.map((item) => {
+                          const entries = skillEntriesFromItem(item);
+                          if (entries.length === 0) return null;
+                          return (
+                            <View key={item.id} style={{ marginTop: 9 }}>
+                              {item.title ? (
+                                <Text
+                                  style={{
+                                    fontFamily: headingFont,
+                                    fontSize: 8.2,
+                                    letterSpacing: 1.1,
+                                    textTransform: "uppercase",
+                                    color: accent
+                                  }}
+                                >
+                                  {item.title}
+                                </Text>
+                              ) : null}
+                              <View style={{ marginTop: 5, flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
+                                {entries.map((entry, index) => (
+                                  <View
+                                    key={`${item.id}-${index}`}
+                                    style={{
+                                      paddingHorizontal: 6,
+                                      paddingVertical: 3,
+                                      borderRadius: 999,
+                                      borderWidth: 1,
+                                      borderColor: `${accent}66`,
+                                      backgroundColor: `${accent}14`
+                                    }}
+                                  >
+                                    <Text style={{ fontFamily: bodyFont, fontSize: 7.8, color: "#111827" }}>
+                                      {entry.name}
+                                    </Text>
+                                  </View>
+                                ))}
+                              </View>
+                            </View>
+                          );
+                        })
+                      )
+                    : skills.flatMap((section) =>
+                        section.items.flatMap((item) => {
+                          const out = skillLinesFromItem(section, item);
+                          return out.map((line, index) => (
+                            <View key={`${item.id}-${index}`} style={{ marginTop: 7 }}>
+                              <Text style={{ fontFamily: bodyFont, fontSize: 8.4, color: "#111827" }}>{line}</Text>
+                              <View style={{ height: 3, backgroundColor: "#111827", marginTop: 3, opacity: 0.9 }} />
+                            </View>
+                          ));
+                        })
+                      )}
                 </View>
               ) : null}
 

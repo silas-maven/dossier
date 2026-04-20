@@ -169,6 +169,11 @@ const themeStylePresets: Record<TemplateTheme, Partial<CvStyle>> = {
     accentColor: "#2563EB",
     sidebarColor: "#F3F4F6"
   },
+  "operational-emerald": {
+    fontFamily: "sans",
+    accentColor: "#10B981",
+    sidebarColor: "#EAFBF4"
+  },
   "editorial-light": {
     fontFamily: "sans",
     accentColor: "#232933",

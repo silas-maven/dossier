@@ -1,4 +1,5 @@
 import type { CvProfile, CvSection, CvStyle } from "@/lib/cv-profile";
+import { parseSkillEntries } from "@/lib/skill-levels";
 import {
   getTemplateById,
   resolveTemplateAtsMode,
@@ -43,9 +44,33 @@ const sortSectionsByPreferredOrder = (sections: CvSection[], orderedTypes: strin
 export const reorderSectionsForTemplate = (sections: CvSection[], templateId: string): CvSection[] =>
   sortSectionsByPreferredOrder(sections, resolveTemplateSectionOrder(templateId));
 
+const normalizeSkillSection = (section: CvSection): CvSection => {
+  if (section.type !== "skills") return section;
+
+  return {
+    ...section,
+    items: section.items.map((item) => {
+      const title = item.title.trim();
+      const description = item.description.trim();
+      const shouldMoveTitleToDescription =
+        !description &&
+        !!title &&
+        (parseSkillEntries(title).length > 1 || /[|,;]/.test(title));
+
+      if (!shouldMoveTitleToDescription) return item;
+
+      return {
+        ...item,
+        title: "",
+        description: title
+      };
+    })
+  };
+};
+
 export const normalizeProfileForTemplate = (profile: CvProfile, templateId: string): CvProfile => ({
   ...profile,
   templateId,
   style: sanitizeStyleForTemplate(profile.style, templateId),
-  sections: reorderSectionsForTemplate(profile.sections, templateId)
+  sections: reorderSectionsForTemplate(profile.sections.map(normalizeSkillSection), templateId)
 });

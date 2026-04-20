@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import DossierLogoLink from "@/components/navigation/dossier-logo-link";
 import TemplateCarousel from "@/components/ui/template-carousel";
-import { cvTemplates, type CvTemplate } from "@/lib/templates";
+import { publicCvTemplates, type CvTemplate } from "@/lib/templates";
 import type { DossierStorageMode } from "@/lib/storage-mode";
 import AuthStatusButton from "@/components/auth/auth-status-button";
 
@@ -47,7 +47,7 @@ export default function TemplatesPickClient({ storageMode }: TemplatesPickClient
         </p>
 
         <div className="mt-8">
-          <TemplateCarousel templates={cvTemplates} onSelect={handleSelect} />
+          <TemplateCarousel templates={publicCvTemplates} onSelect={handleSelect} />
         </div>
       </div>
     </main>

@@ -30,7 +30,6 @@ import {
   templateExperienceLevelOptions,
   templateFamilyDefinitions,
   templateFamilyOptions,
-  templateIndustryOptions,
   templateLayoutOptions,
   templateThemeLabels
 } from "@/lib/templates";
@@ -347,6 +346,10 @@ export default function TemplateCarousel({
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<string[]>([]);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
+  const templateIndustryOptions = useMemo(
+    () => Array.from(new Set(templates.map((template) => template.industry))).sort(),
+    [templates]
+  );
 
   const filteredTemplates = useMemo(
     () =>

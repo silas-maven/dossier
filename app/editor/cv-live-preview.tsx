@@ -5,7 +5,7 @@ import { contactInline, contactLines } from "@/lib/contact";
 import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
 import { parseSkillEntries } from "@/lib/skill-levels";
-import { resolveTemplateVariant } from "@/lib/templates";
+import { resolveTemplateTheme, resolveTemplateVariant } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 type CvLivePreviewProps = {
@@ -88,6 +88,7 @@ const templateTone = (templateId: string) => {
 
 export default function CvLivePreview({ profile, templateName }: CvLivePreviewProps) {
   const variant = resolveTemplateVariant(profile.templateId);
+  const theme = resolveTemplateTheme(profile.templateId);
   const tone = templateTone(variant);
   const isSkillsRightPink = variant === "skills-right-pink";
   const isSidebarTemplate =
@@ -100,6 +101,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
   const usesSkillDots =
     variant === "sidebar-tan-dots" ||
     variant === "boxed-header-dots";
+  const usesSkillPills = theme === "operational-emerald";
   const summaryAlign = profile.style.summaryAlign ?? "left";
   const lineSpacing = profile.style.lineSpacing ?? 1.35;
   const accent = profile.style.accentColor || "#F43F5E";
@@ -212,14 +214,27 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
         </CardHeader>
         <CardContent>
           <article className="overflow-hidden rounded-xl border bg-background p-6" style={{ fontFamily: bodyFont }}>
-            <header className="pb-2">
-              <h2
-                className="text-[44px] font-bold uppercase leading-[0.9] tracking-[0.06em] text-foreground"
-                style={{ fontFamily: headingFont }}
-              >
-                {profile.basics.name || "Your Name"}
-              </h2>
-              {headline ? <p className="mt-2 text-sm text-muted-foreground">{headline}</p> : null}
+            <header className="flex gap-4 pb-2">
+              <div
+                className="w-1.5 shrink-0 rounded-full"
+                style={{ backgroundColor: accent, opacity: usesSkillPills ? 1 : 0.55 }}
+              />
+              <div className="min-w-0 flex-1">
+                <h2
+                  className="text-[44px] font-bold uppercase leading-[0.9] tracking-[0.06em] text-foreground"
+                  style={{ fontFamily: headingFont }}
+                >
+                  {profile.basics.name || "Your Name"}
+                </h2>
+                {headline ? (
+                  <p
+                    className="mt-2 text-sm"
+                    style={{ color: usesSkillPills ? accent : "rgb(100 116 139)" }}
+                  >
+                    {headline}
+                  </p>
+                ) : null}
+              </div>
             </header>
             <div className="h-px w-full bg-border" />
 
@@ -250,18 +265,50 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                     <h3 className="text-sm tracking-[0.16em] text-foreground" style={{ fontFamily: headingFont }}>
                       SKILLS
                     </h3>
-                    <div className="mt-2 space-y-2">
-                      {section.items
-                        .filter((item) => item.visible)
-                        .flatMap((item) =>
-                          parseSkillEntries(item.description).map((entry, index) => (
-                            <div key={`${item.id}-${index}`}>
-                              <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
-                              <div className="mt-1 h-[3px] w-full bg-foreground/90" />
+                    {usesSkillPills ? (
+                      <div className="mt-2 space-y-3">
+                        {section.items.filter((item) => item.visible).map((item) => {
+                          const entries = parseSkillEntries(item.description);
+                          if (entries.length === 0) return null;
+                          return (
+                            <div key={item.id}>
+                              {item.title ? (
+                                <p
+                                  className="text-[11px] uppercase tracking-[0.12em]"
+                                  style={{ color: accent, fontFamily: headingFont }}
+                                >
+                                  {item.title}
+                                </p>
+                              ) : null}
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {entries.map((entry, index) => (
+                                  <span
+                                    key={`${item.id}-${index}`}
+                                    className="rounded-full border px-2.5 py-1 text-[11px] leading-none text-foreground"
+                                    style={{ borderColor: `${accent}55`, backgroundColor: `${accent}14` }}
+                                  >
+                                    {entry.name}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
-                          ))
-                        )}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="mt-2 space-y-2">
+                        {section.items
+                          .filter((item) => item.visible)
+                          .flatMap((item) =>
+                            parseSkillEntries(item.description).map((entry, index) => (
+                              <div key={`${item.id}-${index}`}>
+                                <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
+                                <div className="mt-1 h-[3px] w-full bg-foreground/90" />
+                              </div>
+                            ))
+                          )}
+                      </div>
+                    )}
                   </section>
                 ))}
 
@@ -286,10 +333,16 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
               <div className="space-y-4">
                 {summary ? (
                   <section>
-                    <h3 className="text-lg uppercase tracking-[0.12em] text-foreground" style={{ fontFamily: headingFont }}>
+                    <h3
+                      className="text-lg uppercase tracking-[0.12em] text-foreground"
+                      style={{ fontFamily: headingFont, color: usesSkillPills ? accent : undefined }}
+                    >
                       Profile
                     </h3>
-                    <div className="mt-1 h-0.5 w-8 bg-foreground/85" />
+                    <div
+                      className="mt-1 h-0.5 w-8"
+                      style={{ backgroundColor: usesSkillPills ? accent : "rgba(15,23,42,0.85)" }}
+                    />
                     <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground">
                       <span style={{ display: "block", textAlign: summaryAlign, lineHeight: lineSpacing }}>{summary}</span>
                     </p>
@@ -298,10 +351,16 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
 
                 {mainSections.map((section) => (
                   <section key={section.id}>
-                    <h3 className="text-lg uppercase tracking-[0.12em] text-foreground" style={{ fontFamily: headingFont }}>
+                    <h3
+                      className="text-lg uppercase tracking-[0.12em] text-foreground"
+                      style={{ fontFamily: headingFont, color: usesSkillPills ? accent : undefined }}
+                    >
                       {section.style.uppercaseTitle ? section.title.toUpperCase() : section.title}
                     </h3>
-                    <div className="mt-1 h-0.5 w-8 bg-foreground/85" />
+                    <div
+                      className="mt-1 h-0.5 w-8"
+                      style={{ backgroundColor: usesSkillPills ? accent : "rgba(15,23,42,0.85)" }}
+                    />
                     <div className="mt-2 space-y-3">
                       {section.items.filter((item) => item.visible).map((item) => (
                         <div key={item.id}>

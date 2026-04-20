@@ -42,6 +42,9 @@ const parseLevelFromLine = (line: string): SkillEntry | null => {
   return { name: plain, level: DEFAULT_SKILL_LEVEL };
 };
 
+const hasExplicitTrailingLevel = (line: string) =>
+  /^(.*?)(?:::{1,2}|\|)\s*([1-5])\s*$/i.test(line.trim()) || /\((\d)\s*\/\s*5\)\s*$/i.test(line.trim());
+
 export const parseSkillEntries = (description: string): SkillEntry[] => {
   const text = (description || "").trim();
   if (!text) return [];
@@ -52,9 +55,12 @@ export const parseSkillEntries = (description: string): SkillEntry[] => {
     .filter(Boolean);
 
   const expandedLines =
-    rawLines.length === 1 && !rawLines[0]!.includes("::") && rawLines[0]!.includes(",")
+    rawLines.length === 1 &&
+    !rawLines[0]!.includes("::") &&
+    !hasExplicitTrailingLevel(rawLines[0]!) &&
+    /[,|;]/.test(rawLines[0]!)
       ? rawLines[0]!
-          .split(",")
+          .split(/\s*(?:,|\||;)\s*/)
           .map((part) => part.trim())
           .filter(Boolean)
       : rawLines;
@@ -82,4 +88,3 @@ export const serializeSkillEntries = (entries: SkillEntry[]) =>
     })
     .filter(Boolean)
     .join("\n");
-

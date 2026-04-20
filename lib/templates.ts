@@ -28,6 +28,7 @@ export const templateThemes = [
   "classic-ink",
   "modern-slate",
   "professional-blue",
+  "operational-emerald",
   "editorial-light",
   "navy-contrast",
   "warm-neutral",
@@ -57,6 +58,7 @@ export type CvTemplate = {
   variant: TemplateVariant;
   family: TemplateFamily;
   theme: TemplateTheme;
+  isPublic?: boolean;
   atsMode: TemplateAtsMode;
   name: string;
   category: string;
@@ -115,6 +117,7 @@ export const templateThemeLabels: Record<TemplateTheme, string> = {
   "classic-ink": "Classic Ink",
   "modern-slate": "Modern Slate",
   "professional-blue": "Professional Blue",
+  "operational-emerald": "Operational Emerald",
   "editorial-light": "Editorial Light",
   "navy-contrast": "Navy Contrast",
   "warm-neutral": "Warm Neutral",
@@ -123,8 +126,9 @@ export const templateThemeLabels: Record<TemplateTheme, string> = {
 };
 
 const buildTemplate = (
-  template: Omit<CvTemplate, "recommendedSectionOrder">
+  template: Omit<CvTemplate, "recommendedSectionOrder" | "isPublic"> & Partial<Pick<CvTemplate, "isPublic">>
 ): CvTemplate => ({
+  isPublic: true,
   ...template,
   recommendedSectionOrder: getTemplateGuidanceProfile(template.guidanceProfileId).suggestedSectionOrder
 });
@@ -163,19 +167,19 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "product-management-delivery",
-    variant: "blue-rules",
-    family: "structured-single-column",
-    theme: "professional-blue",
-    atsMode: "safe",
+    variant: "skills-right-pink",
+    family: "hybrid-header-two-zone",
+    theme: "soft-rose",
+    atsMode: "balanced",
     name: "Product Management Delivery",
     category: "Product",
     industry: "Product Management",
     shelf: "Top Rated",
     experienceLevel: "Professional",
-    description: "Structured PM layout for roadmap ownership, experiments, launch outcomes, and cross-functional leadership.",
-    previewImage: "/card-images/blue-rules.jpg",
-    atsFit: "Strong",
-    layout: "Single Column",
+    description: "Two-zone PM layout for roadmap ownership, product judgment, and cross-functional execution with a modern product-led feel.",
+    previewImage: "/card-images/skills-right-pink.jpg",
+    atsFit: "Balanced",
+    layout: "Split Column",
     bestFor: ["Product Manager", "Growth PM", "Platform PM", "Founding PM"],
     guidance: [
       "Use bullets that connect discovery, prioritization, launch, and measurable business impact.",
@@ -185,28 +189,28 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "product-management",
     recommendedIndustries: ["Product Management"],
     capabilities: {
-      sidebar: false,
-      ratings: false,
+      sidebar: true,
+      ratings: true,
       photo: false,
       accentRail: true
     },
-    recommendedFormat: "DOCX first, PDF when requested"
+    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
   }),
   buildTemplate({
     id: "technical-pm-delivery",
-    variant: "banded-grey",
-    family: "classic-single-column",
-    theme: "classic-ink",
-    atsMode: "safe",
+    variant: "sidebar-navy-right",
+    family: "hybrid-header-two-zone",
+    theme: "navy-contrast",
+    atsMode: "balanced",
     name: "Technical PM Delivery",
     category: "Program",
     industry: "Project & Program Management",
     shelf: "Top Rated",
     experienceLevel: "Executive",
-    description: "ATS-safe program layout for stakeholder-heavy delivery roles with budgets, timelines, and implementation scope.",
-    previewImage: "/card-images/banded-grey.jpg",
-    atsFit: "Strong",
-    layout: "Single Column",
+    description: "Navy two-zone delivery layout for stakeholder-heavy programs with cadence, governance, and implementation scope.",
+    previewImage: "/card-images/sidebar-navy-right.jpg",
+    atsFit: "Balanced",
+    layout: "Split Column",
     bestFor: ["Technical PM", "Program Manager", "Implementation Lead", "Delivery Manager"],
     guidance: [
       "Quantify project value, budget, timeline, team size, or rollout footprint in each major role.",
@@ -216,12 +220,12 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "program-delivery",
     recommendedIndustries: ["Project & Program Management", "Operations"],
     capabilities: {
-      sidebar: false,
+      sidebar: true,
       ratings: false,
       photo: false,
-      accentRail: false
+      accentRail: true
     },
-    recommendedFormat: "DOCX first, PDF when the employer asks for it"
+    recommendedFormat: "PDF for direct review, DOCX fallback for portal applications"
   }),
   buildTemplate({
     id: "consulting-case-brief",
@@ -287,19 +291,19 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "data-analytics-clarity",
-    variant: "gutter-minimal",
-    family: "structured-single-column",
+    variant: "boxed-header-dots",
+    family: "sidebar-human-first",
     theme: "modern-slate",
-    atsMode: "safe",
+    atsMode: "balanced",
     name: "Data Analytics Clarity",
     category: "Data",
     industry: "Data & Analytics",
     shelf: "ATS-Safe",
     experienceLevel: "Student",
-    description: "Compact analytics template for SQL, BI, experimentation, dashboards, and decision-ready reporting.",
-    previewImage: "/card-images/gutter-minimal.jpg",
-    atsFit: "Strong",
-    layout: "Single Column",
+    description: "Structured split layout for SQL, BI, experimentation, dashboards, and decision-ready reporting.",
+    previewImage: "/card-images/boxed-header-dots.jpg",
+    atsFit: "Balanced",
+    layout: "Split Column",
     bestFor: ["Data Analyst", "BI Analyst", "Insights", "Analytics Engineer"],
     guidance: [
       "Make every role show a decision or process that improved because of your analysis.",
@@ -309,28 +313,28 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "software-engineering",
     recommendedIndustries: ["Data & Analytics", "Software Engineering"],
     capabilities: {
-      sidebar: false,
-      ratings: false,
+      sidebar: true,
+      ratings: true,
       photo: false,
-      accentRail: true
+      accentRail: false
     },
-    recommendedFormat: "DOCX first, PDF okay for direct applications"
+    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
   }),
   buildTemplate({
     id: "operations-execution",
-    variant: "gutter-minimal",
-    family: "structured-single-column",
-    theme: "modern-slate",
-    atsMode: "safe",
+    variant: "sidebar-tan-dots",
+    family: "sidebar-human-first",
+    theme: "warm-neutral",
+    atsMode: "balanced",
     name: "Operations Execution",
     category: "Operations",
     industry: "Operations",
     shelf: "Corporate",
     experienceLevel: "Professional",
-    description: "Single-column operations resume for process design, SLA improvement, service quality, and delivery reliability.",
-    previewImage: "/card-images/gutter-minimal.jpg",
-    atsFit: "Strong",
-    layout: "Single Column",
+    description: "Warm split-column operations layout for process design, SLA improvement, service quality, and delivery reliability.",
+    previewImage: "/card-images/sidebar-tan-dots.jpg",
+    atsFit: "Balanced",
+    layout: "Split Column",
     bestFor: ["Operations Manager", "Process Improvement", "Service Delivery", "Business Operations"],
     guidance: [
       "Frame bullets around throughput, cost, cycle time, quality, SLA, or process compliance improvements.",
@@ -340,28 +344,28 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "customer-operations",
     recommendedIndustries: ["Operations", "Customer & Operations"],
     capabilities: {
-      sidebar: false,
-      ratings: false,
+      sidebar: true,
+      ratings: true,
       photo: false,
-      accentRail: true
+      accentRail: false
     },
-    recommendedFormat: "DOCX or text-based PDF"
+    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
   }),
   buildTemplate({
     id: "customer-success-renewal",
-    variant: "banded-grey",
-    family: "classic-single-column",
-    theme: "classic-ink",
-    atsMode: "safe",
+    variant: "sidebar-light",
+    family: "sidebar-human-first",
+    theme: "operational-emerald",
+    atsMode: "balanced",
     name: "Customer Success Renewal",
     category: "Customer",
     industry: "Customer Success",
     shelf: "Corporate",
     experienceLevel: "Professional",
-    description: "Retention-focused ATS layout for onboarding, renewals, adoption, escalations, and account growth.",
-    previewImage: "/card-images/banded-grey.jpg",
-    atsFit: "Strong",
-    layout: "Single Column",
+    description: "Two-column customer success layout with an operational sidebar for adoption, renewals, tooling, and portfolio context.",
+    previewImage: "/card-images/sidebar-light.jpg",
+    atsFit: "Balanced",
+    layout: "Split Column",
     bestFor: ["Customer Success", "Account Management", "Implementation", "Onboarding"],
     guidance: [
       "Quantify retention, NRR, renewal rate, adoption milestones, or portfolio size wherever possible.",
@@ -371,15 +375,16 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "customer-operations",
     recommendedIndustries: ["Customer Success", "Customer & Operations"],
     capabilities: {
-      sidebar: false,
+      sidebar: true,
       ratings: false,
       photo: false,
-      accentRail: false
+      accentRail: true
     },
-    recommendedFormat: "DOCX first, PDF when the application supports it"
+    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
   }),
   buildTemplate({
     id: "banded-grey",
+    isPublic: false,
     variant: "banded-grey",
     family: "classic-single-column",
     theme: "classic-ink",
@@ -411,6 +416,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "gutter-minimal",
+    isPublic: false,
     variant: "gutter-minimal",
     family: "structured-single-column",
     theme: "modern-slate",
@@ -442,6 +448,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "blue-rules",
+    isPublic: false,
     variant: "blue-rules",
     family: "structured-single-column",
     theme: "professional-blue",
@@ -473,6 +480,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "sidebar-light",
+    isPublic: false,
     variant: "sidebar-light",
     family: "sidebar-human-first",
     theme: "editorial-light",
@@ -504,6 +512,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "sidebar-navy-right",
+    isPublic: false,
     variant: "sidebar-navy-right",
     family: "hybrid-header-two-zone",
     theme: "navy-contrast",
@@ -535,6 +544,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "sidebar-icons",
+    isPublic: false,
     variant: "sidebar-icons",
     family: "sidebar-human-first",
     theme: "modern-slate",
@@ -566,6 +576,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "sidebar-tan-dots",
+    isPublic: false,
     variant: "sidebar-tan-dots",
     family: "sidebar-human-first",
     theme: "warm-neutral",
@@ -597,6 +608,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "skills-right-red",
+    isPublic: false,
     variant: "skills-right-red",
     family: "hybrid-header-two-zone",
     theme: "impact-red",
@@ -628,6 +640,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "boxed-header-dots",
+    isPublic: false,
     variant: "boxed-header-dots",
     family: "sidebar-human-first",
     theme: "modern-slate",
@@ -659,6 +672,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "skills-right-pink",
+    isPublic: false,
     variant: "skills-right-pink",
     family: "hybrid-header-two-zone",
     theme: "soft-rose",
@@ -720,3 +734,4 @@ export const templateShelfOptions = Array.from(templateShelves);
 export const templateLayoutOptions = Array.from(templateLayouts);
 export const templateExperienceLevelOptions = Array.from(templateExperienceLevels);
 export const templateFamilyOptions = Array.from(templateFamilies);
+export const publicCvTemplates = cvTemplates.filter((template) => template.isPublic !== false);
