@@ -309,6 +309,7 @@ export default function EditorForm({
   const [isHydrated, setIsHydrated] = useState(false);
   const [importCandidate, setImportCandidate] = useState<CvProfile | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [importWarning, setImportWarning] = useState<string | null>(null);
   const [importLoading, setImportLoading] = useState(false);
   const [undoProfile, setUndoProfile] = useState<CvProfile | null>(null);
   const [copiedTemplateId, setCopiedTemplateId] = useState(false);
@@ -412,6 +413,7 @@ export default function EditorForm({
 
   const startSeed = () => {
     setImportError(null);
+    setImportWarning(null);
     setUndoProfile(profile);
     setProfile(normalizeProfileForTemplate(seedExampleProfile(templateId), templateId));
     setImportCandidate(null);
@@ -419,11 +421,13 @@ export default function EditorForm({
 
   const startImportClick = () => {
     setImportError(null);
+    setImportWarning(null);
     fileInputRef.current?.click();
   };
 
   const handleImportFile = async (file: File) => {
     setImportError(null);
+    setImportWarning(null);
     setImportLoading(true);
     setImportCandidate(null);
 
@@ -433,7 +437,11 @@ export default function EditorForm({
       formData.append("templateId", templateId);
 
       const res = await fetch("/api/parse-cv", { method: "POST", body: formData });
-      const json = (await res.json().catch(() => ({}))) as { profile?: CvProfile; error?: string };
+      const json = (await res.json().catch(() => ({}))) as {
+        profile?: CvProfile;
+        error?: string;
+        warnings?: string[];
+      };
       if (!res.ok) {
         throw new Error(json.error || "Import failed");
       }
@@ -447,6 +455,7 @@ export default function EditorForm({
         templateId
       });
       setProfile(applied);
+      setImportWarning(json.warnings?.[0] ?? null);
       setImportCandidate(null);
     } catch (err: unknown) {
       const message =
@@ -1399,6 +1408,7 @@ export default function EditorForm({
                     Import accepts PDF, DOCX, TXT, Markdown, and RTF. DOCX is usually the safest ATS format.
                   </p>
                   {importError ? <p className="text-xs text-red-700">{importError}</p> : null}
+                  {importWarning ? <p className="text-xs text-amber-400">{importWarning}</p> : null}
                   {undoProfile ? (
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-xs text-muted-foreground">Import applied.</p>

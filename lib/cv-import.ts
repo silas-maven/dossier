@@ -14,6 +14,7 @@ const URL_TOKEN_RE =
   /(https?:\/\/\S+)|(www\.\S+)|(\b(?:linkedin|github|gitlab)\.[a-z]{2,}\S*\b)|(\b[a-z0-9-]+\.[a-z]{2,}\b)/gi;
 const URL_RE = URL_TOKEN_RE;
 const PHONE_RE = /(\+?\d[\d\s().-]{7,}\d)/;
+const TARGET_ROLE_RE = /^target role\s*:\s*(.+)$/i;
 
 const digitsCount = (value: string) => value.replace(/\D/g, "").length;
 
@@ -96,7 +97,9 @@ const headingToSection = (heading: string): { type: CvSectionType; title: string
   if (h.includes("missing") && h.includes("custom") && h.includes("translation")) {
     return { type: "projects", title: "Projects" };
   }
-  if (["summary", "profile", "about"].includes(h)) return { type: "custom", title: "Summary" };
+  if (["summary", "profile", "about", "professional summary", "executive summary"].includes(h)) {
+    return { type: "custom", title: "Summary" };
+  }
   return null;
 };
 
@@ -125,6 +128,31 @@ const looksLikeHeading = (line: string) => {
   return upperRatio > 0.7 || /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*$/.test(line);
 };
 
+const looksLikeLocationDateLine = (line: string) => {
+  const cleaned = line.trim();
+  if (!cleaned) return false;
+  if (DATE_TAIL_RE.test(cleaned)) return true;
+  return /^[A-Za-z][A-Za-z /.'-]+(?:,\s*[A-Za-z][A-Za-z /.'-]+)?\s+\|\s+.*\d{4}/.test(cleaned);
+};
+
+const looksLikeExperienceHeaderStart = (line: string, nextLine = "") => {
+  const cleaned = stripListMarker(line);
+  if (!cleaned || /^[-•*]\s+/.test(line)) return false;
+  if (headingToSection(cleaned)) return false;
+  if (cleaned.length > 90) return false;
+  const hasRoleSeparator = /\s+\|\s+|\s+at\s+| @ /i.test(cleaned);
+  return hasRoleSeparator && looksLikeLocationDateLine(nextLine);
+};
+
+const looksLikeProjectTitleLine = (line: string) => {
+  const cleaned = stripListMarker(line);
+  if (!cleaned || /^[-•*]\s+/.test(line)) return false;
+  if (headingToSection(cleaned)) return false;
+  if (looksLikeLocationDateLine(cleaned)) return false;
+  if (cleaned.length > 90) return false;
+  return /[A-Za-z]/.test(cleaned);
+};
+
 const splitBlocks = (lines: string[]) => {
   const blocks: string[] = [];
   let buf: string[] = [];
@@ -147,12 +175,17 @@ const splitExperienceBlocks = (lines: string[]) => {
   let buf: string[] = [];
   let seenBullet = false;
 
-  for (const rawLine of lines) {
+  for (const [index, rawLine] of lines.entries()) {
     const line = rawLine.trim();
     if (!line) continue;
 
     const isBullet = /^[-•*]\s+/.test(line);
-    const startsNewRole = buf.length > 0 && seenBullet && !isBullet && looksLikeHeading(line);
+    const nextLine = lines[index + 1]?.trim() ?? "";
+    const startsNewRole =
+      buf.length > 0 &&
+      seenBullet &&
+      !isBullet &&
+      looksLikeExperienceHeaderStart(line, nextLine);
 
     if (startsNewRole) {
       blocks.push(buf.join("\n"));
@@ -169,9 +202,46 @@ const splitExperienceBlocks = (lines: string[]) => {
   return blocks.map((block) => block.trim()).filter(Boolean);
 };
 
+const splitProjectBlocks = (lines: string[]) => {
+  const blocks: string[] = [];
+  let buf: string[] = [];
+  let seenBullet = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const isBullet = /^[-•*]\s+/.test(line);
+    const startsNewProject = buf.length > 0 && seenBullet && !isBullet && looksLikeProjectTitleLine(line);
+
+    if (startsNewProject) {
+      blocks.push(buf.join("\n"));
+      buf = [line];
+      seenBullet = false;
+      continue;
+    }
+
+    buf.push(line);
+    if (isBullet) seenBullet = true;
+  }
+
+  if (buf.length > 0) blocks.push(buf.join("\n"));
+  return blocks.map((block) => block.trim()).filter(Boolean);
+};
+
+const isSummaryHeading = (title: string) => {
+  const normalized = cleanHeading(title).toLowerCase();
+  return normalized === "summary" || normalized === "professional summary" || normalized === "profile";
+};
+
 export const parseCvText = (text: string): ParsedCv => {
   const lines = normalizeLines(text);
   const basics: ParsedCv["basics"] = {};
+  const targetRoleLine = lines.find((line) => TARGET_ROLE_RE.test(line));
+  const targetRoleMatch = targetRoleLine?.match(TARGET_ROLE_RE);
+  if (targetRoleMatch?.[1]) {
+    basics.headline = targetRoleMatch[1].trim();
+  }
 
   // Prefer extracting contact details from the header-ish region to avoid picking up random URLs in body text.
   const headerText = lines.slice(0, Math.min(lines.length, 40)).join(" ");
@@ -214,7 +284,7 @@ export const parseCvText = (text: string): ParsedCv => {
   // Location heuristic: often appears in DOCX header line, separated with pipes.
   const headerParts = lines
     .slice(0, Math.min(lines.length, 16))
-    .flatMap((l) => l.split("|").map((p) => p.trim()))
+    .flatMap((l) => l.split(/[|•]/).map((p) => p.trim()))
     .filter(Boolean);
   const locationCandidate = headerParts.find((part) => {
     if (EMAIL_RE.test(part) || PHONE_RE.test(part) || URL_RE.test(part)) return false;
@@ -240,9 +310,9 @@ export const parseCvText = (text: string): ParsedCv => {
         if (EMAIL_RE.test(l) || PHONE_RE.test(l) || URL_RE.test(l)) return false;
         if (looksLikeHeading(l) && headingToSection(l)) return false;
         if (l.length < 4 || l.length > 60) return false;
-        return /^[A-Za-z][A-Za-z0-9 &,/|().' -]+$/.test(l);
+        return /^[A-Za-z][A-Za-z0-9 &,/|().:'-]+$/.test(l);
       });
-      if (next) basics.headline = next.split("|")[0]?.trim() ?? next;
+      if (next && !basics.headline) basics.headline = next.split("|")[0]?.trim() ?? next;
     }
   }
 
@@ -254,7 +324,14 @@ export const parseCvText = (text: string): ParsedCv => {
 
   const flush = () => {
     if (!current) return;
-    const blocks = current.type === "experience" ? splitExperienceBlocks(currentLines) : splitBlocks(currentLines);
+    const blocks =
+      current.type === "experience"
+        ? splitExperienceBlocks(currentLines)
+        : current.type === "projects"
+          ? splitProjectBlocks(currentLines)
+          : current.type === "certifications"
+            ? currentLines.map((line) => stripListMarker(line)).filter(Boolean)
+            : splitBlocks(currentLines);
     sections.push({ ...current, blocks });
     current = null;
     currentLines = [];
@@ -290,6 +367,7 @@ export const parseCvText = (text: string): ParsedCv => {
     const summaryLines = preHeading.filter((l) => {
       if (l === basics.name) return false;
       if (basics.headline && (l === basics.headline || l.startsWith(`${basics.headline} |`))) return false;
+      if (TARGET_ROLE_RE.test(l)) return false;
       if (EMAIL_RE.test(l) || PHONE_RE.test(l) || URL_RE.test(l)) return false;
       if (looksLikeHeading(l) && headingToSection(l)) return false;
       return l.length > 20;
@@ -366,7 +444,7 @@ export const parseCvMarkdown = (markdown: string): ParsedCv => {
   if (best) basics.url = best;
 
   const headerParts = headerLines
-    .flatMap((l) => l.split("|").map((p) => p.trim()))
+    .flatMap((l) => l.split(/[|•]/).map((p) => p.trim()))
     .filter(Boolean);
   const locationCandidate = headerParts.find((part) => {
     if (EMAIL_RE.test(part) || PHONE_RE.test(part) || URL_RE.test(part)) return false;
@@ -555,14 +633,6 @@ const parseCustomBlock = (block: string) => {
     return { title: "", description: "" };
   }
 
-  const dividerIndex = text.indexOf(":");
-  if (dividerIndex > 0 && dividerIndex < 36) {
-    return {
-      title: text.slice(0, dividerIndex).trim(),
-      description: text.slice(dividerIndex + 1).trim()
-    };
-  }
-
   return {
     title: "",
     description: text
@@ -579,7 +649,7 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
 
   // If there is a Summary section but basics.summary is empty, use its first block as summary.
   const summarySection = parsed.sections.find(
-    (s) => s.type === "custom" && s.title.toLowerCase() === "summary"
+    (s) => s.type === "custom" && isSummaryHeading(s.title)
   );
   if (!profile.basics.summary && summarySection?.blocks?.[0]) {
     profile.basics.summary = summarySection.blocks[0].replace(/\n+/g, " ").trim();
@@ -593,7 +663,7 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
   // Avoid duplicating summary: once promoted into basics.summary, hide the custom section.
   const normalizedSections = parsed.sections.filter((section) => {
     if (section.type !== "custom") return true;
-    if (section.title.toLowerCase() !== "summary") return true;
+    if (!isSummaryHeading(section.title)) return true;
     return !profile.basics.summary;
   });
 
@@ -696,11 +766,32 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
     if (section.type === "projects") {
       s.items = section.blocks.slice(0, 30).map((block) => {
         const item = createEmptyItem();
-        const lines = collapseBulletLines(block.split("\n"));
-        item.title = lines.join(" ").trim();
-        item.subtitle = "";
-        item.dateRange = "";
-        item.description = "";
+        const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+        const title = stripListMarker(lines[0] ?? "");
+        const maybeMeta = stripListMarker(lines[1] ?? "");
+        const { main, dateRange } = splitDateTail(maybeMeta);
+        const detailStartIndex = maybeMeta ? 2 : 1;
+        const rawDetailLines = lines.slice(detailStartIndex);
+        const summaryLines: string[] = [];
+        const bulletLines: string[] = [];
+
+        for (const raw of rawDetailLines) {
+          if (/^[-•*]\s+/.test(raw)) {
+            bulletLines.push(stripListMarker(raw));
+          } else {
+            summaryLines.push(stripListMarker(raw));
+          }
+        }
+
+        item.title = title;
+        item.subtitle = main;
+        item.dateRange = dateRange;
+        item.description = [
+          ...summaryLines,
+          ...bulletLines.map((line) => `- ${line}`)
+        ]
+          .filter(Boolean)
+          .join("\n");
         item.tags = [];
         item.visible = true;
         return item;

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import mammoth from "mammoth";
+import { PDFParse } from "pdf-parse";
 
 import { parseCvMarkdown, parseCvText, profileFromParsedCv } from "@/lib/cv-import";
 
@@ -16,72 +17,19 @@ declare global {
     | undefined;
 }
 
-const joinPdfLine = (parts: string[]) => parts.join(" ").replace(/\s+/g, " ").trim();
-
 const extractPdfText = async (buf: Buffer) => {
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  if (!globalThis.pdfjsWorker?.WorkerMessageHandler) {
-    const workerModule = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
-    globalThis.pdfjsWorker = {
-      WorkerMessageHandler: workerModule.WorkerMessageHandler
-    };
-  }
-  const loadingTask = pdfjs.getDocument({
-    data: new Uint8Array(buf),
-    useWorkerFetch: false,
-    isEvalSupported: false
-  });
-
+  const parser = new PDFParse({ data: buf });
   try {
-    const pdf = await loadingTask.promise;
-    const pages: string[] = [];
-
-    for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex += 1) {
-      const page = await pdf.getPage(pageIndex);
-      const content = await page.getTextContent();
-      const lines: string[] = [];
-      let currentBaseline: number | null = null;
-      let currentLine: string[] = [];
-
-      const flushLine = () => {
-        const nextLine = joinPdfLine(currentLine);
-        if (nextLine) lines.push(nextLine);
-        currentLine = [];
-      };
-
-      for (const item of content.items) {
-        if (!("str" in item) || typeof item.str !== "string") continue;
-
-        const fragment = item.str.replace(/\s+/g, " ").trim();
-        if (!fragment) continue;
-
-        const baseline = Array.isArray(item.transform) && typeof item.transform[5] === "number" ? item.transform[5] : 0;
-        const startsNewLine = currentBaseline !== null && Math.abs(baseline - currentBaseline) > 4;
-
-        if (startsNewLine) {
-          flushLine();
-        }
-
-        currentLine.push(fragment);
-        currentBaseline = baseline;
-
-        if ("hasEOL" in item && item.hasEOL) {
-          flushLine();
-          currentBaseline = null;
-        }
-      }
-
-      flushLine();
-      page.cleanup();
-
-      if (lines.length > 0) {
-        pages.push(lines.join("\n"));
-      }
-    }
-
-    return pages.join("\n\n").trim();
+    const result = await parser.getText({
+      lineEnforce: true,
+      pageJoiner: ""
+    });
+    return result.text
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .trim();
   } finally {
-    await loadingTask.destroy();
+    await parser.destroy();
   }
 };
 
@@ -180,8 +128,23 @@ export async function POST(req: NextRequest) {
         ? parsedFromMarkdown
         : parseCvText(text);
     const profile = profileFromParsedCv(templateId, parsed);
+    const warnings: string[] = [];
 
-    return Response.json({ profile }, { status: 200 });
+    if (isPdf) {
+      const skillEntryCount = profile.sections
+        .filter((section) => section.type === "skills")
+        .reduce((count, section) => count + section.items.length, 0);
+      const mentionsTechnicalSkills = /technical skills/i.test(text);
+      const missingHeaderSignals = !profile.basics.location || !profile.basics.headline;
+
+      if ((mentionsTechnicalSkills && skillEntryCount <= 1) || missingHeaderSignals) {
+        warnings.push(
+          "This PDF's embedded text layer looks incomplete. Import used the extractable text that was available, but some sections may be missing or partial. TXT or DOCX import is more reliable for this file."
+        );
+      }
+    }
+
+    return Response.json({ profile, warnings }, { status: 200 });
   } catch (err: unknown) {
     const details =
       err instanceof Error
