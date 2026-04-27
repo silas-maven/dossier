@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Zety Alternative: Dossier CV Builder",
-    description: "Compare free CV workflows with local-first and cloud-sync options.",
+    description: "Compare free CV workflows with local-first editing and guided AI review.",
   }
 };
 
@@ -53,13 +53,13 @@ export default function ZetyAlternativePage() {
           <ul className="mt-3 list-disc space-y-2 pl-6 text-white/80">
             <li>Can you start editing immediately without payment friction?</li>
             <li>Do templates stay readable and ATS-friendly after export?</li>
-            <li>Can you keep data local and still opt into cloud later?</li>
+            <li>Can you keep data local while using AI suggestions only when you choose?</li>
           </ul>
 
           <h2 className="mt-10 text-xl font-semibold">Dossier fit</h2>
           <ul className="mt-3 list-disc space-y-2 pl-6 text-white/80">
-            <li>Local-first mode available from start.</li>
-            <li>Cloud mode is optional and account-scoped.</li>
+            <li>Local-first autosave available from start.</li>
+            <li>Bring-your-own AI key for session-only CV review.</li>
             <li>Live preview + PDF export for fast iteration before applying.</li>
           </ul>
 
@@ -67,7 +67,7 @@ export default function ZetyAlternativePage() {
             <p className="text-sm text-white/75">Start now</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
-                href="/storage"
+                href="/templates"
                 className="rounded-lg border border-white/25 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/20"
               >
                 Start building

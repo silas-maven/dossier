@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | Dossier CV Builder"
   },
   description:
-    "Build ATS-friendly CVs fast with a local-first editor, multiple professional templates, and secure cloud sync.",
+    "Build ATS-friendly CVs fast with a local-first editor, professional templates, and guided AI review.",
   alternates: {
     canonical: "/"
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "Dossier CV Builder",
     title: "Dossier CV Builder",
     description:
-      "Create and export professional CVs with a fast local-first editor and secure cloud sync options.",
+      "Create and export professional CVs with a fast local-first editor and optional AI review.",
   },
   twitter: {
     card: "summary_large_image",
@@ -62,16 +62,32 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           <VisitorTracker />
           <div className="flex-1">{children}</div>
-          <footer className="border-t border-white/10 bg-background/80 px-4 py-3 text-center text-xs text-muted-foreground">
-            Built by{" "}
-            <Link
-              href="https://hntwari.vercel.app"
-              target="_blank"
-              rel="noreferrer"
-              className="text-foreground underline decoration-white/30 underline-offset-4 hover:decoration-white/70"
-            >
-              Hamza Ntwari
-            </Link>
+          <footer className="border-t border-white/10 bg-background/80 px-4 py-4 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
+            <div className="flex gap-4">
+              <Link
+                href="/ai-resume-optimizer"
+                className="hover:text-foreground transition-colors"
+              >
+                AI ATS Optimizer
+              </Link>
+              <Link
+                href="/free-cv-builder-uk"
+                className="hover:text-foreground transition-colors"
+              >
+                UK CV Guide
+              </Link>
+            </div>
+            <div>
+              Built by{" "}
+              <Link
+                href="https://hntwari.vercel.app"
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground underline decoration-white/30 underline-offset-4 hover:decoration-white/70"
+              >
+                Hamza Ntwari
+              </Link>
+            </div>
           </footer>
         </div>
       </body>

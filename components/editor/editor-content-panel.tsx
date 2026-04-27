@@ -77,7 +77,29 @@ export default function EditorContentPanel({
               const isActive = tab.key === activeTab;
               const isSectionTab = tab.key.startsWith("section:");
               return (
-                <div key={tab.key} className="flex shrink-0 items-center gap-1 sm:shrink">
+                <div
+                  key={tab.key}
+                  className={cn(
+                    "flex shrink-0 items-center sm:shrink transition-all duration-300",
+                    isActive && isSectionTab
+                      ? "gap-1 rounded-full bg-secondary/40 p-1 border border-border/50 shadow-sm animate-in fade-in zoom-in-95"
+                      : "gap-1"
+                  )}
+                >
+                  {isActive && isSectionTab && onReorderSectionTab && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={!tab.canMovePrev}
+                      aria-label={`Move ${tab.label} left`}
+                      className="h-7 w-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      onClick={() => onReorderSectionTab(tab.key, -1)}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                  )}
+
                   <Button
                     type="button"
                     role="tab"
@@ -87,8 +109,8 @@ export default function EditorContentPanel({
                     size="sm"
                     className={cn(
                       "gap-2 rounded-full",
-                      !isActive && "text-muted-foreground",
-                      tab.complete && !isActive && "border-emerald-500/35 bg-emerald-500/10 text-emerald-300"
+                      !isActive && "text-muted-foreground hover:text-foreground hover:bg-secondary/80",
+                      tab.complete && !isActive && "border-emerald-500/35 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
                     )}
                     onClick={() => onTabChange(tab.key)}
                   >
@@ -100,32 +122,19 @@ export default function EditorContentPanel({
                     <span className="max-w-[11rem] truncate">{tab.label}</span>
                   </Button>
 
-                  {onReorderSectionTab && isSectionTab ? (
-                    <span className="inline-flex items-center gap-1">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        disabled={!tab.canMovePrev}
-                        aria-label={`Move ${tab.label} left`}
-                        className="h-8 w-8 rounded-full p-0"
-                        onClick={() => onReorderSectionTab(tab.key, -1)}
-                      >
-                        <ChevronLeft className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        disabled={!tab.canMoveNext}
-                        aria-label={`Move ${tab.label} right`}
-                        className="h-8 w-8 rounded-full p-0"
-                        onClick={() => onReorderSectionTab(tab.key, 1)}
-                      >
-                        <ChevronRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </span>
-                  ) : null}
+                  {isActive && isSectionTab && onReorderSectionTab && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={!tab.canMoveNext}
+                      aria-label={`Move ${tab.label} right`}
+                      className="h-7 w-7 shrink-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      onClick={() => onReorderSectionTab(tab.key, 1)}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               );
             })}

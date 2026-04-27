@@ -1,28 +1,26 @@
 import type { Metadata } from "next";
-
-import StorageChoiceClientPage from "@/app/storage/storage-choice-client";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Choose Storage Mode",
+  title: "Start Your CV",
   description:
-    "Choose local browser storage or secure cloud sync before creating your CV in Dossier.",
+    "Start building an ATS-friendly CV with local browser autosave in Dossier.",
   alternates: {
-    canonical: "/storage"
+    canonical: "/templates"
   },
   openGraph: {
-    title: "Dossier Storage Choice",
-    description:
-      "Pick local mode for browser-only storage or cloud mode for account-based profile sync.",
-    url: "/storage",
+    title: "Start your Dossier CV",
+    description: "Pick a template and build your CV with local browser autosave.",
+    url: "/templates",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dossier Storage Choice",
-    description: "Pick local or cloud mode before choosing your CV template.",
+    title: "Start your Dossier CV",
+    description: "Pick a template and build your CV with local browser autosave.",
   }
 };
 
 export default function StoragePage() {
-  return <StorageChoiceClientPage />;
+  redirect("/templates");
 }

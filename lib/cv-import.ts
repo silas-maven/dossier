@@ -80,14 +80,19 @@ const prettifyHeadingTitle = (heading: string) => {
 const headingToSection = (heading: string): { type: CvSectionType; title: string } | null => {
   const h = cleanHeading(heading).toLowerCase();
   if (
-    ["experience", "work experience", "professional experience", "employment", "employment history"].includes(
+    ["experience", "work experience", "professional experience", "employment", "employment history", "career history"].includes(
       h
     )
   ) {
     return { type: "experience", title: "Experience" };
   }
-  if (["education", "academic", "academics"].includes(h)) return { type: "education", title: "Education" };
-  if (["skills", "technical skills", "core skills"].includes(h)) return { type: "skills", title: "Skills" };
+  if (["education", "academic", "academics", "academic history"].includes(h)) return { type: "education", title: "Education" };
+  if (
+    ["skills", "technical skills", "core skills", "key skills", "expertise", "core competencies", "tools", "technologies", "tools & methods"].includes(h) ||
+    h.includes("skills") || h.includes("competencies")
+  ) {
+    return { type: "skills", title: "Skills" };
+  }
   if (["courses", "coursework", "certificates", "certifications", "certification", "training"].includes(h)) {
     return { type: "certifications", title: "Certificates" };
   }
@@ -97,7 +102,7 @@ const headingToSection = (heading: string): { type: CvSectionType; title: string
   if (h.includes("missing") && h.includes("custom") && h.includes("translation")) {
     return { type: "projects", title: "Projects" };
   }
-  if (["summary", "profile", "about", "professional summary", "executive summary"].includes(h)) {
+  if (["summary", "profile", "about", "professional summary", "executive summary", "personal profile"].includes(h)) {
     return { type: "custom", title: "Summary" };
   }
   return null;
@@ -121,7 +126,7 @@ const looksLikeCustomSectionHeading = (line: string) => {
 };
 
 const looksLikeHeading = (line: string) => {
-  if (line.length > 42) return false;
+  if (line.length > 50) return false;
   const alpha = line.replace(/[^A-Za-z]/g, "");
   if (alpha.length < 4) return false;
   const upperRatio = alpha.replace(/[^A-Z]/g, "").length / alpha.length;
@@ -139,8 +144,9 @@ const looksLikeExperienceHeaderStart = (line: string, nextLine = "") => {
   const cleaned = stripListMarker(line);
   if (!cleaned || /^[-•*]\s+/.test(line)) return false;
   if (headingToSection(cleaned)) return false;
-  if (cleaned.length > 90) return false;
-  const hasRoleSeparator = /\s+\|\s+|\s+at\s+| @ /i.test(cleaned);
+  if (cleaned.length > 120) return false;
+  const hasRoleSeparator = /\s+\|\s+|\s+at\s+| @ |,\s+/i.test(cleaned);
+  if (looksLikeLocationDateLine(cleaned)) return true;
   return hasRoleSeparator && looksLikeLocationDateLine(nextLine);
 };
 
@@ -320,7 +326,7 @@ export const parseCvText = (text: string): ParsedCv => {
   const sections: ParsedCv["sections"] = [];
   let current: ParsedCv["sections"][number] | null = null;
   let currentLines: string[] = [];
-  let preambleLines: string[] = [];
+  const preambleLines: string[] = [];
 
   const flush = () => {
     if (!current) return;
@@ -799,15 +805,17 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       return s;
     }
 
-    s.items = section.blocks.slice(0, 30).map((block) => {
-      const item = createEmptyItem();
-      const parsedBlock = parseCustomBlock(block);
-      item.title = parsedBlock.title;
-      item.subtitle = "";
-      item.description = parsedBlock.description ? `- ${parsedBlock.description}` : "";
-      item.visible = true;
-      return item;
-    });
+    const item = createEmptyItem();
+    item.title = "";
+    item.subtitle = "";
+    item.description = section.blocks
+      .slice(0, 30)
+      .map((block) => stripListMarker(block))
+      .filter(Boolean)
+      .map((text) => `- ${text.replace(/\n+/g, " ")}`)
+      .join("\n");
+    item.visible = true;
+    s.items = item.description ? [item] : [];
     return s;
   });
 

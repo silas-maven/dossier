@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type EditorPanelTab = "style" | "content" | "preview";
+export type EditorPanelTab = "content" | "preview";
 
 type EditorMobileTabsProps = {
   activeTab: EditorPanelTab;
@@ -12,7 +12,6 @@ type EditorMobileTabsProps = {
 
 export default function EditorMobileTabs({ activeTab, onTabChange }: EditorMobileTabsProps) {
   const tabs: Array<{ id: EditorPanelTab; label: string }> = [
-    { id: "style", label: "Style" },
     { id: "content", label: "Content" },
     { id: "preview", label: "Preview" }
   ];
@@ -21,7 +20,7 @@ export default function EditorMobileTabs({ activeTab, onTabChange }: EditorMobil
     <div
       role="tablist"
       aria-label="Editor panels"
-      className="grid grid-cols-3 gap-2 rounded-lg border bg-card/50 p-1"
+      className="grid grid-cols-2 gap-2 rounded-lg border bg-card/50 p-1"
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;

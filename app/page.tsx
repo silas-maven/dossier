@@ -23,7 +23,7 @@ const metadataBase = resolvePageBase();
 export const metadata: Metadata = {
   title: "Free CV Builder for ATS-Friendly Resumes",
   description:
-    "Build and export professional CVs with structured templates, local-first editing, and secure cloud sync.",
+    "Build and export professional CVs with structured templates, local-first editing, and guided AI review.",
   alternates: {
     canonical: "/"
   },
@@ -84,15 +84,7 @@ export default async function HomePage() {
             name: "Can I keep my CV data local?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Yes. Local mode keeps CV data in your browser."
-            }
-          },
-          {
-            "@type": "Question",
-            name: "Does Dossier support cloud sync?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Yes. Cloud mode uses secure account-based storage for per-user profile sync."
+              text: "Yes. Dossier autosaves your working CV in your browser by default."
             }
           },
           {
@@ -119,14 +111,20 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ExperienceHero ctaHref="/storage" templateCount={publicCvTemplates.length} userCount={userCount} />
+      <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} userCount={userCount} />
       <section className="border-t border-white/10 bg-[#03050b] px-6 py-12 md:px-12 lg:px-16">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-xl font-semibold text-white md:text-2xl">Compare CV builder options</h2>
           <p className="mt-3 text-sm text-white/70">
             Practical guides for choosing a free CV builder based on privacy, ATS quality, and export flow.
           </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="mt-6 grid gap-3 sm:grid-cols-4">
+            <Link
+              href="/ai-resume-optimizer"
+              className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
+            >
+              AI ATS Optimizer
+            </Link>
             <Link
               href="/resume-io-alternative"
               className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"

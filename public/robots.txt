@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Allow: /storage
 Allow: /templates
 Disallow: /editor
 Disallow: /auth

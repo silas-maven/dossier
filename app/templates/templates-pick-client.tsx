@@ -1,23 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import DossierLogoLink from "@/components/navigation/dossier-logo-link";
 import TemplateCarousel from "@/components/ui/template-carousel";
 import { publicCvTemplates, type CvTemplate } from "@/lib/templates";
-import type { DossierStorageMode } from "@/lib/storage-mode";
-import AuthStatusButton from "@/components/auth/auth-status-button";
 
-type TemplatesPickClientProps = {
-  storageMode: DossierStorageMode;
-};
-
-export default function TemplatesPickClient({ storageMode }: TemplatesPickClientProps) {
+export default function TemplatesPickClient() {
   const router = useRouter();
 
   const handleSelect = (template: CvTemplate) => {
-    router.push(`/editor?template=${template.id}&storage=${storageMode}`);
+    router.push(`/editor?template=${template.id}`);
   };
 
   return (
@@ -33,17 +26,13 @@ export default function TemplatesPickClient({ storageMode }: TemplatesPickClient
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Choose your CV style</h1>
             <p className="mt-2 text-xs text-muted-foreground">
-              Storage mode: <span className="font-medium text-foreground">{storageMode}</span>{" "}
-              <Link href="/storage" className="underline underline-offset-2">
-                Change
-              </Link>
+              Local autosave is active. Your CV stays in this browser unless you export it.
             </p>
           </div>
-          <AuthStatusButton nextPath={`/templates?storage=${storageMode}`} />
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Compare ATS-safe and human-first layouts, filter by industry, and pick the style you want to
-          edit. You can still swap templates later without rewriting your content.
+          Compare ATS-safe and human-first layouts by use case. Pick a style first, then let the builder
+          guide the content and AI review.
         </p>
 
         <div className="mt-8">

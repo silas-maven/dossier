@@ -11,7 +11,6 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
-  Sparkles,
   X
 } from "lucide-react";
 
@@ -79,39 +78,6 @@ function matchesSearch(template: CvTemplate, query: string) {
     .toLowerCase();
 
   return haystack.includes(query);
-}
-
-function FamilyCard({
-  family,
-  active,
-  count,
-  onClick
-}: {
-  family: CvTemplate["family"];
-  active: boolean;
-  count: number;
-  onClick: () => void;
-}) {
-  const meta = templateFamilyDefinitions[family];
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-[24px] border p-4 text-left transition",
-        active
-          ? "border-[#5ea4ff]/60 bg-[#5ea4ff]/10"
-          : "border-white/8 bg-[#0d1526]/70 hover:border-white/14 hover:bg-[#10192d]"
-      )}
-    >
-      <p className="text-sm font-semibold tracking-tight text-foreground">{meta.label}</p>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">{meta.description}</p>
-      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-        <span>{meta.focus}</span>
-        <span>{count} templates</span>
-      </div>
-    </button>
-  );
 }
 
 function TemplatePreviewImage({
@@ -186,14 +152,24 @@ function TemplateCard({
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,12,20,0.04)_0%,rgba(7,12,20,0.18)_55%,rgba(7,12,20,0.9)_100%)]" />
 
           <div className="absolute inset-x-0 bottom-0 p-4">
-            <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-white/78 backdrop-blur-sm">
-              {template.category}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-white/78 backdrop-blur-sm">
+                {template.category}
+              </span>
+              <span
+                className={cn(
+                  "inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium backdrop-blur-sm",
+                  compactMetaTone[template.atsFit]
+                )}
+              >
+                {template.atsFit} ATS
+              </span>
+            </div>
             <h3 className="mt-3 text-xl font-semibold tracking-tight text-white">{template.name}</h3>
           </div>
 
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.24)_0%,rgba(4,8,16,0.72)_48%,rgba(4,8,16,0.94)_100%)] opacity-100 transition duration-200 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100" />
-          <div className="absolute inset-0 flex flex-col justify-between p-4 opacity-100 transition duration-200 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.24)_0%,rgba(4,8,16,0.72)_48%,rgba(4,8,16,0.94)_100%)] opacity-0 transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100" />
+          <div className="absolute inset-0 flex flex-col justify-between p-4 opacity-0 transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
             <div className="flex flex-wrap gap-2">
               <span
                 className={cn(
@@ -365,16 +341,47 @@ export default function TemplateCarousel({
     [normalizedQuery, selectedExperienceLevels, selectedFamily, selectedIndustries, selectedLayouts, templates]
   );
 
-  const familySections = useMemo(
-    () =>
-      templateFamilyOptions
-        .map((family) => ({
-          family,
-          templates: filteredTemplates.filter((template) => template.family === family)
-        }))
-        .filter((section) => section.templates.length > 0),
-    [filteredTemplates]
-  );
+  const gallerySections = useMemo(() => {
+    const used = new Set<string>();
+    const pull = (predicate: (template: CvTemplate) => boolean) => {
+      const matches = filteredTemplates.filter((template) => !used.has(template.id) && predicate(template));
+      matches.forEach((template) => used.add(template.id));
+      return matches;
+    };
+
+    return [
+      {
+        id: "recommended",
+        label: "Recommended",
+        description: "The safest starting points for most users: strong ATS fit, clean hierarchy, and broad role coverage.",
+        templates: pull((template) => template.shelf === "Top Rated")
+      },
+      {
+        id: "ats-safe",
+        label: "ATS-safe",
+        description: "Single-column and conservative layouts for application portals and automated parsing.",
+        templates: pull((template) => template.atsMode === "safe" || template.atsFit === "Strong")
+      },
+      {
+        id: "executive-corporate",
+        label: "Executive / Corporate",
+        description: "Structured templates for consulting, finance, programme delivery, and senior stakeholder-facing roles.",
+        templates: pull((template) => template.shelf === "Corporate" || template.experienceLevel === "Executive")
+      },
+      {
+        id: "creative-human",
+        label: "Creative / Human-first",
+        description: "More visual PDFs for direct recruiter review, networking, and brand-forward applications.",
+        templates: pull((template) => template.shelf === "Creative" || template.atsMode === "human-first")
+      },
+      {
+        id: "other",
+        label: "More matches",
+        description: "Additional templates that match the current filters.",
+        templates: pull(() => true)
+      }
+    ].filter((section) => section.templates.length > 0);
+  }, [filteredTemplates]);
 
   const activeFilters = [
     ...(selectedFamily !== "All" ? [{ group: "family" as const, value: templateFamilyDefinitions[selectedFamily as CvTemplate["family"]].label }] : []),
@@ -600,27 +607,6 @@ export default function TemplateCarousel({
           ) : null}
         </div>
 
-        <section className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Layout Families</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Browse by family first</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              Pick the layout engine first, then compare its theme variants and industry guidance.
-            </p>
-          </div>
-          <div className="grid gap-4 xl:grid-cols-2">
-            {templateFamilyOptions.map((family) => (
-              <FamilyCard
-                key={family}
-                family={family}
-                active={selectedFamily === family}
-                count={templates.filter((template) => template.family === family).length}
-                onClick={() => setSelectedFamily(family)}
-              />
-            ))}
-          </div>
-        </section>
-
         {!filteredTemplates.length ? (
           <div className="rounded-[28px] border border-dashed border-white/12 bg-[#0c1424] p-10 text-center">
             <p className="font-medium text-foreground">No templates match those filters.</p>
@@ -628,16 +614,15 @@ export default function TemplateCarousel({
           </div>
         ) : (
           <div className="space-y-10">
-            {familySections.map((section) => (
-              <section key={section.family} className="space-y-4">
+            {gallerySections.map((section) => (
+              <section key={section.id} className="space-y-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {templateFamilyDefinitions[section.family].label}
+                      {section.label}
                     </div>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                      {templateFamilyDefinitions[section.family].description}
+                      {section.description}
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground">

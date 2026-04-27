@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Free CV Builder UK (Local or Cloud)",
+  title: "Free CV Builder UK",
   description:
     "Free CV builder for UK job seekers. Build ATS-friendly CVs with local-first editing, template selection, and PDF export.",
   alternates: {
@@ -50,9 +50,9 @@ export default function FreeCvBuilderUkPage() {
 
           <h2 className="mt-10 text-xl font-semibold">Workflow</h2>
           <ol className="mt-3 list-decimal space-y-2 pl-6 text-white/80">
-            <li>Choose local mode if you want browser-only storage.</li>
-            <li>Select a template and import or type your experience.</li>
-            <li>Tune content and export as PDF for applications.</li>
+            <li>Select a template for your target role and ATS risk.</li>
+            <li>Import or type your experience into structured sections.</li>
+            <li>Review content, tailor it to the job, and export as PDF.</li>
           </ol>
 
           <h2 className="mt-10 text-xl font-semibold">Why this helps</h2>
@@ -66,16 +66,16 @@ export default function FreeCvBuilderUkPage() {
             <p className="text-sm text-white/75">Build your CV</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
-                href="/storage"
+                href="/templates"
                 className="rounded-lg border border-white/25 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/20"
               >
-                Choose storage mode
+                Browse templates
               </Link>
               <Link
-                href="/templates"
+                href="/resume-io-alternative"
                 className="rounded-lg border border-white/25 bg-transparent px-4 py-2 text-sm text-white transition hover:bg-white/10"
               >
-                Browse templates
+                Compare builders
               </Link>
             </div>
           </div>

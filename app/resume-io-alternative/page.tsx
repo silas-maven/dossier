@@ -60,7 +60,7 @@ export default function ResumeIoAlternativePage() {
           <h2 className="mt-10 text-xl font-semibold">Why job seekers choose Dossier</h2>
           <ul className="mt-3 list-disc space-y-2 pl-6 text-white/80">
             <li>Start in local mode without mandatory signup.</li>
-            <li>Optional cloud sync with per-user account scoping.</li>
+            <li>Session-only AI key support for guided review and targeted rewrites.</li>
             <li>Template-first workflow with live preview and PDF export.</li>
           </ul>
 
@@ -68,7 +68,7 @@ export default function ResumeIoAlternativePage() {
             <p className="text-sm text-white/75">Next step</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link
-                href="/storage"
+                href="/templates"
                 className="rounded-lg border border-white/25 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/20"
               >
                 Try Dossier free

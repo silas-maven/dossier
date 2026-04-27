@@ -5,14 +5,6 @@ import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import EditorStylePanel from "@/components/editor/editor-style-panel";
 import EditorContentPanel, {
@@ -21,6 +13,8 @@ import EditorContentPanel, {
 } from "@/components/editor/editor-content-panel";
 import EditorPreviewPanel from "@/components/editor/editor-preview-panel";
 import EditorMobileTabs, { type EditorPanelTab } from "@/components/editor/editor-mobile-tabs";
+import EditorAiPanel from "@/components/editor/editor-ai-panel";
+import type { AiCvSuggestion } from "@/lib/ai/types";
 import {
   createEmptyItem,
   createEmptyProfile,
@@ -50,14 +44,10 @@ import {
   normalizeStoredDescriptionHtml
 } from "@/lib/description-format";
 import {
-  getCloudProfileById,
-  getCurrentSupabaseUser,
-  getLatestCloudProfileByTemplate,
   getStoredProfileMeta,
   loadLocalProfileForTemplate,
   nowIso,
   profileChecksum,
-  saveCloudProfile,
   saveStoredProfileEnvelope,
   type ProfileStorageMode,
   type StoredProfileMeta
@@ -65,7 +55,6 @@ import {
 import { getTemplateById } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { type DossierStorageMode } from "@/lib/storage-mode";
-import { createSupabaseBrowserClientOrNull } from "@/lib/supabase/client";
 
 type EditorFormProps = {
   templateId: string;
@@ -298,7 +287,6 @@ export default function EditorForm({
   preferredStorageMode
 }: EditorFormProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const cloudConfigured = useMemo(() => Boolean(createSupabaseBrowserClientOrNull()), []);
   const selectedTemplate = useMemo(() => getTemplateById(templateId), [templateId]);
   const guidanceProfile = useMemo(
     () => getTemplateGuidanceProfile(selectedTemplate.guidanceProfileId),
@@ -314,19 +302,12 @@ export default function EditorForm({
   const [undoProfile, setUndoProfile] = useState<CvProfile | null>(null);
   const [copiedTemplateId, setCopiedTemplateId] = useState(false);
   const [storageMode, setStorageMode] = useState<ProfileStorageMode>("local");
-  const [profileMeta, setProfileMeta] = useState<StoredProfileMeta | null>(null);
+  const [, setProfileMeta] = useState<StoredProfileMeta | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
-  const [cloudBusy, setCloudBusy] = useState(false);
   const [activePanelTab, setActivePanelTab] = useState<EditorPanelTab>("content");
   const [activeContentTab, setActiveContentTab] = useState<EditorContentTab>("import");
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
-  const [conflictState, setConflictState] = useState<{
-    localProfile: CvProfile;
-    cloudProfile: CvProfile;
-    cloudId: string;
-    cloudUpdatedAt: string;
-  } | null>(null);
   const [lastExplicitSaveChecksum, setLastExplicitSaveChecksum] = useState<string | null>(null);
 
   useEffect(() => {
@@ -335,7 +316,7 @@ export default function EditorForm({
     const hydrate = async () => {
       const fallbackProfile = createEmptyProfile(templateId);
       const localProfile = loadLocalProfileForTemplate(templateId);
-      let nextProfile = normalizeProfileShape(templateId, localProfile ?? fallbackProfile);
+      const nextProfile = normalizeProfileShape(templateId, localProfile ?? fallbackProfile);
       let nextMeta = getStoredProfileMeta(nextProfile.id);
       const nextMode: ProfileStorageMode = preferredStorageMode ?? nextMeta?.mode ?? "local";
 
@@ -346,41 +327,6 @@ export default function EditorForm({
           mode: nextMode,
           existing: null
         });
-      }
-
-      if (nextMode === "cloud") {
-        try {
-          const cloudRecord = nextMeta.cloudId
-            ? await getCloudProfileById(nextMeta.cloudId)
-            : await getLatestCloudProfileByTemplate(templateId);
-
-          if (cloudRecord) {
-            const cloudProfile = normalizeProfileShape(templateId, cloudRecord.profile_data);
-            const localChecksum = profileChecksum(nextProfile);
-            const cloudChecksum = profileChecksum(cloudProfile);
-            if (localChecksum !== cloudChecksum) {
-              setConflictState({
-                localProfile: nextProfile,
-                cloudProfile,
-                cloudId: cloudRecord.id,
-                cloudUpdatedAt: cloudRecord.updated_at
-              });
-            } else {
-              nextProfile = cloudProfile;
-              nextMeta = buildMeta({
-                profile: nextProfile,
-                templateId,
-                mode: "cloud",
-                existing: nextMeta,
-                cloudId: cloudRecord.id,
-                cloudChecksum,
-                cloudUpdatedAt: cloudRecord.updated_at
-              });
-            }
-          }
-        } catch {
-          setSyncError("Cloud profile unavailable right now. Using local draft.");
-        }
       }
 
       if (!active) return;
@@ -492,84 +438,6 @@ export default function EditorForm({
     });
   };
 
-  const maybeLoadCloudIntoConflict = async (opts?: { forceCloud?: boolean }) => {
-    try {
-      const cloudRecord = profileMeta?.cloudId
-        ? await getCloudProfileById(profileMeta.cloudId)
-        : await getLatestCloudProfileByTemplate(templateId);
-
-      if (!cloudRecord) {
-        setSyncMessage("No cloud profile found for this template yet.");
-        return;
-      }
-
-      const cloudProfile = normalizeProfileShape(templateId, cloudRecord.profile_data);
-      const localChecksum = profileChecksum(profile);
-      const cloudChecksum = profileChecksum(cloudProfile);
-
-      if (localChecksum !== cloudChecksum) {
-        setConflictState({
-          localProfile: profile,
-          cloudProfile,
-          cloudId: cloudRecord.id,
-          cloudUpdatedAt: cloudRecord.updated_at
-        });
-        return;
-      }
-
-      setProfile(cloudProfile);
-      const nextMode: ProfileStorageMode = opts?.forceCloud ? "cloud" : storageMode;
-      setStorageMode(nextMode);
-      setLastExplicitSaveChecksum(cloudChecksum);
-      persistProfileToLocal(cloudProfile, nextMode, {
-        cloudId: cloudRecord.id,
-        cloudChecksum,
-        cloudUpdatedAt: cloudRecord.updated_at,
-        mode: nextMode
-      });
-      setSyncMessage("Cloud profile is already in sync.");
-    } catch {
-      setSyncError("Could not sync from cloud right now.");
-    }
-  };
-
-  const saveToCloudNow = async () => {
-    setCloudBusy(true);
-    setSyncError(null);
-    setSyncMessage(null);
-    try {
-      const user = await getCurrentSupabaseUser();
-      if (!user) {
-        setSyncError("Sign in is required before using cloud storage.");
-        setStorageMode("local");
-        return;
-      }
-
-      const saved = await saveCloudProfile({
-        profile,
-        templateId,
-        cloudId: profileMeta?.cloudId ?? null
-      });
-      const normalizedCloud = normalizeProfileShape(templateId, saved.profile_data);
-      const cloudChecksum = profileChecksum(normalizedCloud);
-
-      setStorageMode("cloud");
-      setProfile(normalizedCloud);
-      setLastExplicitSaveChecksum(cloudChecksum);
-      persistProfileToLocal(normalizedCloud, "cloud", {
-        cloudId: saved.id,
-        cloudChecksum,
-        cloudUpdatedAt: saved.updated_at,
-        mode: "cloud"
-      });
-      setSyncMessage("Saved to cloud.");
-    } catch {
-      setSyncError("Cloud save failed.");
-    } finally {
-      setCloudBusy(false);
-    }
-  };
-
   const saveLocalNow = () => {
     setSyncError(null);
     setSyncMessage("Saved locally.");
@@ -577,36 +445,6 @@ export default function EditorForm({
     persistProfileToLocal(profile, "local", {
       mode: "local"
     });
-  };
-
-  const setStorageModeWithValidation = async (nextMode: ProfileStorageMode) => {
-    setSyncError(null);
-    setSyncMessage(null);
-    if (nextMode === "local") {
-      setStorageMode("local");
-      persistProfileToLocal(profile, "local", { mode: "local" });
-      return;
-    }
-
-    if (!cloudConfigured) {
-      setSyncError("Cloud storage is not configured in this environment.");
-      return;
-    }
-
-    setCloudBusy(true);
-    try {
-      const user = await getCurrentSupabaseUser();
-      if (!user) {
-        setSyncError("Sign in is required before switching to cloud mode.");
-        setStorageMode("local");
-        return;
-      }
-
-      setStorageMode("cloud");
-      await maybeLoadCloudIntoConflict({ forceCloud: true });
-    } finally {
-      setCloudBusy(false);
-    }
   };
 
   const updateBasics = <K extends keyof CvBasics>(field: K, value: CvBasics[K]) => {
@@ -1047,72 +885,6 @@ export default function EditorForm({
     setActiveContentTab(`section:${sectionId}`);
   };
 
-  const resolveConflictKeepLocal = async () => {
-    if (!conflictState) return;
-    setCloudBusy(true);
-    setSyncError(null);
-    setSyncMessage(null);
-    try {
-      const saved = await saveCloudProfile({
-        profile: conflictState.localProfile,
-        templateId,
-        cloudId: conflictState.cloudId
-      });
-      const cloudChecksum = profileChecksum(conflictState.localProfile);
-      setStorageMode("cloud");
-      setProfile(conflictState.localProfile);
-      setLastExplicitSaveChecksum(cloudChecksum);
-      persistProfileToLocal(conflictState.localProfile, "cloud", {
-        cloudId: saved.id,
-        cloudChecksum,
-        cloudUpdatedAt: saved.updated_at,
-        mode: "cloud"
-      });
-      setSyncMessage("Kept local version and updated cloud.");
-      setConflictState(null);
-    } catch {
-      setSyncError("Could not overwrite cloud profile.");
-    } finally {
-      setCloudBusy(false);
-    }
-  };
-
-  const resolveConflictKeepCloud = () => {
-    if (!conflictState) return;
-    const cloudChecksum = profileChecksum(conflictState.cloudProfile);
-    setStorageMode("cloud");
-    setProfile(conflictState.cloudProfile);
-    setLastExplicitSaveChecksum(cloudChecksum);
-    persistProfileToLocal(conflictState.cloudProfile, "cloud", {
-      cloudId: conflictState.cloudId,
-      cloudChecksum,
-      cloudUpdatedAt: conflictState.cloudUpdatedAt,
-      mode: "cloud"
-    });
-    setSyncMessage("Loaded cloud version.");
-    setConflictState(null);
-  };
-
-  const resolveConflictSaveLocalCopy = () => {
-    if (!conflictState) return;
-    const copy = normalizeProfileShape(templateId, {
-      ...conflictState.localProfile,
-      id: createEmptyProfile(templateId).id,
-      name: `${conflictState.localProfile.name || "CV Profile"} (Local Copy)`
-    });
-    setStorageMode("local");
-    setProfile(copy);
-    setLastExplicitSaveChecksum(profileChecksum(copy));
-    persistProfileToLocal(copy, "local", {
-      cloudId: null,
-      cloudChecksum: null,
-      cloudUpdatedAt: null,
-      mode: "local"
-    });
-    setSyncMessage("Saved local version as a copy.");
-    setConflictState(null);
-  };
-
   const activeContentSection =
     activeContentTab.startsWith("section:")
       ? profile.sections.find((section) => section.id === activeContentTab.replace("section:", "")) ?? null
@@ -1185,6 +957,38 @@ export default function EditorForm({
     updateItemField(activeContentSectionIndex, itemIndex, "description", nextDescription);
   };
 
+  const applyAiSuggestion = (suggestion: AiCvSuggestion, replacement: string) => {
+    const target = suggestion.target;
+    if (target.kind === "summary") {
+      updateBasics("summary", replacement);
+      return;
+    }
+
+    setProfile((current) => {
+      const sections = [...current.sections];
+      const sectionIndex = sections.findIndex((section) => section.id === target.sectionId);
+      const section = sections[sectionIndex];
+      if (!section) return current;
+
+      if (target.kind === "section_title") {
+        sections[sectionIndex] = { ...section, title: replacement };
+        return { ...current, sections };
+      }
+
+      const items = [...section.items];
+      const itemIndex = items.findIndex((item) => item.id === target.itemId);
+      const item = items[itemIndex];
+      if (!item) return current;
+
+      items[itemIndex] =
+        target.kind === "item_title"
+          ? { ...item, title: replacement }
+          : { ...item, description: replacement };
+      sections[sectionIndex] = { ...section, items };
+      return { ...current, sections };
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="xl:hidden">
@@ -1199,27 +1003,34 @@ export default function EditorForm({
         </div>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[40fr_80fr_60fr] xl:items-start">
-        <EditorStylePanel
-          templateId={templateId}
-          style={profile.style}
-          sections={profile.sections}
-          selectedSectionId={selectedSectionIdSafe}
-          onSelectSection={handleStyleSectionSelect}
-          onStyleChange={updateStyle}
-          onSelectedSectionStyleChange={updateSelectedSectionStyleField}
-          className={cn(
-            activePanelTab === "style" ? "block" : "hidden",
-            "xl:sticky xl:top-6 xl:block xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:pr-1 scrollbar-dark"
-          )}
-        />
-
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.85fr)] xl:items-start">
         <div
           className={cn(
             activePanelTab === "content" ? "block" : "hidden",
             "xl:block xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:pr-1 scrollbar-dark"
           )}
         >
+          <div className="mb-4 space-y-4">
+            <EditorAiPanel profile={profile} template={selectedTemplate} onApplySuggestion={applyAiSuggestion} />
+            <details className="rounded-2xl border border-border/70 bg-card/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                Advanced formatting
+              </summary>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Template defaults are tuned for readability. Use these controls only when you need a specific export tweak.
+              </p>
+              <EditorStylePanel
+                templateId={templateId}
+                style={profile.style}
+                sections={profile.sections}
+                selectedSectionId={selectedSectionIdSafe}
+                onSelectSection={handleStyleSectionSelect}
+                onStyleChange={updateStyle}
+                onSelectedSectionStyleChange={updateSelectedSectionStyleField}
+                className="mt-4"
+              />
+            </details>
+          </div>
           <EditorContentPanel
             tabs={contentTabs}
             activeTab={activeContentTab}
@@ -1311,69 +1122,20 @@ export default function EditorForm({
                       {copiedTemplateId ? "Copied" : "Copy"}
                     </Button>
                   </div>
-                  <div className="space-y-2 rounded-lg border border-border/70 bg-muted/10 p-3">
+                  <div className="rounded-lg border border-border/70 bg-muted/10 p-3">
                     <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      Storage location
+                      Local autosave
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={storageMode === "local" ? "default" : "secondary"}
-                        onClick={() => void setStorageModeWithValidation("local")}
-                        disabled={cloudBusy}
-                      >
-                        Local
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={storageMode === "cloud" ? "default" : "secondary"}
-                        onClick={() => void setStorageModeWithValidation("cloud")}
-                        disabled={cloudBusy || !cloudConfigured}
-                      >
-                        Cloud
-                      </Button>
-                    </div>
-                    {!cloudConfigured ? (
-                      <p className="text-xs text-amber-400">
-                        Cloud storage is unavailable until Supabase env variables are configured.
-                      </p>
-                    ) : null}
-                    <div className="flex flex-wrap gap-2">
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Dossier saves this profile in your browser while you edit. Use PDF export when you are ready to apply.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="secondary" onClick={saveLocalNow}>
-                        Save
+                        Save now
                       </Button>
-                      {storageMode === "cloud" ? (
-                        <>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => void saveToCloudNow()}
-                            disabled={cloudBusy}
-                          >
-                            {cloudBusy ? "Saving..." : "Save to Cloud"}
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => void maybeLoadCloudIntoConflict({ forceCloud: true })}
-                            disabled={cloudBusy}
-                          >
-                            Sync from Cloud
-                          </Button>
-                        </>
-                      ) : null}
                     </div>
-                    {profileMeta?.cloudUpdatedAt && storageMode === "cloud" ? (
-                      <p className="text-xs text-muted-foreground">
-                        Cloud updated: {new Date(profileMeta.cloudUpdatedAt).toLocaleString()}
-                      </p>
-                    ) : null}
-                    {syncMessage ? <p className="text-xs text-emerald-400">{syncMessage}</p> : null}
-                    {syncError ? <p className="text-xs text-red-500">{syncError}</p> : null}
+                    {syncMessage ? <p className="mt-2 text-xs text-emerald-400">{syncMessage}</p> : null}
+                    {syncError ? <p className="mt-2 text-xs text-red-500">{syncError}</p> : null}
                   </div>
                   <input
                     ref={fileInputRef}
@@ -1399,9 +1161,7 @@ export default function EditorForm({
                     />
                   </label>
                   <p className="text-xs text-muted-foreground">
-                    {storageMode === "cloud"
-                      ? "Cloud mode active. Local snapshot is still kept for conflict recovery."
-                      : "Local mode active. Data stays in your browser unless you sync to cloud."}
+                    Local mode active. Data stays in your browser.
                     {!isHydrated ? " (loading...)" : ""}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -2118,31 +1878,6 @@ export default function EditorForm({
         />
       </div>
 
-      <Dialog open={Boolean(conflictState)} onOpenChange={(open) => (!open ? setConflictState(null) : null)}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Local and cloud versions differ</DialogTitle>
-            <DialogDescription>
-              Choose how to resolve this profile conflict before continuing in cloud mode.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>Local profile: {conflictState?.localProfile.name || "Untitled profile"}</p>
-            <p>Cloud updated: {conflictState?.cloudUpdatedAt ? new Date(conflictState.cloudUpdatedAt).toLocaleString() : "Unknown"}</p>
-          </div>
-          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="secondary" onClick={() => void resolveConflictKeepLocal()} disabled={cloudBusy}>
-              Keep Local
-            </Button>
-            <Button type="button" variant="secondary" onClick={resolveConflictKeepCloud} disabled={cloudBusy}>
-              Keep Cloud
-            </Button>
-            <Button type="button" onClick={resolveConflictSaveLocalCopy} disabled={cloudBusy}>
-              Save Local as Copy
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

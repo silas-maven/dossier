@@ -1,12 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, MeshDistortMaterial } from "@react-three/drei";
-import * as THREE from "three";
-import gsap from "gsap";
-import Lenis from "lenis";
 import { ArrowUpRight } from "lucide-react";
 
 type ExperienceHeroProps = {
@@ -15,325 +9,146 @@ type ExperienceHeroProps = {
   userCount?: number | null;
 };
 
-const LiquidBackground = () => {
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
-  const pointerRef = useRef(new THREE.Vector2(0, 0));
-  const { viewport } = useThree();
-
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) }
-    }),
-    []
-  );
-
-  useFrame((state) => {
-    const material = materialRef.current;
-    if (!material) return;
-    material.uniforms.uTime.value = state.clock.getElapsedTime();
-    pointerRef.current.set(state.mouse.x, state.mouse.y);
-    material.uniforms.uMouse.value.lerp(pointerRef.current, 0.05);
-  });
-
-  return (
-    <mesh scale={[viewport.width, viewport.height, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        ref={materialRef}
-        transparent
-        uniforms={uniforms}
-        vertexShader={`varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`}
-        fragmentShader={`
-          uniform float uTime; uniform vec2 uMouse; varying vec2 vUv;
-          void main() {
-            vec2 uv = vUv; float t = uTime * 0.14;
-            vec2 m = uMouse * 0.1;
-            float wave = (sin(uv.x * 8.0 + t + m.x * 12.0) + sin(uv.y * 6.0 - t + m.y * 12.0)) * 0.5;
-            float color = smoothstep(0.0, 1.0, wave * 0.5 + 0.5);
-            gl_FragColor = vec4(mix(vec3(0.01, 0.02, 0.04), vec3(0.03, 0.05, 0.1), color), 1.0);
-          }
-        `}
-      />
-    </mesh>
-  );
-};
-
-const Monolith = () => {
-  const meshRef = useRef<THREE.Mesh | null>(null);
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.25;
-  });
-
-  return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-      <mesh ref={meshRef}>
-        <icosahedronGeometry args={[13, 1]} />
-        <MeshDistortMaterial color="#03060d" speed={4} distort={0.4} roughness={0.1} metalness={0.95} />
-      </mesh>
-    </Float>
-  );
-};
-
 export default function ExperienceHero({ ctaHref, templateCount, userCount }: ExperienceHeroProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const revealRef = useRef<HTMLDivElement | null>(null);
-  const ctaRef = useRef<HTMLAnchorElement | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(
-    () => (typeof window !== "undefined" ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false)
-  );
-  const [isMobile, setIsMobile] = useState(
-    () => (typeof window !== "undefined" ? window.matchMedia("(max-width: 1023px)").matches : false)
-  );
-
-  useEffect(() => {
-    const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileQuery = window.matchMedia("(max-width: 1023px)");
-
-    const handleReducedChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
-    const handleMobileChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
-    reducedQuery.addEventListener("change", handleReducedChange);
-    mobileQuery.addEventListener("change", handleMobileChange);
-    return () => {
-      reducedQuery.removeEventListener("change", handleReducedChange);
-      mobileQuery.removeEventListener("change", handleMobileChange);
-    };
-  }, []);
-
-  const useInteractiveMotion = !reducedMotion && !isMobile;
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const lenis = new Lenis({
-      duration: 1.2,
-      smoothWheel: true
-    });
-
-    let frameId = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frameId = requestAnimationFrame(raf);
-    };
-
-    frameId = requestAnimationFrame(raf);
-    return () => {
-      cancelAnimationFrame(frameId);
-      lenis.destroy();
-    };
-  }, [reducedMotion]);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      if (!revealRef.current) return;
-
-      if (useInteractiveMotion) {
-        gsap.fromTo(
-          revealRef.current,
-          { filter: "blur(26px)", opacity: 0, scale: 1.02 },
-          { filter: "blur(0px)", opacity: 1, scale: 1, duration: 1.9, ease: "expo.out" }
-        );
-
-        gsap.from(".command-cell", {
-          x: 60,
-          opacity: 0,
-          stagger: 0.1,
-          duration: 1.3,
-          ease: "power4.out",
-          delay: 0.7,
-          clearProps: "all"
-        });
-      } else {
-        gsap.set(revealRef.current, { opacity: 1, filter: "blur(0px)", scale: 1 });
-        gsap.set(".command-cell", { opacity: 1, x: 0 });
-      }
-
-      if (!useInteractiveMotion) return;
-
-      const handleMouseMove = (event: MouseEvent) => {
-        if (!ctaRef.current) return;
-        const rect = ctaRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
-
-        if (distance < 150) {
-          gsap.to(ctaRef.current, {
-            x: (event.clientX - centerX) * 0.25,
-            y: (event.clientY - centerY) * 0.25,
-            duration: 0.45,
-            ease: "power3.out"
-          });
-        } else {
-          gsap.to(ctaRef.current, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.28)" });
-        }
-      };
-
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [useInteractiveMotion]);
-
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-[#03050b] selection:bg-white selection:text-black"
-    >
-      <div className="absolute inset-0 z-0">
-        {useInteractiveMotion ? (
-          <Canvas camera={{ position: [0, 0, 60], fov: 35 }}>
-            <ambientLight intensity={0.35} />
-            <spotLight position={[48, 48, 48]} intensity={2.4} />
-            <LiquidBackground />
-            <Monolith />
-          </Canvas>
-        ) : (
-          <div className="h-full w-full bg-[radial-gradient(circle_at_20%_15%,rgba(59,130,246,0.22),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(30,64,175,0.16),transparent_45%),linear-gradient(160deg,#02040a,#050915_45%,#03050b)]" />
-        )}
-      </div>
-
-      <div className="pointer-events-none absolute inset-0 z-[5] bento-mask opacity-25" />
-
-      <div
-        ref={revealRef}
-        className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1600px] flex-col gap-10 px-6 py-8 md:flex-row md:items-stretch md:px-12 md:py-12 lg:px-16 lg:py-16"
-      >
-        <div className="flex min-w-0 flex-1 flex-col justify-between gap-12 pb-12 md:pb-8">
-          <div className="flex items-center gap-3">
-            <div className="relative h-2.5 w-2.5 rounded-full bg-white">
-              <div className="absolute inset-0 rounded-full bg-white opacity-30 animate-ping" />
-            </div>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white">
-              DOSSIER CV BUILDER
-            </span>
-          </div>
-
-          <div className="max-w-5xl md:-translate-y-8">
-            <h1 className="text-[clamp(2.9rem,9vw,9rem)] font-black uppercase leading-[0.86] tracking-tight text-white">
-              BUILD CVs THAT
-              <br />
-              <span className="text-outline">LOOK HIRED</span>
-            </h1>
-            <p className="mt-8 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.28em] text-white/45">
-              Craft professional resumes with structured templates, local-first editing, and export-ready
-              layouts for fintech, consulting, and project delivery roles.
-            </p>
-          </div>
-
-          <Link
-            href={ctaHref}
-            ref={ctaRef}
-            className="group inline-flex w-fit items-center gap-6 md:-translate-y-10"
+    <main className="relative min-h-screen w-full overflow-hidden bg-[#030509] text-white">
+      {/* Moving Ambient Background */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[#030509]">
+        
+        {/* Grid lines - behind the blob */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        
+        {/* Highly Visible Solid Geometric Blob (Slate-900 for stark contrast against #030509) */}
+        <div className="absolute left-[20%] top-[10%] w-[120vw] h-[120vw] min-w-[1000px] min-h-[1000px] -translate-y-1/4 mix-blend-normal">
+          <svg
+            viewBox="0 0 200 200"
+            className="w-full h-full animate-[spin_40s_linear_infinite]"
+            fill="#0f172a" /* This is Slate 900, distinctly lighter than the 030509 background */
           >
-            <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/15 transition-all duration-500 group-hover:bg-white">
-              <ArrowUpRight className="h-5 w-5 text-white transition-colors duration-500 group-hover:text-black" />
-            </span>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white">
-              Browse Templates
-            </span>
-          </Link>
+            <path 
+              d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.3,-46.1C90.8,-33.1,96.9,-17.2,97.4,-1.2C97.9,14.8,92.8,30.9,83.8,44.7C74.8,58.5,61.9,70.1,47.4,78.2C32.9,86.3,16.5,90.9,0.5,90.1C-15.5,89.3,-31,83.1,-45.4,74.6C-59.8,66.1,-73.1,55.3,-82.1,41.4C-91.1,27.5,-95.8,10.5,-94.1,-5.8C-92.4,-22.1,-84.3,-37.7,-73.4,-50.7C-62.5,-63.7,-48.8,-74.1,-34.2,-80.6C-19.6,-87.1,-4.1,-89.7,11,-88.1C26.1,-86.5,41.2,-80.7,44.7,-76.4Z" 
+              transform="translate(100 100)" 
+            />
+          </svg>
         </div>
 
-        <aside className="z-20 flex w-full flex-shrink-0 flex-col justify-center gap-4 md:w-80 lg:w-96">
-          {[
-            {
-              id: "001",
-              title: "Template Library",
-              value: `${templateCount}+ Styles`,
-              detailA: "Fintech + Consulting",
-              detailB: "Consistent PDF exports"
-            },
-            {
-              id: "002",
-              title: "Import + Export",
-              value: "PDF + DOCX In",
-              detailA: "Auto-map into sections",
-              detailB: "Editable before export"
-            },
-            {
-              id: "003",
-              title: "Community",
-              value: userCount !== null && userCount !== undefined ? `${userCount} Users` : "Live Count",
-              detailA: "Unique visitors (local + cloud)",
-              detailB: "Cloud remains per-user secured"
-            }
-          ].map((item) => (
-            <article key={item.id} className="command-cell glass-panel p-6 sm:p-7">
-              <span className="mb-3 block font-mono text-[9px] uppercase tracking-widest text-white/35">
-                {`${item.id} // ${item.title}`}
-              </span>
-              <div className="mt-2 flex items-end justify-between gap-3">
-                <h4 className="text-xl font-bold tracking-tight text-white sm:text-2xl">{item.value}</h4>
-                <div className="h-[2px] w-20 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full w-[65%] bg-white animate-loading" />
-                </div>
-              </div>
-              <div className="mt-4 space-y-2 font-mono text-[10px] text-white/55">
-                <div className="flex items-center justify-between gap-3">
-                  <span>{item.detailA}</span>
-                </div>
-                <div className="h-px w-full bg-white/10" />
-                <div className="flex items-center justify-between gap-3">
-                  <span>{item.detailB}</span>
-                </div>
-              </div>
-            </article>
-          ))}
-        </aside>
+        {/* Subtle dark gradient overlay to blend edges */}
+        <div className="absolute inset-y-0 right-0 w-[40%] bg-gradient-to-l from-[#030509] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-[#030509] to-transparent" />
       </div>
 
-      <section className="relative z-10 border-t border-white/10 bg-[#040814]/95 px-6 py-12 md:px-12 lg:px-16">
-        <div className="mx-auto grid w-full max-w-[1200px] gap-10 lg:grid-cols-[1fr_1fr]">
-          <div className="space-y-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/45">
-              Why Dossier
+      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
+        <div className="grid gap-16 lg:grid-cols-[1fr_400px] lg:gap-8 xl:grid-cols-[1fr_460px]">
+          
+          {/* Left Column: Typography & CTA */}
+          <div className="flex flex-col justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
+            <div className="flex items-center gap-3">
+              <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/80">
+                Dossier CV Builder
+              </span>
+            </div>
+
+            <div className="mt-12 flex flex-col">
+              <h1 className="text-[clamp(4rem,12vw,9rem)] font-black uppercase leading-[0.85] tracking-tight text-white">
+                Build CVs
+                <br />
+                That
+              </h1>
+              <h1 
+                className="mt-2 text-[clamp(4rem,12vw,9rem)] font-black uppercase leading-[0.85] tracking-tight"
+                style={{
+                  color: "transparent",
+                  WebkitTextStroke: "1px rgba(255,255,255,0.6)",
+                }}
+              >
+                Look Hired
+              </h1>
+            </div>
+
+            <p className="mt-14 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.15em] text-white/50">
+              Craft professional resumes with structured templates,
+              <br className="hidden sm:block" />
+              local-first editing, and export-ready layouts for fintech,
+              <br className="hidden sm:block" />
+              consulting, and project delivery roles.
             </p>
-            <h2 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
-              A free CV builder focused on speed, structure, and control.
-            </h2>
-            <p className="max-w-xl text-sm text-white/70">
-              Dossier helps job seekers produce ATS-friendly CVs quickly without paywalls. You can edit
-              locally in-browser, switch templates without rewriting content, and export a clean PDF.
-            </p>
-            <p className="max-w-xl text-sm text-white/70">
-              For users who want account-backed sync, cloud mode stores profiles per user. For privacy-first
-              workflows, local mode keeps data in your browser.
-            </p>
+
+            <div className="mt-16 flex items-center">
+              <Link
+                href={ctaHref}
+                className="group flex items-center gap-6"
+                aria-label="Browse Templates"
+              >
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-transparent transition-all duration-500 ease-out group-hover:scale-110 group-hover:border-white overflow-hidden">
+                  <div className="absolute inset-0 translate-y-full bg-white transition-transform duration-500 ease-out group-hover:translate-y-0" />
+                  <ArrowUpRight className="relative z-10 h-5 w-5 text-white transition-all duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-black" />
+                </div>
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 group-hover:translate-x-2 group-hover:text-white/70">
+                  Browse Templates
+                </span>
+              </Link>
+            </div>
           </div>
 
-          <div className="space-y-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/45">FAQ</p>
-            <dl className="space-y-4">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <dt className="text-sm font-semibold text-white">Is Dossier free to use?</dt>
-                <dd className="mt-1 text-sm text-white/70">
-                  Yes. You can build and export CVs without a subscription.
-                </dd>
+          {/* Right Column: Information Cards */}
+          <div className="flex flex-col justify-center gap-6 animate-in fade-in slide-in-from-right-8 duration-1000 delay-300 fill-mode-both">
+            {/* Card 1 */}
+            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
+                  001 // Template Library
+                </span>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <dt className="text-sm font-semibold text-white">Can I keep my CV data local?</dt>
-                <dd className="mt-1 text-sm text-white/70">
-                  Yes. Local mode stores your profile data in your browser.
-                </dd>
+              <div className="mt-6 flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-white">{templateCount}+ Styles</h3>
+                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <dt className="text-sm font-semibold text-white">Does it support cloud sync?</dt>
-                <dd className="mt-1 text-sm text-white/70">
-                  Yes. Cloud mode uses secure account-based storage with per-user access controls.
-                </dd>
+              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
+                <p>Fintech + Consulting</p>
+                <p>Consistent PDF exports</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <dt className="text-sm font-semibold text-white">Can I export my CV as PDF?</dt>
-                <dd className="mt-1 text-sm text-white/70">
-                  Yes. Every template can be exported as PDF directly from the editor.
-                </dd>
+            </div>
+
+            {/* Card 2 */}
+            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
+                  002 // Import + Export
+                </span>
               </div>
-            </dl>
+              <div className="mt-6 flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-white">PDF + DOCX In</h3>
+                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
+              </div>
+              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
+                <p>Auto-map into sections</p>
+                <p>Editable before export</p>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
+                  003 // Community
+                </span>
+              </div>
+              <div className="mt-6 flex items-end justify-between">
+                <h3 className="text-3xl font-bold text-white">
+                  {userCount ? `${userCount} Users` : "Active Users"}
+                </h3>
+                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
+              </div>
+              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
+                <p>Unique visitors (local + cloud)</p>
+                <p>Cloud remains per-user secured</p>
+              </div>
+            </div>
           </div>
+
         </div>
-      </section>
-    </section>
+      </div>
+    </main>
   );
 }
