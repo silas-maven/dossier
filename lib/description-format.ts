@@ -83,9 +83,9 @@ const splitTextLines = (value: string) =>
 
 const isLikelyHeadingLine = (line: string) => {
   if (!line || BULLET_INPUT_RE.test(line)) return false;
+  if (line.length > 85) return false;
   if (ROLE_TITLE_LINE_RE.test(line) || DATE_RANGE_LINE_RE.test(line)) return true;
   if (/[.!?]$/.test(line)) return false;
-  if (line.length > 72) return false;
   return /[A-Za-z]/.test(line);
 };
 
