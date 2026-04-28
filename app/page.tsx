@@ -4,7 +4,7 @@ import LandingShell from "@/components/ui/landing-shell";
 import { publicCvTemplates } from "@/lib/templates";
 import { getDossierUserCount } from "@/lib/user-count";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const resolvePageBase = () => {
   const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
