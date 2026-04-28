@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import ExperienceHero from "@/components/ui/experience-hero";
+import LandingShell from "@/components/ui/landing-shell";
 import { publicCvTemplates } from "@/lib/templates";
 import { getDossierUserCount } from "@/lib/user-count";
 
@@ -15,7 +15,7 @@ const resolvePageBase = () => {
       // Fall through.
     }
   }
-  return new URL("http://localhost:3000");
+  return new URL("https://www.your-dossier.xyz");
 };
 
 const metadataBase = resolvePageBase();
@@ -111,41 +111,9 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} userCount={userCount} />
-      <section className="border-t border-white/10 bg-[#03050b] px-6 py-12 md:px-12 lg:px-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-xl font-semibold text-white md:text-2xl">Compare CV builder options</h2>
-          <p className="mt-3 text-sm text-white/70">
-            Practical guides for choosing a free CV builder based on privacy, ATS quality, and export flow.
-          </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-4">
-            <Link
-              href="/ai-resume-optimizer"
-              className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
-            >
-              AI ATS Optimizer
-            </Link>
-            <Link
-              href="/resume-io-alternative"
-              className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
-            >
-              Resume.io alternative
-            </Link>
-            <Link
-              href="/zety-alternative"
-              className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
-            >
-              Zety alternative
-            </Link>
-            <Link
-              href="/free-cv-builder-uk"
-              className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white transition hover:bg-white/10"
-            >
-              Free CV builder UK
-            </Link>
-          </div>
-        </div>
-      </section>
+      <LandingShell>
+        <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} userCount={userCount} />
+      </LandingShell>
     </>
   );
 }

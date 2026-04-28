@@ -1,72 +1,215 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import {
+  useTextScramble,
+  useWordReveal,
+  useOutlineReveal,
+  useFadeUp,
+  useCardEntrance,
+  useCardTilt,
+  useMagnetic,
+  useCounter,
+  useParallaxGrid,
+} from "./use-landing-effects";
 
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 type ExperienceHeroProps = {
   ctaHref: string;
   templateCount: number;
   userCount?: number | null;
 };
 
+/* ------------------------------------------------------------------ */
+/*  Tilt Card Wrapper                                                  */
+/* ------------------------------------------------------------------ */
+function TiltCard({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useCardTilt(ref);
+
+  return (
+    <div
+      ref={ref}
+      data-card
+      className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a] cursor-pointer"
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {/* Glossy highlight overlay */}
+      <div
+        data-highlight
+        className="pointer-events-none absolute inset-0 rounded-[20px]"
+        style={{
+          background: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 60%)",
+          opacity: 0,
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Counter Display                                                    */
+/* ------------------------------------------------------------------ */
+function CounterValue({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useCounter(ref, value, 1.5);
+
+  return (
+    <>
+      <span ref={ref}>0</span>{suffix}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main Hero                                                          */
+/* ------------------------------------------------------------------ */
 export default function ExperienceHero({ ctaHref, templateCount, userCount }: ExperienceHeroProps) {
+  // Refs for animations
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
+  const outlineRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Wire up effects
+  useTextScramble(labelRef, "DOSSIER CV BUILDER", 200);
+  useWordReveal(titleContainerRef, 0.5);
+  useOutlineReveal(outlineRef, 1.1);
+  useFadeUp(descRef, 1.6);
+  useFadeUp(ctaRef, 1.9);
+  useCardEntrance(cardsRef, 1.4);
+  useMagnetic(ctaRef, 0.25);
+  useParallaxGrid(gridRef);
+
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[#030509] text-white">
-      {/* Moving Ambient Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[#030509]">
-        
-        {/* Grid lines - behind the blob */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
-        
-        {/* Highly Visible Solid Geometric Blob (Slate-900 for stark contrast against #030509) */}
-        <div className="absolute left-[20%] top-[10%] w-[120vw] h-[120vw] min-w-[1000px] min-h-[1000px] -translate-y-1/4 mix-blend-normal">
-          <svg
-            viewBox="0 0 200 200"
-            className="w-full h-full animate-[spin_40s_linear_infinite]"
-            fill="#0f172a" /* This is Slate 900, distinctly lighter than the 030509 background */
-          >
-            <path 
-              d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.3,-46.1C90.8,-33.1,96.9,-17.2,97.4,-1.2C97.9,14.8,92.8,30.9,83.8,44.7C74.8,58.5,61.9,70.1,47.4,78.2C32.9,86.3,16.5,90.9,0.5,90.1C-15.5,89.3,-31,83.1,-45.4,74.6C-59.8,66.1,-73.1,55.3,-82.1,41.4C-91.1,27.5,-95.8,10.5,-94.1,-5.8C-92.4,-22.1,-84.3,-37.7,-73.4,-50.7C-62.5,-63.7,-48.8,-74.1,-34.2,-80.6C-19.6,-87.1,-4.1,-89.7,11,-88.1C26.1,-86.5,41.2,-80.7,44.7,-76.4Z" 
-              transform="translate(100 100)" 
-            />
-          </svg>
-        </div>
+      {/* Inline keyframes */}
+      <style>{`
+        @keyframes blob-drift-1 {
+          0%, 100% { transform: translate(0%, 0%) scale(1) rotate(0deg); }
+          33% { transform: translate(5%, -8%) scale(1.08) rotate(120deg); }
+          66% { transform: translate(-4%, 5%) scale(0.94) rotate(240deg); }
+        }
+        @keyframes blob-drift-2 {
+          0%, 100% { transform: translate(0%, 0%) scale(1) rotate(0deg); }
+          33% { transform: translate(-6%, 4%) scale(0.92) rotate(-120deg); }
+          66% { transform: translate(4%, -6%) scale(1.06) rotate(-240deg); }
+        }
+        @keyframes grid-pulse {
+          0%, 100% { opacity: 0.04; }
+          50% { opacity: 0.07; }
+        }
+      `}</style>
 
-        {/* Subtle dark gradient overlay to blend edges */}
-        <div className="absolute inset-y-0 right-0 w-[40%] bg-gradient-to-l from-[#030509] to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-[#030509] to-transparent" />
+      {/* ── Background Layers ── */}
+
+      {/* Parallax Grid */}
+      <div
+        ref={gridRef}
+        className="pointer-events-none absolute -inset-4"
+        style={{ animation: "grid-pulse 8s ease-in-out infinite" }}
+      >
+        <div className="h-full w-full bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
+      {/* Ambient Blob 1 — Deep blue */}
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          top: "-25%",
+          left: "-10%",
+          width: "80vw",
+          height: "80vw",
+          minWidth: "600px",
+          minHeight: "600px",
+          borderRadius: "40% 60% 55% 45% / 50% 40% 60% 50%",
+          background:
+            "radial-gradient(circle, rgba(30,58,138,0.4) 0%, rgba(30,58,138,0.15) 40%, transparent 70%)",
+          filter: "blur(90px)",
+          animation: "blob-drift-1 25s ease-in-out infinite",
+        }}
+      />
+
+      {/* Ambient Blob 2 — Deep purple (offset, counter-rotating) */}
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          bottom: "-20%",
+          right: "-15%",
+          width: "70vw",
+          height: "70vw",
+          minWidth: "500px",
+          minHeight: "500px",
+          borderRadius: "55% 45% 40% 60% / 45% 55% 45% 55%",
+          background:
+            "radial-gradient(circle, rgba(88,28,135,0.3) 0%, rgba(88,28,135,0.1) 40%, transparent 70%)",
+          filter: "blur(100px)",
+          animation: "blob-drift-2 30s ease-in-out infinite",
+        }}
+      />
+
+      {/* Edge fade overlays */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-[35%] bg-gradient-to-l from-[#030509]/90 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-[#030509] to-transparent" />
+
+      {/* ── Content ── */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1600px] flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
         <div className="grid gap-16 lg:grid-cols-[1fr_400px] lg:gap-8 xl:grid-cols-[1fr_460px]">
-          
+
           {/* Left Column: Typography & CTA */}
-          <div className="flex flex-col justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
+          <div className="flex flex-col justify-center">
+            {/* Label with text scramble */}
             <div className="flex items-center gap-3">
               <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/80">
-                Dossier CV Builder
+              <span
+                ref={labelRef}
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/80"
+                aria-label="Dossier CV Builder"
+              >
+                &nbsp;
               </span>
             </div>
 
-            <div className="mt-12 flex flex-col">
+            {/* Title — word-by-word reveal */}
+            <div ref={titleContainerRef} className="mt-12 flex flex-col">
               <h1 className="text-[clamp(4rem,12vw,9rem)] font-black uppercase leading-[0.85] tracking-tight text-white">
-                Build CVs
-                <br />
-                That
+                {["Build", "CVs", "That"].map((word) => (
+                  <span key={word} className="inline-block overflow-hidden mr-[0.25em] last:mr-0">
+                    <span data-reveal-word className="inline-block">
+                      {word}
+                    </span>
+                  </span>
+                ))}
               </h1>
-              <h1 
+
+              {/* Outline text — scale reveal */}
+              <h1
+                ref={outlineRef}
                 className="mt-2 text-[clamp(4rem,12vw,9rem)] font-black uppercase leading-[0.85] tracking-tight"
                 style={{
                   color: "transparent",
                   WebkitTextStroke: "1px rgba(255,255,255,0.6)",
+                  opacity: 0,
                 }}
               >
                 Look Hired
               </h1>
             </div>
 
-            <p className="mt-14 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.15em] text-white/50">
+            {/* Description — fade up */}
+            <p
+              ref={descRef}
+              className="mt-14 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.15em] text-white/50"
+              style={{ opacity: 0 }}
+            >
               Craft professional resumes with structured templates,
               <br className="hidden sm:block" />
               local-first editing, and export-ready layouts for fintech,
@@ -74,7 +217,8 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               consulting, and project delivery roles.
             </p>
 
-            <div className="mt-16 flex items-center">
+            {/* CTA — magnetic + fill animation */}
+            <div ref={ctaRef} className="mt-16 flex items-center" style={{ opacity: 0 }}>
               <Link
                 href={ctaHref}
                 className="group flex items-center gap-6"
@@ -92,26 +236,28 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
           </div>
 
           {/* Right Column: Information Cards */}
-          <div className="flex flex-col justify-center gap-6 animate-in fade-in slide-in-from-right-8 duration-1000 delay-300 fill-mode-both">
+          <div ref={cardsRef} className="flex flex-col justify-center gap-6">
             {/* Card 1 */}
-            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+            <TiltCard>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
                   001 // Template Library
                 </span>
               </div>
               <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">{templateCount}+ Styles</h3>
+                <h3 className="text-3xl font-bold text-white">
+                  <CounterValue value={templateCount} suffix="+ Styles" />
+                </h3>
                 <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
               <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
                 <p>Fintech + Consulting</p>
                 <p>Consistent PDF exports</p>
               </div>
-            </div>
+            </TiltCard>
 
             {/* Card 2 */}
-            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+            <TiltCard>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
                   002 // Import + Export
@@ -125,10 +271,10 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
                 <p>Auto-map into sections</p>
                 <p>Editable before export</p>
               </div>
-            </div>
+            </TiltCard>
 
             {/* Card 3 */}
-            <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
+            <TiltCard>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
                   003 // Community
@@ -136,7 +282,11 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               </div>
               <div className="mt-6 flex items-end justify-between">
                 <h3 className="text-3xl font-bold text-white">
-                  {userCount ? `${userCount} Users` : "Active Users"}
+                  {userCount ? (
+                    <CounterValue value={userCount} suffix=" Users" />
+                  ) : (
+                    "Active Users"
+                  )}
                 </h3>
                 <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
@@ -144,7 +294,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
                 <p>Unique visitors (local + cloud)</p>
                 <p>Cloud remains per-user secured</p>
               </div>
-            </div>
+            </TiltCard>
           </div>
 
         </div>

@@ -12,7 +12,7 @@ const resolveMetadataBase = () => {
       // Fall through to localhost for local/dev safety.
     }
   }
-  return new URL("http://localhost:3000");
+  return new URL("https://www.your-dossier.xyz");
 };
 
 const metadataBase = resolveMetadataBase();

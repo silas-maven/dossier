@@ -9,7 +9,7 @@ const resolveBaseUrl = () => {
       // Fall through.
     }
   }
-  return "http://localhost:3000";
+  return "https://www.your-dossier.xyz";
 };
 
 export async function GET() {
