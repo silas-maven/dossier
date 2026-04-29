@@ -310,6 +310,32 @@ export function useParallaxGrid(ref: React.RefObject<HTMLElement | null>) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Blob Mouse Tracking                                                */
+/* ------------------------------------------------------------------ */
+export function useBlobMouseTracking(ref: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+
+    const handleMove = (e: MouseEvent) => {
+      // Calculate normalized mouse coordinates (-0.5 to 0.5)
+      const x = (e.clientX / window.innerWidth - 0.5) * 80; // 80px max movement
+      const y = (e.clientY / window.innerHeight - 0.5) * 80;
+
+      gsap.to(el, {
+        x,
+        y,
+        duration: 3, // Slow, fluid catching up
+        ease: "power2.out",
+      });
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [ref]);
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scroll Reveal (for below-fold sections)                            */
 /* ------------------------------------------------------------------ */
 export function useScrollReveal(ref: React.RefObject<HTMLElement | null>) {

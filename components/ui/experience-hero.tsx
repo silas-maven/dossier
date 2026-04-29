@@ -13,6 +13,7 @@ import {
   useMagnetic,
   useCounter,
   useParallaxGrid,
+  useBlobMouseTracking,
 } from "./use-landing-effects";
 
 /* ------------------------------------------------------------------ */
@@ -78,6 +79,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
   const ctaRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const blobRef = useRef<HTMLDivElement>(null);
 
   // Wire up effects
   useTextScramble(labelRef, "DOSSIER CV BUILDER", 200);
@@ -88,20 +90,16 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
   useCardEntrance(cardsRef, 1.4);
   useMagnetic(ctaRef, 0.25);
   useParallaxGrid(gridRef);
+  useBlobMouseTracking(blobRef);
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-[#030509] text-white">
+    <main className="relative min-h-screen w-full overflow-hidden bg-[#0a0d14] text-white">
       {/* Inline keyframes */}
       <style>{`
-        @keyframes blob-drift-1 {
-          0%, 100% { transform: translate(0%, 0%) scale(1) rotate(0deg); }
-          33% { transform: translate(5%, -8%) scale(1.08) rotate(120deg); }
-          66% { transform: translate(-4%, 5%) scale(0.94) rotate(240deg); }
-        }
-        @keyframes blob-drift-2 {
-          0%, 100% { transform: translate(0%, 0%) scale(1) rotate(0deg); }
-          33% { transform: translate(-6%, 4%) scale(0.92) rotate(-120deg); }
-          66% { transform: translate(4%, -6%) scale(1.06) rotate(-240deg); }
+        @keyframes brutalist-blob {
+          0% { border-radius: 40% 60% 55% 45% / 50% 40% 60% 50%; transform: rotate(0deg); }
+          50% { border-radius: 60% 40% 45% 55% / 40% 50% 50% 60%; transform: rotate(180deg) scale(1.05); }
+          100% { border-radius: 40% 60% 55% 45% / 50% 40% 60% 50%; transform: rotate(360deg); }
         }
         @keyframes grid-pulse {
           0%, 100% { opacity: 0.04; }
@@ -120,45 +118,27 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
         <div className="h-full w-full bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      {/* Ambient Blob 1 — Deep blue */}
+      {/* Brutalist Void Blob */}
       <div
+        ref={blobRef}
         className="pointer-events-none absolute"
         style={{
-          top: "-25%",
-          left: "-10%",
-          width: "80vw",
-          height: "80vw",
-          minWidth: "600px",
-          minHeight: "600px",
-          borderRadius: "40% 60% 55% 45% / 50% 40% 60% 50%",
-          background:
-            "radial-gradient(circle, rgba(30,58,138,0.4) 0%, rgba(30,58,138,0.15) 40%, transparent 70%)",
-          filter: "blur(90px)",
-          animation: "blob-drift-1 25s ease-in-out infinite",
-        }}
-      />
-
-      {/* Ambient Blob 2 — Deep purple (offset, counter-rotating) */}
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          bottom: "-20%",
-          right: "-15%",
+          top: "10%",
+          right: "-10%",
           width: "70vw",
           height: "70vw",
-          minWidth: "500px",
-          minHeight: "500px",
-          borderRadius: "55% 45% 40% 60% / 45% 55% 45% 55%",
-          background:
-            "radial-gradient(circle, rgba(88,28,135,0.3) 0%, rgba(88,28,135,0.1) 40%, transparent 70%)",
-          filter: "blur(100px)",
-          animation: "blob-drift-2 30s ease-in-out infinite",
+          minWidth: "600px",
+          minHeight: "600px",
+          backgroundColor: "#000000",
+          border: "1px solid rgba(255,255,255,0.05)",
+          animation: "brutalist-blob 30s linear infinite",
+          zIndex: 0,
         }}
       />
 
       {/* Edge fade overlays */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[35%] bg-gradient-to-l from-[#030509]/90 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-[#030509] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-[35%] bg-gradient-to-l from-[#0a0d14]/90 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-[#0a0d14] to-transparent" />
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-[1600px] flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
