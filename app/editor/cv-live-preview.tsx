@@ -789,7 +789,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                       <div
                         className="mt-2 grid gap-x-4 gap-y-2"
                         style={{
-                          gridTemplateColumns: `repeat(${section.style.skillsColumns}, minmax(0, 1fr))`
+                          gridTemplateColumns: `repeat(${Math.max(2, section.style.skillsColumns)}, minmax(0, 1fr))`
                         }}
                       >
                         {section.items

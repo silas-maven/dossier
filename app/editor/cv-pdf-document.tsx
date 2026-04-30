@@ -30,13 +30,11 @@ const sectionTitleSize = (section: CvSection) =>
 const sectionBodySize = (section: CvSection) =>
   clamp(section.style?.bodyFontSize ?? DEFAULT_SECTION_BODY_SIZE, 8, 14);
 
-const sectionSkillsColumns = (section: CvSection) =>
-  section.style?.skillsColumns === 1 ||
-  section.style?.skillsColumns === 2 ||
-  section.style?.skillsColumns === 3 ||
-  section.style?.skillsColumns === 4
-    ? section.style.skillsColumns
-    : 4;
+const sectionSkillsColumns = (section: CvSection) => {
+  const raw = section.style?.skillsColumns;
+  if (raw === 2 || raw === 3 || raw === 4) return raw;
+  return 2; // minimum 2 columns — never render skills as a flat list
+};
 
 const sectionTextAlign = (section: CvSection) => section.style?.textAlign ?? "left";
 const sectionUsesBullets = (section: CvSection) =>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Plus, Trash2, Bot } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import RichTextEditor from "@/components/ui/rich-text-editor";
+import EvidenceBulletGenerator from "@/components/editor/evidence-bullet-generator";
 import EditorStylePanel from "@/components/editor/editor-style-panel";
 import EditorContentPanel, {
   type ContentTabStatus,
@@ -13,7 +14,7 @@ import EditorContentPanel, {
 } from "@/components/editor/editor-content-panel";
 import EditorPreviewPanel from "@/components/editor/editor-preview-panel";
 import EditorMobileTabs, { type EditorPanelTab } from "@/components/editor/editor-mobile-tabs";
-import EditorAiPanel from "@/components/editor/editor-ai-panel";
+
 import type { AiCvSuggestion } from "@/lib/ai/types";
 import {
   createEmptyItem,
@@ -49,12 +50,21 @@ import {
   nowIso,
   profileChecksum,
   saveStoredProfileEnvelope,
+  listProfilesForTemplate,
+  duplicateStoredProfile,
+  renameStoredProfile,
+  deleteStoredProfile,
+  pinProfileToTemplate,
+  readStoredProfileEnvelope,
   type ProfileStorageMode,
   type StoredProfileMeta
 } from "@/lib/profile-store";
 import { getTemplateById } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { type DossierStorageMode } from "@/lib/storage-mode";
+import BranchSelector from "@/components/editor/branch-selector";
+import TailorPane from "@/components/editor/tailor-pane";
+
 
 type EditorFormProps = {
   templateId: string;
@@ -309,6 +319,52 @@ export default function EditorForm({
   const [activeContentTab, setActiveContentTab] = useState<EditorContentTab>("import");
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [lastExplicitSaveChecksum, setLastExplicitSaveChecksum] = useState<string | null>(null);
+  const [availableProfiles, setAvailableProfiles] = useState<StoredProfileMeta[]>([]);
+
+  const loadProfilesList = () => {
+    setAvailableProfiles(listProfilesForTemplate(templateId));
+  };
+
+  const handleSwitchBranch = (profileId: string) => {
+    pinProfileToTemplate(templateId, profileId);
+    const env = readStoredProfileEnvelope(profileId);
+    if (env?.profile) {
+      setProfile(env.profile);
+      setProfileMeta(env.meta);
+      setLastExplicitSaveChecksum(profileChecksum(env.profile));
+    }
+  };
+
+  const handleDuplicateBranch = (profileId: string, newName: string) => {
+    const newEnv = duplicateStoredProfile(profileId, newName);
+    if (newEnv) {
+      loadProfilesList();
+      handleSwitchBranch(newEnv.meta.profileId);
+    }
+  };
+
+  const handleRenameBranch = (profileId: string, newName: string) => {
+    renameStoredProfile(profileId, newName);
+    loadProfilesList();
+    if (profile.id === profileId) {
+      const env = readStoredProfileEnvelope(profileId);
+      if (env?.profile) {
+        setProfile(env.profile);
+        setProfileMeta(env.meta);
+      }
+    }
+  };
+
+  const handleDeleteBranch = (profileId: string) => {
+    deleteStoredProfile(profileId);
+    loadProfilesList();
+    if (profile.id === profileId) {
+      const remaining = listProfilesForTemplate(templateId);
+      if (remaining.length > 0) {
+        handleSwitchBranch(remaining[0].profileId);
+      }
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -335,6 +391,7 @@ export default function EditorForm({
       setProfileMeta(nextMeta);
       setStorageMode(nextMode);
       setIsHydrated(true);
+      loadProfilesList();
     };
 
     void hydrate();
@@ -434,6 +491,8 @@ export default function EditorForm({
       });
       const nextMeta = { ...built, ...overrides };
       saveStoredProfileEnvelope({ meta: nextMeta, profile: nextProfile }, true);
+      // Wait for state to settle, then reload list
+      setTimeout(loadProfilesList, 0);
       return nextMeta;
     });
   };
@@ -988,9 +1047,37 @@ export default function EditorForm({
       return { ...current, sections };
     });
   };
+  const [tailorMode, setTailorMode] = useState(false);
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border bg-card p-3 shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-muted-foreground">Version:</span>
+          {availableProfiles.length > 0 && (
+            <BranchSelector
+              profiles={availableProfiles}
+              currentProfileId={profile.id}
+              onSelect={handleSwitchBranch}
+              onDuplicate={handleDuplicateBranch}
+              onRename={handleRenameBranch}
+              onDelete={handleDeleteBranch}
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={tailorMode ? "default" : "secondary"}
+            size="sm"
+            onClick={() => setTailorMode(!tailorMode)}
+            className="gap-2"
+          >
+            <Bot className="h-4 w-4" />
+            AI Workspace
+          </Button>
+        </div>
+      </div>
+
       <div className="xl:hidden">
         <EditorMobileTabs activeTab={activePanelTab} onTabChange={setActivePanelTab} />
       </div>
@@ -1011,7 +1098,6 @@ export default function EditorForm({
           )}
         >
           <div className="mb-4 space-y-4">
-            <EditorAiPanel profile={profile} template={selectedTemplate} onApplySuggestion={applyAiSuggestion} />
             <details className="rounded-2xl border border-border/70 bg-card/80 p-4">
               <summary className="cursor-pointer text-sm font-semibold text-foreground">
                 Advanced formatting
@@ -1759,6 +1845,22 @@ export default function EditorForm({
                                   />
                                 </label>
                                 <div className="md:col-span-2">
+                                  {(activeContentSection.type === "experience" ||
+                                    activeContentSection.type === "projects") && (
+                                    <EvidenceBulletGenerator
+                                      roleTitle={item.title}
+                                      onAppend={(bullet) => {
+                                        const current = item.description || "";
+                                        const addition = `<ul><li>${bullet}</li></ul>`;
+                                        updateItemField(
+                                          activeContentSectionIndex,
+                                          itemIndex,
+                                          "description",
+                                          current ? `${current}\n${addition}` : addition
+                                        );
+                                      }}
+                                    />
+                                  )}
                                   <RichTextEditor
                                     value={item.description}
                                     onChange={(nextValue) =>
@@ -1868,14 +1970,26 @@ export default function EditorForm({
           </EditorContentPanel>
         </div>
 
-        <EditorPreviewPanel
-          profile={importCandidate ?? profile}
-          templateName={templateName}
-          className={cn(
-            activePanelTab === "preview" ? "block" : "hidden",
-            "xl:sticky xl:top-6 xl:block xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:pl-1 scrollbar-dark"
-          )}
-        />
+        {tailorMode ? (
+          <TailorPane
+            profile={importCandidate ?? profile}
+            template={selectedTemplate}
+            onApplySuggestion={applyAiSuggestion}
+            className={cn(
+              activePanelTab === "preview" ? "flex" : "hidden",
+              "xl:sticky xl:top-6 xl:flex xl:h-[calc(100vh-2rem)]"
+            )}
+          />
+        ) : (
+          <EditorPreviewPanel
+            profile={importCandidate ?? profile}
+            templateName={templateName}
+            className={cn(
+              activePanelTab === "preview" ? "block" : "hidden",
+              "xl:sticky xl:top-6 xl:block xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:pl-1 scrollbar-dark"
+            )}
+          />
+        )}
       </div>
 
     </div>

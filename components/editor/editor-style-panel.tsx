@@ -273,8 +273,7 @@ export default function EditorStylePanel({
                         }
                         className="h-10 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        <option value="1">1 column</option>
-                        <option value="2">2 columns</option>
+                      <option value="2">2 columns</option>
                         <option value="3">3 columns</option>
                         <option value="4">4 columns</option>
                       </select>

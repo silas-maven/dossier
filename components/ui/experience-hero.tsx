@@ -198,19 +198,15 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
             </p>
 
             {/* CTA — magnetic + fill animation */}
-            <div ref={ctaRef} className="mt-16 flex items-center" style={{ opacity: 0 }}>
+            <div ref={ctaRef} className="mt-14 flex items-center" style={{ opacity: 0 }}>
               <Link
                 href={ctaHref}
-                className="group flex items-center gap-6"
+                className="group relative inline-flex h-16 items-center justify-center gap-4 overflow-hidden rounded-full bg-white px-10 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-black transition-transform hover:scale-105 active:scale-95"
                 aria-label="Browse Templates"
               >
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-transparent transition-all duration-500 ease-out group-hover:scale-110 group-hover:border-white overflow-hidden">
-                  <div className="absolute inset-0 translate-y-full bg-white transition-transform duration-500 ease-out group-hover:translate-y-0" />
-                  <ArrowUpRight className="relative z-10 h-5 w-5 text-white transition-all duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-black" />
-                </div>
-                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 group-hover:translate-x-2 group-hover:text-white/70">
-                  Browse Templates
-                </span>
+                <span className="relative z-10">Browse Templates</span>
+                <ArrowUpRight className="relative z-10 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-r from-white via-white to-neutral-200 transition-opacity" />
               </Link>
             </div>
           </div>

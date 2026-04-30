@@ -72,3 +72,62 @@ export const getStoredProfileMeta = (profileId: string): StoredProfileMeta | nul
   const env = readStoredProfileEnvelope(profileId);
   return env?.meta ?? null;
 };
+
+export const listProfilesForTemplate = (templateId: string): StoredProfileMeta[] => {
+  if (typeof window === "undefined") return [];
+  return readIndex().filter((meta) => meta.templateId === templateId);
+};
+
+export const deleteStoredProfile = (profileId: string) => {
+  if (typeof window === "undefined") return;
+  
+  localStorage.removeItem(`${SNAPSHOT_PREFIX}${profileId}`);
+  
+  const index = readIndex();
+  const nextIndex = index.filter((item) => item.profileId !== profileId);
+  writeIndex(nextIndex);
+};
+
+export const pinProfileToTemplate = (templateId: string, profileId: string) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(`${TEMPLATE_POINTER_PREFIX}${templateId}`, profileId);
+};
+
+export const duplicateStoredProfile = (profileId: string, newName: string): StoredProfileEnvelope | null => {
+  if (typeof window === "undefined") return null;
+  
+  const envelope = readStoredProfileEnvelope(profileId);
+  if (!envelope) return null;
+  
+  const newProfileId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  
+  const newEnvelope: StoredProfileEnvelope = {
+    meta: {
+      ...envelope.meta,
+      profileId: newProfileId,
+      profileName: newName,
+      updatedAt: new Date().toISOString()
+    },
+    profile: {
+      ...envelope.profile,
+      id: newProfileId,
+      name: newName
+    }
+  };
+  
+  saveStoredProfileEnvelope(newEnvelope, false);
+  return newEnvelope;
+};
+
+export const renameStoredProfile = (profileId: string, newName: string) => {
+  if (typeof window === "undefined") return;
+  
+  const envelope = readStoredProfileEnvelope(profileId);
+  if (!envelope) return;
+  
+  envelope.meta.profileName = newName;
+  envelope.meta.updatedAt = new Date().toISOString();
+  envelope.profile.name = newName;
+  
+  saveStoredProfileEnvelope(envelope, false);
+};

@@ -704,7 +704,7 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
         })
         .filter((entry) => entry.description);
 
-      s.style.skillsColumns = groupedItems.some((entry) => entry.title) ? 2 : 1;
+      s.style.skillsColumns = groupedItems.some((entry) => entry.title) ? 2 : 3;
       s.items = groupedItems.map((entry) => {
         const item = createEmptyItem();
         item.title = entry.title;
