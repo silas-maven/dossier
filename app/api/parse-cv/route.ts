@@ -1,6 +1,4 @@
 import type { NextRequest } from "next/server";
-import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
 
 import { parseCvMarkdown, parseCvText, profileFromParsedCv } from "@/lib/cv-import";
 
@@ -18,6 +16,7 @@ declare global {
 }
 
 const extractPdfText = async (buf: Buffer) => {
+  const { PDFParse } = await import("pdf-parse");
   const parser = new PDFParse({ data: buf });
   try {
     const result = await parser.getText({
@@ -84,6 +83,8 @@ export async function POST(req: NextRequest) {
     let markdown = "";
 
     if (isDocx) {
+      const mammothModule = await import("mammoth");
+      const mammoth = mammothModule.default || mammothModule;
       const markdownResult = await (
         mammoth as unknown as {
           convertToMarkdown?: (input: { buffer: Buffer }) => Promise<{ value: string }>;
