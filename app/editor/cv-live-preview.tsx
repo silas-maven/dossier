@@ -785,7 +785,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                     >
                       {section.style.uppercaseTitle ? section.title.toUpperCase() : section.title}
                     </h3>
-                    {section.type === "skills" ? (
+                    {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                       <div
                         className="mt-2 grid gap-x-4 gap-y-2"
                         style={{

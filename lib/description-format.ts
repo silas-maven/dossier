@@ -83,7 +83,7 @@ const splitTextLines = (value: string) =>
 
 const isLikelyHeadingLine = (line: string) => {
   if (!line || BULLET_INPUT_RE.test(line)) return false;
-  if (line.length > 85) return false;
+  if (line.length > 60) return false;
   if (ROLE_TITLE_LINE_RE.test(line) || DATE_RANGE_LINE_RE.test(line)) return true;
   if (/[.!?]$/.test(line)) return false;
   return /[A-Za-z]/.test(line);
@@ -197,7 +197,11 @@ const applyHeadingHeuristics = (blocks: DescriptionBlock[]) =>
 
     if ((block.kind === "bullet" || block.kind === "numbered") && next) {
       const nextIsList = next.kind === "bullet" || next.kind === "numbered";
-      if (nextIsList && isLikelyHeadingLine(text) && !/[.!?]$/.test(text)) {
+      const isExplicitHeading =
+        text.endsWith(":") ||
+        (block.runs.length > 0 && block.runs.every((r) => r.bold || !r.text.trim()) && text.length < 60);
+        
+      if (nextIsList && isExplicitHeading && !/[.!?]$/.test(text)) {
         return { ...block, kind: "heading" as const };
       }
       return block;
@@ -205,7 +209,9 @@ const applyHeadingHeuristics = (blocks: DescriptionBlock[]) =>
 
     if (block.kind === "para") {
       if (next && (next.kind === "bullet" || next.kind === "numbered")) {
-        return { ...block, kind: "heading" as const };
+        if (text.length < 60 || text.endsWith(":")) {
+          return { ...block, kind: "heading" as const };
+        }
       }
       if (isLikelyHeadingLine(text)) {
         return { ...block, kind: "heading" as const };
@@ -227,10 +233,14 @@ const parseLegacyMarkdownBlocks = (value: string): DescriptionBlock[] => {
     if (bullet?.[1]) {
       const bulletText = bullet[1].trim();
       const nextLine = allLines[index + 1];
+      const isExplicitHeading =
+        bulletText.endsWith(":") ||
+        (parseInlineMarkdownRuns(bulletText).every((r) => r.bold || !r.text.trim()) && bulletText.length < 60);
+
       const looksHeading =
         nextLine &&
         /^[-•*]\s+/.test(nextLine) &&
-        isLikelyHeadingLine(stripMarkdownInlineMarkers(bulletText)) &&
+        isExplicitHeading &&
         !/[.!?]$/.test(stripMarkdownInlineMarkers(bulletText));
 
       if (looksHeading) {
@@ -446,9 +456,14 @@ export const normalizeDescriptionPlainText = (sectionType: CvSectionType, rawTex
     const isBullet = BULLET_INPUT_RE.test(line);
 
     if (isBullet) {
+      const isExplicitHeading =
+        bulletBody.endsWith(":") ||
+        bulletBody.startsWith("**") ||
+        (bulletBody.length < 30 && bulletBody === bulletBody.toUpperCase());
+
       if (
         BULLET_INPUT_RE.test(nextLine) &&
-        isLikelyHeadingLine(bulletBody) &&
+        isExplicitHeading &&
         !/[.!?]$/.test(bulletBody)
       ) {
         merged.push(bulletBody);

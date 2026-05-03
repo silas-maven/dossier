@@ -138,31 +138,62 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
       </div>
 
       {showSettings && (
-        <div className="space-y-3 rounded bg-background p-3 border">
-          <label className="space-y-1 block">
-            <span className="text-xs font-medium">AI Provider</span>
-            <select
-              value={providerId}
-              onChange={(e) => setProviderId(e.target.value as AiProviderId)}
-              className="h-8 w-full rounded-md border bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        <div className="space-y-4 rounded-xl bg-background p-4 border shadow-sm">
+          <div>
+            <h4 className="text-sm font-semibold">AI Provider Setup</h4>
+            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+              An <strong className="text-foreground">API key</strong> is a password that lets Dossier connect to an AI service on your behalf.
+              Your key stays locally in your browser.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <label className="space-y-1.5 block">
+              <span className="text-xs font-medium">1. Pick a provider</span>
+              <select
+                value={providerId}
+                onChange={(e) => setProviderId(e.target.value as AiProviderId)}
+                className="h-9 w-full rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {aiProviders.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1.5 block">
+              <span className="text-xs font-medium">2. Paste your API key</span>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="h-9 w-full rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                placeholder="sk-..."
+                autoComplete="off"
+              />
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+            <p className="text-xs text-muted-foreground">Don&apos;t have a key?</p>
+            <a
+              href={
+                {
+                  openai: "https://platform.openai.com/api-keys",
+                  anthropic: "https://console.anthropic.com/settings/keys",
+                  groq: "https://console.groq.com/keys",
+                  google: "https://aistudio.google.com/app/apikey",
+                  deepseek: "https://platform.deepseek.com/api_keys"
+                }[providerId] || "#"
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              {aiProviders.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="space-y-1 block">
-            <span className="text-xs font-medium">API Key (stored locally)</span>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="h-8 w-full rounded-md border bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              placeholder="sk-..."
-            />
-          </label>
+              Get your key →
+            </a>
+          </div>
         </div>
       )}
 

@@ -583,7 +583,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 </Text>
               </View>
 
-              {section.type === "skills" ? (
+              {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ marginTop: 6 }}>
                   {section.items.map((item) => {
                     const category = (item.title || "").trim();
@@ -1237,7 +1237,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   {sectionTitleLabel(section)}
                 </Text>
               </View>
-              {section.type === "skills" ? (
+              {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ marginTop: 6 }}>
                   {section.items.map((item) => {
                     const category = (item.title || "").trim();
@@ -1635,7 +1635,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               </Text>
             </View>
 
-            {section.type === "skills" ? (
+            {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
               <View style={{ marginTop: 6 }}>
                 {section.items.map((item) => {
                   const category = (item.title || "").trim();
