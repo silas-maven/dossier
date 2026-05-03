@@ -179,13 +179,20 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
             <p className="text-xs text-muted-foreground">Don&apos;t have a key?</p>
             <a
               href={
-                {
-                  openai: "https://platform.openai.com/api-keys",
-                  anthropic: "https://console.anthropic.com/settings/keys",
-                  groq: "https://console.groq.com/keys",
-                  google: "https://aistudio.google.com/app/apikey",
-                  deepseek: "https://platform.deepseek.com/api_keys"
-                }[providerId] || "#"
+                (
+                  {
+                    openai: "https://platform.openai.com/api-keys",
+                    anthropic: "https://console.anthropic.com/settings/keys",
+                    groq: "https://console.groq.com/keys",
+                    "google-gemini": "https://aistudio.google.com/app/apikey",
+                    deepseek: "https://platform.deepseek.com/api_keys",
+                    cohere: "https://dashboard.cohere.com/api-keys",
+                    mistral: "https://console.mistral.ai/api-keys/",
+                    together: "https://api.together.xyz/settings/api-keys",
+                    openrouter: "https://openrouter.ai/keys",
+                    xai: "https://console.x.ai/"
+                  } as Record<string, string>
+                )[providerId] || "#"
               }
               target="_blank"
               rel="noopener noreferrer"
