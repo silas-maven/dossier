@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import ExperienceHero from "@/components/ui/experience-hero";
 import LandingShell from "@/components/ui/landing-shell";
 import { publicCvTemplates } from "@/lib/templates";
+import { getDossierUserCount } from "@/lib/user-count";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 const resolvePageBase = () => {
   const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
@@ -41,8 +42,9 @@ export const metadata: Metadata = {
   }
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const baseUrl = metadataBase.toString().replace(/\/$/, "");
+  const userCount = await getDossierUserCount();
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -110,7 +112,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <LandingShell>
-        <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} />
+        <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} userCount={userCount} />
       </LandingShell>
     </>
   );

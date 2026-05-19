@@ -21,6 +21,7 @@ import {
 type ExperienceHeroProps = {
   ctaHref: string;
   templateCount: number;
+  userCount: number;
 };
 
 /* ------------------------------------------------------------------ */
@@ -54,7 +55,7 @@ function TiltCard({ children }: { children: React.ReactNode }) {
 /* ------------------------------------------------------------------ */
 /*  Main Hero                                                          */
 /* ------------------------------------------------------------------ */
-export default function ExperienceHero({ ctaHref, templateCount }: ExperienceHeroProps) {
+export default function ExperienceHero({ ctaHref, templateCount, userCount }: ExperienceHeroProps) {
   // Refs for animations
   const labelRef = useRef<HTMLSpanElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
@@ -239,11 +240,11 @@ export default function ExperienceHero({ ctaHref, templateCount }: ExperienceHer
                 </span>
               </div>
               <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">Local-first</h3>
+                <h3 className="text-3xl font-bold text-white">{userCount}+ Users</h3>
                 <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
               <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
-                <p>No account gate</p>
+                <p>Live community counter</p>
                 <p>Browser-only CV data</p>
               </div>
             </TiltCard>

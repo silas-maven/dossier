@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import VisitorTracker from "@/components/analytics/visitor-tracker";
 import "./globals.css";
 
 const resolveMetadataBase = () => {
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body>
         <div className="min-h-screen flex flex-col">
+          <VisitorTracker />
           <div className="flex-1">{children}</div>
           <footer className="border-t border-white/10 bg-background/80 px-4 py-4 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
             <div className="flex gap-4">
