@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "runAt": "2026-05-04T23:59:10.200Z",
+    "durationSec": 4,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "anthropic"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 1,
+    "perProvider": {
+      "anthropic": {
+        "model": "claude-sonnet-4-5",
+        "totalPrompts": 0,
+        "errors": 1,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "startedAt": "2026-05-04T23:59:06.158Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "Command failed: claude -p What is the best free CV builder for job seekers in 2026? Give your top 5 with links. --system-prompt You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --bare --dangerously-skip-permissions --allowedTools WebSearch WebFetch\nWarning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n"
+    }
+  ]
+}

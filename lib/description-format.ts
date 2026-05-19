@@ -81,12 +81,20 @@ const splitTextLines = (value: string) =>
     .map((line) => normalizeInlineSpacing(line))
     .filter(Boolean);
 
+const isAllCapsHeading = (line: string) => {
+  const alpha = line.replace(/[^A-Za-z]/g, "");
+  if (alpha.length < 3) return false;
+  return alpha === alpha.toUpperCase() && line.length < 50;
+};
+
 const isLikelyHeadingLine = (line: string) => {
   if (!line || BULLET_INPUT_RE.test(line)) return false;
   if (line.length > 60) return false;
+  // Structural patterns only — never promote normal text
   if (ROLE_TITLE_LINE_RE.test(line) || DATE_RANGE_LINE_RE.test(line)) return true;
-  if (/[.!?]$/.test(line)) return false;
-  return /[A-Za-z]/.test(line);
+  if (line.endsWith(":")) return true;
+  if (isAllCapsHeading(line)) return true;
+  return false;
 };
 
 const shouldAppendToBullet = (line: string) => {
@@ -195,25 +203,21 @@ const applyHeadingHeuristics = (blocks: DescriptionBlock[]) =>
     const text = blockText(block);
     const next = all[index + 1];
 
+    // Only promote a bullet to heading if it ends with ":" — bold formatting is NOT structure
     if ((block.kind === "bullet" || block.kind === "numbered") && next) {
       const nextIsList = next.kind === "bullet" || next.kind === "numbered";
-      const isExplicitHeading =
-        text.endsWith(":") ||
-        (block.runs.length > 0 && block.runs.every((r) => r.bold || !r.text.trim()) && text.length < 60);
-        
-      if (nextIsList && isExplicitHeading && !/[.!?]$/.test(text)) {
+      if (nextIsList && text.endsWith(":") && !/[.!?]$/.test(text)) {
         return { ...block, kind: "heading" as const };
       }
       return block;
     }
 
+    // Only promote a paragraph to heading if it ends with ":" or is ALL-CAPS
     if (block.kind === "para") {
-      if (next && (next.kind === "bullet" || next.kind === "numbered")) {
-        if (text.length < 60 || text.endsWith(":")) {
-          return { ...block, kind: "heading" as const };
-        }
+      if (text.endsWith(":")) {
+        return { ...block, kind: "heading" as const };
       }
-      if (isLikelyHeadingLine(text)) {
+      if (isAllCapsHeading(text)) {
         return { ...block, kind: "heading" as const };
       }
     }
@@ -233,14 +237,12 @@ const parseLegacyMarkdownBlocks = (value: string): DescriptionBlock[] => {
     if (bullet?.[1]) {
       const bulletText = bullet[1].trim();
       const nextLine = allLines[index + 1];
-      const isExplicitHeading =
-        bulletText.endsWith(":") ||
-        (parseInlineMarkdownRuns(bulletText).every((r) => r.bold || !r.text.trim()) && bulletText.length < 60);
 
+      // Only promote a bullet to heading if it ends with ":" — bold is formatting, not structure
       const looksHeading =
         nextLine &&
         /^[-•*]\s+/.test(nextLine) &&
-        isExplicitHeading &&
+        bulletText.endsWith(":") &&
         !/[.!?]$/.test(stripMarkdownInlineMarkers(bulletText));
 
       if (looksHeading) {
@@ -456,9 +458,9 @@ export const normalizeDescriptionPlainText = (sectionType: CvSectionType, rawTex
     const isBullet = BULLET_INPUT_RE.test(line);
 
     if (isBullet) {
+      // Only structural markers — bold formatting ("**") is NOT a heading signal
       const isExplicitHeading =
         bulletBody.endsWith(":") ||
-        bulletBody.startsWith("**") ||
         (bulletBody.length < 30 && bulletBody === bulletBody.toUpperCase());
 
       if (

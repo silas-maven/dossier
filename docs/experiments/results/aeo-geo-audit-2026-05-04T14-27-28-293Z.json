@@ -1,0 +1,54 @@
+{
+  "summary": {
+    "runAt": "2026-05-04T14:27:47.784Z",
+    "durationSec": 19,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "openai"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 2,
+    "perProvider": {
+      "openai": {
+        "model": "gpt-4.1-mini",
+        "totalPrompts": 0,
+        "errors": 2,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T14:27:28.294Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_f509a09ce9e24718abdf763a319bd98e in your message."
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T14:27:40.495Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_c2cd965b17d04b39ae3cdb693176cfa8 in your message."
+    }
+  ]
+}

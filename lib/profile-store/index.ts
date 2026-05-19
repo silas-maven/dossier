@@ -2,7 +2,6 @@ import type { CvProfile } from "@/lib/cv-profile";
 
 export * from "@/lib/profile-store/types";
 export * from "@/lib/profile-store/local";
-export * from "@/lib/profile-store/cloud";
 
 export const profileChecksum = (profile: CvProfile) => {
   const text = JSON.stringify(profile);

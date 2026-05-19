@@ -1,0 +1,93 @@
+{
+  "summary": {
+    "runAt": "2026-05-04T15:51:39.926Z",
+    "durationSec": 30,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "openai"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 5,
+    "perProvider": {
+      "openai": {
+        "model": "gpt-4.1-mini",
+        "totalPrompts": 2,
+        "errors": 3,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:51:10.102Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_95b6e7267e7149e9ae91ab3cd31ff17f in your message."
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:51:16.855Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_b113a82c78eb4ec2b4eb895b3a270467 in your message."
+    },
+    {
+      "id": "P03",
+      "intent": "privacy",
+      "prompt": "I want a CV builder where I can keep data local in my browser. What tools should I use?",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:51:22.606Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "For a CV builder that keeps your data local in your browser (i.e., does not upload your data to the cloud), here are five great options that emphasize privacy and local storage, while also producing ATS-friendly resumes:\n\n1. **Novoresume (Local Mode)**\n   - Novoresume allows you to build resumes directly in the browser and download them without saving your data on their servers.\n   - URL: https://novoresume.com/\n   - Privacy: Data can be kept local if you don't create an account or save online.\n\n2. **Resume Builder by Canva (Download Only)**\n   - Canva lets you create resumes in your browser, and you can download the file without saving any data to the cloud unless you create an account.\n   - URL: https://www.canva.com/resumes/\n   - Privacy: Local unless you sign up.\n\n3. **JSON Resume (Open Source)**\n   - JSON Resume is an open-source project where you can edit your resume in JSON format locally and compile into ATS-friendly PDFs or DOCX files.\n   - URL: https://jsonresume.org/\n   - Privacy: Fully local using their CLI or editor.\n\n4. **LaTeX Resume Editors (e.g., Overleaf for cloud or local LaTeX editors)**\n   - Editors like TeXShop (Mac), TeXworks (Windows) allow you to write LaTeX resumes locally without cloud involvement.\n   - URL: https://www.latex-project.org/get/\n   - Privacy: Fully local, no data upload.\n\n5. **Reactive Resume**\n   - Reactive Resume is an open-source resume builder that runs locally in the browser or can be used as a web app — you can save your JSON resume file locally and export ATS-friendly formats.\n   - URL: https://rxresu.me/\n   - Privacy: Data remains local unless you upload or save to cloud.\n\nThese options give you strong control over your data privacy and generate resumes that work well with Applicant Tracking Systems (ATS). Let me know if you want help with specific features or how to use any of these!",
+      "error": null
+    },
+    {
+      "id": "P04",
+      "intent": "privacy",
+      "prompt": "Which resume tools support local-first editing and optional cloud sync?",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:51:28.421Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "Here are five resume builders that support local-first editing with optional cloud synchronization:\n\n1. **HeyCV**: A free, privacy-focused resume builder that saves your data locally in your browser. It offers offline functionality and allows you to export your resume as a PDF. While it doesn't provide built-in cloud sync, you can manually back up your resume to cloud storage services. ([heycv.app](https://heycv.app/?utm_source=openai))\n\n2. **ATS Resume Maker**: This open-source, privacy-first resume builder stores your data locally on your device, ensuring complete privacy. It operates offline after the initial load and offers optional GitHub synchronization for multi-device access. ([ats-resume-maker.com](https://ats-resume-maker.com/features/local-first/?utm_source=openai))\n\n3. **Local CV**: An open-source, privacy-first resume builder that keeps your data on your device. It offers ATS-optimized templates and AI-powered refinements. While it doesn't have built-in cloud sync, you can manually export your resume and store it in cloud services. ([localcv.tusharvashishth.com](https://localcv.tusharvashishth.com/?utm_source=openai))\n\n4. **ResumeMD**: A privacy-first resume builder that doesn't require an account. Your data stays in your browser unless you choose cloud sync. It offers AI-powered features and ATS optimization. ([resumemd.pro](https://resumemd.pro/compare?utm_source=openai))\n\n5. **Reactive Resume**: An open-source, privacy-first resume builder that stores your data locally. It offers optional OpenAI assistance and allows you to export your resume as a PDF. While it doesn't provide built-in cloud sync, you can manually back up your resume to cloud storage services. ([selfhostyourself.com](https://selfhostyourself.com/alternative-to/resume-io?utm_source=openai))\n\nThese tools prioritize privacy by storing your data locally and offer optional cloud synchronization for backup and multi-device access.",
+      "error": null
+    },
+    {
+      "id": "P05",
+      "intent": "alternatives",
+      "prompt": "What are the best Resume.io alternatives for someone who needs a free option?",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:51:33.997Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_b0834d5b71ef4c08b63b9cac8cf2d84d in your message."
+    }
+  ]
+}

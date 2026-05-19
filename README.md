@@ -4,7 +4,7 @@ A privacy-focused resume builder for managing multiple profiles and templates.
 
 ## Core Philosophy
 1.  **Separation of Content & Presentation:** Edit your career data once; generate infinite resume variations.
-2.  **Local-First:** All data lives on your machine (LocalStorage/SQLite/JSON). No cloud lock-in.
+2.  **Local-First:** All data lives on your machine (LocalStorage/SQLite/JSON). No server-side CV database.
 3.  **Strictly Assistive AI:** AI suggests improvements but *never* writes for you.
 
 ## Key Features
@@ -26,7 +26,3 @@ A privacy-focused resume builder for managing multiple profiles and templates.
 2.  **Editor UI:** Section-based editing with drag-and-drop reordering.
 3.  **Template System:** Implement "Modern" and "Classic" templates.
 4.  **Export Pipeline:** PDF rendering.
-
-## Supabase
-- Schema/bootstrap notes: `docs/supabase-setup.md`
-- Migration file: `supabase/migrations/20260219_000001_dossier_core.sql`

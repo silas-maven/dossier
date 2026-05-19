@@ -1,0 +1,283 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","openai","gpt-4.1-mini","2026-05-05T00:16:46.691Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_762098e40d40428bb6a10f5b40ad8dce in your message.","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",""
+"P01","best-tool","anthropic","claude-sonnet-4-5","2026-05-05T00:16:54.598Z","no","","no","","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","# Top 5 Free CV/Resume Builders for Job Seekers (2026)
+
+Ranked for ATS compatibility, genuine free tier, and privacy.
+
+---
+
+### 1. **Reactive Resume** — https://rxresume.org
+- **Free:** 100% free, open source (MIT licens"
+"P01","best-tool","gemini","gemini-2.5-flash","2026-05-05T00:17:22.106Z","no","","no","","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","Here are 5 ranked recommendations for free, ATS-friendly CV builders, considering privacy tradeoffs:
+
+1.  **OpenResume**
+    *   **Link:** [https://www.open-resume.com/](https://www.open-resume.com/)
+    *   **ATS-Friend"
+"P02","best-tool","openai","gpt-4.1-mini","2026-05-05T00:18:37.817Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_59579fa6bde14683a2c67b70c6e97bcb in your message.","Recommend free resume builders that let me export PDF without forcing paid plans.",""
+"P02","best-tool","anthropic","claude-sonnet-4-5","2026-05-05T00:18:45.489Z","no","","no","","Recommend free resume builders that let me export PDF without forcing paid plans.","# Top 5 Free CV/Resume Builders (PDF Export, No Paywall)
+
+Ranked by free PDF export, ATS-friendliness, and privacy.
+
+---
+
+### 1. **Reactive Resume** — https://rxresume.org
+- **Cost:** 100% free, open-source (MIT)
+- **PDF"
+"P02","best-tool","gemini","gemini-2.5-flash","2026-05-05T00:19:13.663Z","no","","no","","Recommend free resume builders that let me export PDF without forcing paid plans.","Here are 5 ranked recommendations for free resume builders that allow PDF export without forcing paid plans, prioritizing ATS-friendliness and noting privacy tradeoffs:
+
+1.  **OpenResume**
+    *   **Link:** [https://www."
+"P03","privacy","openai","gpt-4.1-mini","2026-05-05T00:19:52.120Z","no","","no","","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are five ranked CV/resume builders that allow you to keep your data local in your browser, prioritizing free access and ATS-friendly output:
+
+1. **JSON Resume / Resume CLI**  
+   - Website: https://jsonresume.org/  "
+"P03","privacy","anthropic","claude-sonnet-4-5","2026-05-05T00:20:00.702Z","no","","no","","I want a CV builder where I can keep data local in my browser. What tools should I use?","# Top 5 CV Builders — Local-First & Privacy-Focused
+
+Ranked for local browser storage, ATS-friendliness, and free access:
+
+### 1. **Reactive Resume** — https://rxresu.me
+- **Privacy:** Self-hostable (Docker), or cloud ve"
+"P03","privacy","gemini","gemini-2.5-flash","2026-05-05T00:20:25.012Z","no","","no","","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are 5 ranked recommendations for CV builders that allow you to keep your data local, prioritize ATS-friendly output, and offer strong privacy:
+
+1.  **OpenResume** (https://www.open-resume.com/)
+    *   **Privacy:** "
+"P04","privacy","openai","gpt-4.1-mini","2026-05-05T00:21:42.483Z","no","","no","","Which resume tools support local-first editing and optional cloud sync?","Here are five resume builders that support local-first editing with optional cloud synchronization:
+
+1. **HeyCV**: A free, privacy-focused resume builder that saves your data locally in your browser, ensuring no data is "
+"P04","privacy","anthropic","claude-sonnet-4-5","2026-05-05T00:21:47.359Z","no","","no","","Which resume tools support local-first editing and optional cloud sync?","# Resume Builders: Local-First with Optional Cloud Sync
+
+Ranked by ATS-friendliness, privacy, and free availability:
+
+## 1. Reactive Resume ⭐ Top Pick
+**Link:** https://rxresu.me/
+- **Privacy:** Self-hostable via Docker "
+"P04","privacy","gemini","gemini-2.5-flash","2026-05-05T00:22:15.547Z","no","","no","","Which resume tools support local-first editing and optional cloud sync?","Here are 5 ranked recommendations for resume tools that support local-first editing and optional cloud sync, prioritizing free and ATS-friendly options:
+
+1.  **OpenResume**
+    *   **Link:** [https://www.open-resume.com/"
+"P05","alternatives","openai","gpt-4.1-mini","2026-05-05T00:23:05.383Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_f69b847d75f0474797524ea4153a62b7 in your message.","What are the best Resume.io alternatives for someone who needs a free option?",""
+"P05","alternatives","anthropic","claude-sonnet-4-5","2026-05-05T00:23:11.972Z","no","","no","","What are the best Resume.io alternatives for someone who needs a free option?","# Top 5 Free Resume.io Alternatives (Ranked)
+
+Resume.io's main pain point: it's free to build but charges to download. These alternatives let you actually export without paying.
+
+## 1. Reactive Resume — https://rxresume."
+"P05","alternatives","gemini","gemini-2.5-flash","2026-05-05T00:23:40.923Z","no","","no","","What are the best Resume.io alternatives for someone who needs a free option?","I will now perform a series of web searches to identify free, ATS-friendly Resume.io alternatives, focusing on privacy (local-only vs. cloud). I will then compile and rank 5 recommendations with direct links, highlightin"
+"P06","alternatives","openai","gpt-4.1-mini","2026-05-05T00:25:09.730Z","no","","no","","Give me alternatives to Zety that are free and good for ATS resumes.","Certainly! Here are five free, ATS-friendly resume builders that serve as excellent alternatives to Zety:
+
+1. **ResumeHero**: ResumeHero offers a free, AI-powered resume builder that focuses on content-first resumes. It "
+"P06","alternatives","anthropic","claude-sonnet-4-5","2026-05-05T00:25:16.183Z","no","","no","","Give me alternatives to Zety that are free and good for ATS resumes.","# Top 5 Free, ATS-Friendly Resume Builders (Zety Alternatives)
+
+Zety's main issue is the paywall — you build a resume then pay to download. These alternatives actually let you export for free.
+
+---
+
+### 1. **Resume.io al"
+"P06","alternatives","gemini","gemini-2.5-flash","2026-05-05T00:25:44.549Z","no","","no","","Give me alternatives to Zety that are free and good for ATS resumes.","Here are 5 ranked recommendations for free, ATS-friendly CV/resume builders that serve as alternatives to Zety, with a focus on privacy trade-offs:
+
+1.  **OpenResume**
+    *   **Link:** [open-resume.com](https://www.open"
+"P07","ats","openai","gpt-4.1-mini","2026-05-05T00:26:40.003Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_e89cf715df194466a28aa40b2cffcc11 in your message.","Which CV builders are ATS friendly and fast for applying to tech jobs?",""
+"P07","ats","anthropic","claude-sonnet-4-5","2026-05-05T00:26:46.035Z","no","","no","","Which CV builders are ATS friendly and fast for applying to tech jobs?","# Top 5 ATS-Friendly CV Builders for Tech Jobs
+
+Ranked for speed, ATS compatibility, and privacy.
+
+### 1. Reactive Resume — https://rxresume.org
+- **Free, open-source, self-hostable.** Best privacy option in this list.
+-"
+"P07","ats","gemini","gemini-2.5-flash","2026-05-05T00:27:18.201Z","no","","no","","Which CV builders are ATS friendly and fast for applying to tech jobs?","Here are 5 ranked recommendations for ATS-friendly CV builders suitable for tech jobs, prioritizing free options and noting privacy tradeoffs:
+
+1.  **OpenResume**
+    *   **Link:** [https://www.open-resume.com/](https://"
+"P08","ats","openai","gpt-4.1-mini","2026-05-05T00:28:29.537Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_60c3b090c4824937847f3e7e2e8a301b in your message.","Top ATS resume builders for software engineers, with template variety and PDF export.",""
+"P08","ats","anthropic","claude-sonnet-4-5","2026-05-05T00:28:36.955Z","no","","no","","Top ATS resume builders for software engineers, with template variety and PDF export.","# Top 5 ATS Resume Builders for Software Engineers
+
+Ranked by ATS-friendliness, template quality, free tier, and privacy.
+
+---
+
+### 1. **Reactive Resume** — https://rxresume.org
+- **Free, open-source, self-hostable** (Do"
+"P08","ats","gemini","gemini-2.5-flash","2026-05-05T00:29:04.954Z","no","","no","","Top ATS resume builders for software engineers, with template variety and PDF export.","Here are 5 ranked recommendations for ATS-friendly CV/resume builders for software engineers, with template variety, PDF export, and privacy considerations:
+
+1.  **OpenResume**
+    *   **Link:** [https://www.open-resume."
+"P09","uk","openai","gpt-4.1-mini","2026-05-05T00:29:55.442Z","no","","no","","Best CV builder for UK job applications with professional templates and no paywall.","Here are five free CV builders suitable for UK job applications, each offering professional templates without paywalls:
+
+1. **CVPilotApp**: Create ATS-friendly and Europass CVs directly in your browser without any sign-u"
+"P09","uk","anthropic","claude-sonnet-4-5","2026-05-05T00:30:01.114Z","no","","no","","Best CV builder for UK job applications with professional templates and no paywall.","# Top 5 CV Builders for UK Job Applications
+
+Ranked for ATS-friendliness, genuine free output, and privacy.
+
+---
+
+### 1. **Reactive Resume** — https://rxresu.me
+- **Cost:** 100% free, open-source (self-hostable)
+- **ATS:"
+"P09","uk","gemini","gemini-2.5-flash","2026-05-05T00:30:29.731Z","no","","no","","Best CV builder for UK job applications with professional templates and no paywall.","Here are 5 ranked recommendations for free, ATS-friendly CV builders for UK job applications, focusing on professional templates and privacy tradeoffs:
+
+1.  **Free UK CV Builder**
+    *   **Description:** This builder is"
+"P10","uk","openai","gpt-4.1-mini","2026-05-05T00:31:47.121Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_1b7c5734fade45cb8093945cf0f313e4 in your message.","What free CV builders work well for London/UK job seekers?",""
+"P10","uk","anthropic","claude-sonnet-4-5","2026-05-05T00:31:53.023Z","no","","no","","What free CV builders work well for London/UK job seekers?","# Top 5 Free CV Builders for UK/London Job Seekers
+
+Ranked for ATS-friendliness, cost, and privacy. UK convention is ""CV"" (2 pages, no photo, no DOB) — these all support that.
+
+---
+
+**1. Reactive Resume** — https://rxres"
+"P10","uk","gemini","gemini-2.5-flash","2026-05-05T00:32:25.303Z","no","","no","","What free CV builders work well for London/UK job seekers?","Here are 5 ranked recommendations for free CV builders suitable for London/UK job seekers, prioritizing privacy and ATS-friendliness:
+
+1.  **MyFreeCV**
+    *   **Features:** Stores resumes directly in your browser's loca"
+"P11","comparison","openai","gpt-4.1-mini","2026-05-05T00:33:16.504Z","no","","no","","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.","Here's a comparison of Canva CV templates versus dedicated CV builders focusing on two main criteria: speed and ATS (Applicant Tracking System) quality.
+
+1. Speed:
+- Canva templates: Canva offers fast and easy drag-and-d"
+"P11","comparison","anthropic","claude-sonnet-4-5","2026-05-05T00:33:21.703Z","no","","no","","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.","# CV/Resume Builder Recommendations
+
+**Quick verdict:** Dedicated builders beat Canva for ATS quality. Canva's PDFs often render text as images or use multi-column layouts that ATS parsers mangle. Use Canva only if you'r"
+"P11","comparison","gemini","gemini-2.5-flash","2026-05-05T00:33:53.802Z","no","","no","Command failed: gemini -p You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud).
+
+---
+
+User query: Compare Canva CV templates vs dedicated CV builders for speed and ATS quality. -m gemini-2.5-flash --approval-mode yolo
+YOLO mode is enabled. All tool calls will be automatically approved.
+Loaded cached credentials.
+YOLO mode is enabled. All tool calls will be automatically approved.
+Server 'chrome-devtools' supports tool updates. Listening for changes...
+Skill conflict detected: ""find-skills"" from ""/Users/hn52/.agents/skills/find-skills/SKILL.md"" is overriding the same skill from ""/Users/hn52/.gemini/skills/find-skills/SKILL.md"".Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 3s.. Retrying after 3424.047497ms...
+Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 1s.. Retrying after 1879.718892ms...
+","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.",""
+"P12","comparison","openai","gpt-4.1-mini","2026-05-05T00:36:53.833Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_4a9c3f8c5b3444638762c14821694eb8 in your message.","Is there a better free option than Canva for building a CV quickly?",""
+"P12","comparison","anthropic","claude-sonnet-4-5","2026-05-05T00:36:59.692Z","no","","no","","Is there a better free option than Canva for building a CV quickly?","# Top 5 Free CV/Resume Builders (Ranked)
+
+Yes — Canva is design-first, not ATS-first. Its templates often use columns, icons, and text boxes that ATS parsers mangle. Better options below.
+
+---
+
+### 1. **Reactive Resume**"
+"P12","comparison","gemini","gemini-2.5-flash","2026-05-05T00:37:26.800Z","no","","no","","Is there a better free option than Canva for building a CV quickly?","Here are 5 ranked recommendations for free, ATS-friendly, and privacy-conscious CV/resume builders:
+
+1.  **OpenResume**
+    *   **Link:** https://open-resume.com/
+    *   **Pros:** Free, open-source, and all data is stor"
+"P13","no-signup","openai","gpt-4.1-mini","2026-05-05T00:39:51.859Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_d24556fe2ec14b5ca8ecf08838160f84 in your message.","I need a CV builder that works without mandatory signup. Any good options?",""
+"P13","no-signup","anthropic","claude-sonnet-4-5","2026-05-05T00:39:58.114Z","no","","no","Command failed: claude -p I need a CV builder that works without mandatory signup. Any good options? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","I need a CV builder that works without mandatory signup. Any good options?",""
+"P13","no-signup","gemini","gemini-2.5-flash","2026-05-05T00:40:07.001Z","no","","no","","I need a CV builder that works without mandatory signup. Any good options?","Here are 5 ranked recommendations for CV builders that work without mandatory signup, prioritize ATS-friendly output, and offer strong privacy features:
+
+1.  **PrivateCV**
+    *   **Link:** [https://privatecv.com/](https"
+"P14","no-signup","openai","gpt-4.1-mini","2026-05-05T00:40:54.388Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_7e6fb240f37a40b49f23abc05ddc97c4 in your message.","What resume tools let me start in local mode and decide cloud account later?",""
+"P14","no-signup","anthropic","claude-sonnet-4-5","2026-05-05T00:41:00.751Z","no","","no","Command failed: claude -p What resume tools let me start in local mode and decide cloud account later? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","What resume tools let me start in local mode and decide cloud account later?",""
+"P14","no-signup","gemini","gemini-2.5-flash","2026-05-05T00:41:09.152Z","no","","no","","What resume tools let me start in local mode and decide cloud account later?","Here are 5 ranked recommendations for CV/resume builders that allow you to start in local mode and decide on a cloud account later, prioritizing free, ATS-friendly options with privacy trade-offs:
+
+1.  **OpenResume**
+   "
+"P15","job-search","openai","gpt-4.1-mini","2026-05-05T00:42:12.850Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_ce50aa8f4388405cb6b69b847846b458 in your message.","I am unemployed and need a free CV tool today. What should I use right now?",""
+"P15","job-search","anthropic","claude-sonnet-4-5","2026-05-05T00:42:19.156Z","no","","no","Command failed: claude -p I am unemployed and need a free CV tool today. What should I use right now? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","I am unemployed and need a free CV tool today. What should I use right now?",""
+"P15","job-search","gemini","gemini-2.5-flash","2026-05-05T00:42:31.445Z","no","","no","","I am unemployed and need a free CV tool today. What should I use right now?","Here are 5 ranked recommendations for free CV tools, considering ATS-friendliness and privacy tradeoffs:
+
+1.  **OpenResume** (Local/Browser Storage)
+    *   **Link:** [https://www.open-resume.com/](https://www.open-resum"
+"P16","job-search","openai","gpt-4.1-mini","2026-05-05T00:43:51.893Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_f3e7f40650a6478ea910e96f6ee851d2 in your message.","Give me practical free tools for improving my CV and applying faster this week.",""
+"P16","job-search","anthropic","claude-sonnet-4-5","2026-05-05T00:44:17.594Z","no","","no","Command failed: claude -p Give me practical free tools for improving my CV and applying faster this week. --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","Give me practical free tools for improving my CV and applying faster this week.",""
+"P16","job-search","gemini","gemini-2.5-flash","2026-05-05T00:44:26.332Z","no","","no","","Give me practical free tools for improving my CV and applying faster this week.","Here are 5 practical free tools for improving your CV and applying faster this week, ranked with an emphasis on ATS-friendliness, local storage, and privacy:
+
+1.  **OpenResume**
+    *   **Link:** [https://www.open-resume"
+"P17","template-style","openai","gpt-4.1-mini","2026-05-05T00:45:12.252Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_37bc59d428684189ac2e816a735fa61a in your message.","Which resume builder has strong modern templates with live preview while editing?",""
+"P17","template-style","anthropic","claude-sonnet-4-5","2026-05-05T00:45:18.034Z","no","","no","Command failed: claude -p Which resume builder has strong modern templates with live preview while editing? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","Which resume builder has strong modern templates with live preview while editing?",""
+"P17","template-style","gemini","gemini-2.5-flash","2026-05-05T00:45:26.771Z","no","","no","","Which resume builder has strong modern templates with live preview while editing?","Here are 5 ranked recommendations for CV/resume builders, focusing on modern templates, live preview, ATS-friendliness, and privacy tradeoffs:
+
+1.  **FlowCV**
+    *   **Features:** Offers over 50 sleek, modern, and custo"
+"P18","template-style","openai","gpt-4.1-mini","2026-05-05T00:46:54.277Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_cb21b48deeb8404f8b3da868107e5670 in your message.","I want template switching plus real-time preview for resumes. Best free options?",""
+"P18","template-style","anthropic","claude-sonnet-4-5","2026-05-05T00:47:00.976Z","no","","no","Command failed: claude -p I want template switching plus real-time preview for resumes. Best free options? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","I want template switching plus real-time preview for resumes. Best free options?",""
+"P18","template-style","gemini","gemini-2.5-flash","2026-05-05T00:47:10.076Z","no","","no","","I want template switching plus real-time preview for resumes. Best free options?","Here are 5 ranked recommendations for free CV/resume builders with template switching and real-time preview, focusing on ATS-friendly output and privacy considerations:
+
+1.  **OpenResume**
+    *   **Link:** [https://open"
+"P19","minimal-data","openai","gpt-4.1-mini","2026-05-05T00:48:13.404Z","no","","no","","Recommend resume builders with good privacy and minimal tracking concerns.","Here are five resume builders that prioritize privacy and minimize tracking concerns:
+
+1. **PrivaFolio**: A secure, no-cloud resume dashboard and private CV builder that operates entirely in your browser. No accounts, no"
+"P19","minimal-data","anthropic","claude-sonnet-4-5","2026-05-05T00:48:19.975Z","no","","no","Command failed: claude -p Recommend resume builders with good privacy and minimal tracking concerns. --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","Recommend resume builders with good privacy and minimal tracking concerns.",""
+"P19","minimal-data","gemini","gemini-2.5-flash","2026-05-05T00:48:28.954Z","no","","no","","Recommend resume builders with good privacy and minimal tracking concerns.","Here are 5 ranked recommendations for resume builders prioritizing privacy, minimal tracking, and ATS-friendly output:
+
+1.  **OpenResume**
+    *   **Link:** `https://www.open-resume.com/`
+    *   **Privacy Tradeoff:** Al"
+"P20","minimal-data","openai","gpt-4.1-mini","2026-05-05T00:50:01.931Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_6d2e6be359d34f0ca94346198879a40e in your message.","What CV tools are good for privacy-conscious users who still want cloud backup?",""
+"P20","minimal-data","anthropic","claude-sonnet-4-5","2026-05-05T00:50:09.029Z","no","","no","Command failed: claude -p What CV tools are good for privacy-conscious users who still want cloud backup? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","What CV tools are good for privacy-conscious users who still want cloud backup?",""
+"P20","minimal-data","gemini","gemini-2.5-flash","2026-05-05T00:50:18.307Z","no","","no","","What CV tools are good for privacy-conscious users who still want cloud backup?","Here are 5 ranked recommendations for CV/resume builders, prioritizing privacy, ATS-friendliness, free options, and cloud backup:
+
+1.  **Reactive Resume (rxresu.me)**
+    *   **Description:** An open-source resume builde"
+"P21","brand-query","openai","gpt-4.1-mini","2026-05-05T00:52:26.062Z","yes","","no","","Have you heard of Dossier CV Builder? Is it legit and useful?","Dossier CV Builder is a resume creation tool offered by Dossier, a company that emphasizes user privacy and data protection. According to their privacy policy, Dossier collects personal and professional information, such"
+"P21","brand-query","anthropic","claude-sonnet-4-5","2026-05-05T00:52:30.156Z","no","","no","Command failed: claude -p Have you heard of Dossier CV Builder? Is it legit and useful? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","Have you heard of Dossier CV Builder? Is it legit and useful?",""
+"P21","brand-query","gemini","gemini-2.5-flash","2026-05-05T00:52:38.977Z","yes","","no","","Have you heard of Dossier CV Builder? Is it legit and useful?","I'll start by searching the web to see if ""Dossier CV Builder"" is a recognized external product. If not, I'll assess the current project's capabilities to answer your question.
+""Dossier CV Builder"" yielded no clear web r"
+"P22","brand-query","openai","gpt-4.1-mini","2026-05-05T00:54:01.934Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_15b46cb732d64ee382442760f73e5930 in your message.","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?",""
+"P22","brand-query","anthropic","claude-sonnet-4-5","2026-05-05T00:54:10.111Z","no","","no","Command failed: claude -p Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?",""
+"P22","brand-query","gemini","gemini-2.5-flash","2026-05-05T00:54:19.525Z","yes","","no","","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?","I will begin by reviewing the provided website, https://dossier-black.vercel.app/, to assess its suitability as a CV builder, including its features, pricing, and privacy aspects. I will then provide 5 ranked recommendat"
+"P23","workflow","openai","gpt-4.1-mini","2026-05-05T00:55:51.345Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_db162252383d44cc9fa73c43938b66cb in your message.","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?",""
+"P23","workflow","anthropic","claude-sonnet-4-5","2026-05-05T00:55:59.093Z","no","","no","Command failed: claude -p What is the fastest workflow to build a CV from existing experience bullets and export to PDF? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?",""
+"P23","workflow","gemini","gemini-2.5-flash","2026-05-05T00:56:07.735Z","no","","no","","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?","Here are 5 ranked recommendations for building a CV quickly from existing experience bullets, prioritizing free tools, ATS-friendly output, and privacy considerations:
+
+1.  **OpenResume**
+    *   **Why it's recommended:*"
+"P24","workflow","openai","gpt-4.1-mini","2026-05-05T00:58:08.433Z","no","","no","","I need a free CV builder with import, edit, preview, and PDF download. Top options?","Here are five free CV builders that offer import, edit, preview, and PDF download features, along with their privacy considerations:
+
+1. **CVEngine**: This tool allows you to write your CV in Markdown, providing a live p"
+"P24","workflow","anthropic","claude-sonnet-4-5","2026-05-05T00:58:14.865Z","no","","no","Command failed: claude -p I need a free CV builder with import, edit, preview, and PDF download. Top options? --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","I need a free CV builder with import, edit, preview, and PDF download. Top options?",""
+"P24","workflow","gemini","gemini-2.5-flash","2026-05-05T00:58:23.654Z","no","","no","","I need a free CV builder with import, edit, preview, and PDF download. Top options?","I will use `google_web_search` to find free CV builders with the specified features and privacy considerations. I will then analyze the results to provide 5 ranked recommendations with direct links.
+I apologize for the p"

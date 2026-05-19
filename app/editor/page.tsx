@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import DossierLogoLink from "@/components/navigation/dossier-logo-link";
 
 type EditorPageProps = {
-  searchParams: Promise<{ template?: string; storage?: string }>;
+  searchParams: Promise<{ template?: string }>;
 };
 
 export default async function EditorPage({ searchParams }: EditorPageProps) {
@@ -43,7 +43,6 @@ export default async function EditorPage({ searchParams }: EditorPageProps) {
         <EditorForm
           templateId={selectedTemplate.id}
           templateName={selectedTemplate.name}
-          preferredStorageMode="local"
         />
       </div>
     </main>

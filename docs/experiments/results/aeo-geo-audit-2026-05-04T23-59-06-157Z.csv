@@ -1,0 +1,6 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","anthropic","claude-sonnet-4-5","2026-05-04T23:59:06.158Z","no","","no","Command failed: claude -p What is the best free CV builder for job seekers in 2026? Give your top 5 with links. --system-prompt You are helping a job seeker choose a CV/resume builder.
+Return exactly 5 ranked recommendations with direct links.
+Prefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --bare --dangerously-skip-permissions --allowedTools WebSearch WebFetch
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",""

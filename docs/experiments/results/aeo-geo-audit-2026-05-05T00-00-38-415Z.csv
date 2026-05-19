@@ -1,0 +1,9 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","anthropic","claude-sonnet-4-5","2026-05-05T00:00:38.416Z","no","","no","","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","# Top 5 Free CV/Resume Builders for Job Seekers (2026)
+
+Ranked for ATS-friendliness, cost, and privacy. Lead with the trade-offs that actually matter.
+
+---
+
+### 1. **Reactive Resume** — https://rxresume.org
+- **Free:** F"

@@ -11,7 +11,6 @@ import {
   useCardEntrance,
   useCardTilt,
   useMagnetic,
-  useCounter,
   useParallaxGrid,
   useBlobMouseTracking,
 } from "./use-landing-effects";
@@ -22,7 +21,6 @@ import {
 type ExperienceHeroProps = {
   ctaHref: string;
   templateCount: number;
-  userCount?: number | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -54,23 +52,9 @@ function TiltCard({ children }: { children: React.ReactNode }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Counter Display                                                    */
-/* ------------------------------------------------------------------ */
-function CounterValue({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  useCounter(ref, value, 1.5);
-
-  return (
-    <>
-      <span ref={ref}>0</span>{suffix}
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Main Hero                                                          */
 /* ------------------------------------------------------------------ */
-export default function ExperienceHero({ ctaHref, templateCount, userCount }: ExperienceHeroProps) {
+export default function ExperienceHero({ ctaHref, templateCount }: ExperienceHeroProps) {
   // Refs for animations
   const labelRef = useRef<HTMLSpanElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
@@ -221,9 +205,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
                 </span>
               </div>
               <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">
-                  <CounterValue value={templateCount} suffix="+ Styles" />
-                </h3>
+                <h3 className="text-3xl font-bold text-white">{templateCount}+ Styles</h3>
                 <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
               <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
@@ -257,18 +239,12 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
                 </span>
               </div>
               <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">
-                  {userCount ? (
-                    <CounterValue value={userCount} suffix=" Users" />
-                  ) : (
-                    "Active Users"
-                  )}
-                </h3>
+                <h3 className="text-3xl font-bold text-white">Local-first</h3>
                 <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
               </div>
               <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
-                <p>Unique visitors (local + cloud)</p>
-                <p>Cloud remains per-user secured</p>
+                <p>No account gate</p>
+                <p>Browser-only CV data</p>
               </div>
             </TiltCard>
           </div>

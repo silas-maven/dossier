@@ -56,12 +56,10 @@ import {
   deleteStoredProfile,
   pinProfileToTemplate,
   readStoredProfileEnvelope,
-  type ProfileStorageMode,
   type StoredProfileMeta
 } from "@/lib/profile-store";
 import { getTemplateById } from "@/lib/templates";
 import { cn } from "@/lib/utils";
-import { type DossierStorageMode } from "@/lib/storage-mode";
 import BranchSelector from "@/components/editor/branch-selector";
 import TailorPane from "@/components/editor/tailor-pane";
 
@@ -69,7 +67,6 @@ import TailorPane from "@/components/editor/tailor-pane";
 type EditorFormProps = {
   templateId: string;
   templateName: string;
-  preferredStorageMode?: DossierStorageMode;
 };
 
 const tagsFromInput = (value: string) =>
@@ -271,30 +268,21 @@ const normalizeProfileShape = (templateId: string, raw: unknown): CvProfile => {
 const buildMeta = (input: {
   profile: CvProfile;
   templateId: string;
-  mode: ProfileStorageMode;
   existing: StoredProfileMeta | null;
-  cloudId?: string | null;
-  cloudChecksum?: string | null;
-  cloudUpdatedAt?: string | null;
 }): StoredProfileMeta => {
   const localChecksum = profileChecksum(input.profile);
   return {
     profileId: input.profile.id,
     templateId: input.templateId,
     profileName: input.profile.name,
-    mode: input.mode,
     updatedAt: nowIso(),
-    cloudId: input.cloudId ?? input.existing?.cloudId ?? null,
-    localChecksum,
-    cloudChecksum: input.cloudChecksum ?? input.existing?.cloudChecksum ?? null,
-    cloudUpdatedAt: input.cloudUpdatedAt ?? input.existing?.cloudUpdatedAt ?? null
+    localChecksum
   };
 };
 
 export default function EditorForm({
   templateId,
-  templateName,
-  preferredStorageMode
+  templateName
 }: EditorFormProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const selectedTemplate = useMemo(() => getTemplateById(templateId), [templateId]);
@@ -311,10 +299,8 @@ export default function EditorForm({
   const [importLoading, setImportLoading] = useState(false);
   const [undoProfile, setUndoProfile] = useState<CvProfile | null>(null);
   const [copiedTemplateId, setCopiedTemplateId] = useState(false);
-  const [storageMode, setStorageMode] = useState<ProfileStorageMode>("local");
   const [, setProfileMeta] = useState<StoredProfileMeta | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
-  const [syncError, setSyncError] = useState<string | null>(null);
   const [activePanelTab, setActivePanelTab] = useState<EditorPanelTab>("content");
   const [activeContentTab, setActiveContentTab] = useState<EditorContentTab>("import");
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
@@ -374,13 +360,11 @@ export default function EditorForm({
       const localProfile = loadLocalProfileForTemplate(templateId);
       const nextProfile = normalizeProfileShape(templateId, localProfile ?? fallbackProfile);
       let nextMeta = getStoredProfileMeta(nextProfile.id);
-      const nextMode: ProfileStorageMode = preferredStorageMode ?? nextMeta?.mode ?? "local";
 
       if (!nextMeta) {
         nextMeta = buildMeta({
           profile: nextProfile,
           templateId,
-          mode: nextMode,
           existing: null
         });
       }
@@ -389,7 +373,6 @@ export default function EditorForm({
       setProfile(nextProfile);
       setLastExplicitSaveChecksum(profileChecksum(nextProfile));
       setProfileMeta(nextMeta);
-      setStorageMode(nextMode);
       setIsHydrated(true);
       loadProfilesList();
     };
@@ -398,7 +381,7 @@ export default function EditorForm({
     return () => {
       active = false;
     };
-  }, [preferredStorageMode, templateId]);
+  }, [templateId]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -406,13 +389,12 @@ export default function EditorForm({
       const nextMeta = buildMeta({
         profile,
         templateId,
-        mode: storageMode,
         existing: previous
       });
       saveStoredProfileEnvelope({ meta: nextMeta, profile }, true);
       return nextMeta;
     });
-  }, [isHydrated, profile, storageMode, templateId]);
+  }, [isHydrated, profile, templateId]);
 
   const startSeed = () => {
     setImportError(null);
@@ -479,14 +461,12 @@ export default function EditorForm({
 
   const persistProfileToLocal = (
     nextProfile: CvProfile,
-    nextMode: ProfileStorageMode,
     overrides?: Partial<StoredProfileMeta>
   ) => {
     setProfileMeta((previous) => {
       const built = buildMeta({
         profile: nextProfile,
         templateId,
-        mode: nextMode,
         existing: previous
       });
       const nextMeta = { ...built, ...overrides };
@@ -498,12 +478,9 @@ export default function EditorForm({
   };
 
   const saveLocalNow = () => {
-    setSyncError(null);
     setSyncMessage("Saved locally.");
     setLastExplicitSaveChecksum(profileChecksum(profile));
-    persistProfileToLocal(profile, "local", {
-      mode: "local"
-    });
+    persistProfileToLocal(profile);
   };
 
   const updateBasics = <K extends keyof CvBasics>(field: K, value: CvBasics[K]) => {
@@ -1221,7 +1198,6 @@ export default function EditorForm({
                       </Button>
                     </div>
                     {syncMessage ? <p className="mt-2 text-xs text-emerald-400">{syncMessage}</p> : null}
-                    {syncError ? <p className="mt-2 text-xs text-red-500">{syncError}</p> : null}
                   </div>
                   <input
                     ref={fileInputRef}

@@ -1,0 +1,45 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","openai","gpt-4.1-mini","2026-05-07T08:00:35.834Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_1795738f70ee46f08e2982bd464c624d in your message.","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",""
+"P02","best-tool","openai","gpt-4.1-mini","2026-05-07T08:00:45.094Z","no","","no","","Recommend free resume builders that let me export PDF without forcing paid plans.","Certainly! Here are five free resume builders that allow you to export your resume as a PDF without requiring a paid plan:
+
+1. **CV Studio**: Offers a 100% free resume builder with no sign-up or payment required. You can"
+"P03","privacy","openai","gpt-4.1-mini","2026-05-07T08:00:51.910Z","no","","no","","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are 5 ranked CV/resume builders that allow you to keep your data local in your browser, ensuring privacy and control:
+
+1. **Resumake.io**  
+   - Free and open-source  
+   - Works entirely in your browser, no data se"
+"P04","privacy","openai","gpt-4.1-mini","2026-05-07T08:00:59.655Z","no","","no","","Which resume tools support local-first editing and optional cloud sync?","Here are five resume builders that support local-first editing with optional cloud synchronization:
+
+1. **HeyCV**: A free, privacy-focused resume builder that saves your data locally in your browser. It offers optional c"
+"P05","alternatives","openai","gpt-4.1-mini","2026-05-07T08:01:07.590Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_b4bf756517fe4eb9935a4b6355792d78 in your message.","What are the best Resume.io alternatives for someone who needs a free option?",""
+"P06","alternatives","openai","gpt-4.1-mini","2026-05-07T08:01:14.860Z","no","","no","fetch failed","Give me alternatives to Zety that are free and good for ATS resumes.",""
+"P07","ats","openai","gpt-4.1-mini","2026-05-07T08:29:49.034Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_cf5ac0083eed4552a8acaacd2fb32169 in your message.","Which CV builders are ATS friendly and fast for applying to tech jobs?",""
+"P08","ats","openai","gpt-4.1-mini","2026-05-07T08:30:00.878Z","no","","no","","Top ATS resume builders for software engineers, with template variety and PDF export.","Here are five top ATS-friendly resume builders suitable for software engineers, offering a variety of templates and PDF export capabilities:
+
+1. **StackInterview Resume Builder**
+   - **Features**: Offers 15 professional"
+"P09","uk","openai","gpt-4.1-mini","2026-05-07T08:30:08.512Z","no","","no","fetch failed","Best CV builder for UK job applications with professional templates and no paywall.",""
+"P10","uk","openai","gpt-4.1-mini","2026-05-07T08:46:08.711Z","no","","no","fetch failed","What free CV builders work well for London/UK job seekers?",""
+"P11","comparison","openai","gpt-4.1-mini","2026-05-07T09:17:09.655Z","no","","no","","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.","Here's a comparison between Canva CV templates and dedicated CV builders focusing on speed and ATS quality:
+
+1. **Speed:**
+   - **Canva CV Templates:** Canva offers a highly visual drag-and-drop interface that can be ver"
+"P12","comparison","openai","gpt-4.1-mini","2026-05-07T09:17:16.387Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_37a23de3106a4e6cac9b3045ab4cf108 in your message.","Is there a better free option than Canva for building a CV quickly?",""
+"P13","no-signup","openai","gpt-4.1-mini","2026-05-07T09:17:24.182Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_c3b9a49053ea4fcab79378882cf1978d in your message.","I need a CV builder that works without mandatory signup. Any good options?",""
+"P14","no-signup","openai","gpt-4.1-mini","2026-05-07T09:17:29.674Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_d79a81b6a8fc4d6986009a2a0689a7bf in your message.","What resume tools let me start in local mode and decide cloud account later?",""
+"P15","job-search","openai","gpt-4.1-mini","2026-05-07T09:17:37.457Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_6dfb111309b941b18cbb64a09905408d in your message.","I am unemployed and need a free CV tool today. What should I use right now?",""
+"P16","job-search","openai","gpt-4.1-mini","2026-05-07T09:17:44.111Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_8a6cb936fabe4f398504e0c5e914a1c7 in your message.","Give me practical free tools for improving my CV and applying faster this week.",""
+"P17","template-style","openai","gpt-4.1-mini","2026-05-07T09:17:49.617Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_d2b88e2a61e54ae39b86c11d69a35f66 in your message.","Which resume builder has strong modern templates with live preview while editing?",""
+"P18","template-style","openai","gpt-4.1-mini","2026-05-07T09:17:54.965Z","no","","no","fetch failed","I want template switching plus real-time preview for resumes. Best free options?",""
+"P19","minimal-data","openai","gpt-4.1-mini","2026-05-07T09:46:28.509Z","no","","no","","Recommend resume builders with good privacy and minimal tracking concerns.","Here are five resume builders that prioritize privacy and minimize tracking concerns:
+
+1. **PrivaFolio**: A free, browser-based resume builder that stores all data locally, ensuring complete privacy. No accounts or cloud"
+"P20","minimal-data","openai","gpt-4.1-mini","2026-05-07T09:46:35.351Z","no","","no","OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_774b55f46e3d4fa6b09d3689caacfaf1 in your message.","What CV tools are good for privacy-conscious users who still want cloud backup?",""
+"P21","brand-query","openai","gpt-4.1-mini","2026-05-07T09:46:44.585Z","yes","","no","","Have you heard of Dossier CV Builder? Is it legit and useful?","Dossier CV Builder is a resume creation tool offered by Dossier, a company that provides various professional services. While specific user reviews for Dossier CV Builder are limited, the company emphasizes user privacy "
+"P22","brand-query","openai","gpt-4.1-mini","2026-05-07T09:46:48.340Z","yes","","no","","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?","The website **dossier-black.vercel.app** appears to be a CV builder hosted on Vercel, a platform known for deploying web applications. However, there is limited information available about this specific site, making it c"
+"P23","workflow","openai","gpt-4.1-mini","2026-05-07T09:46:53.457Z","no","","no","","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?","The fastest workflow to build a CV from existing experience bullets and export to PDF typically involves the following steps:
+
+1. Choose a CV/resume builder that supports quick input of bullet points and easy formatting."
+"P24","workflow","openai","gpt-4.1-mini","2026-05-07T09:46:57.564Z","no","","no","","I need a free CV builder with import, edit, preview, and PDF download. Top options?","Here are five free CV builders that offer import, edit, preview, and PDF download features:
+
+1. **CV Studio**: Upload your existing resume or paste your resume text to get started. No signup required. ATS-optimized templ"

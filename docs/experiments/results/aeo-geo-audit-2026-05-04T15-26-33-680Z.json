@@ -1,0 +1,130 @@
+{
+  "summary": {
+    "runAt": "2026-05-04T15:27:44.965Z",
+    "durationSec": 71,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "openai",
+      "anthropic",
+      "gemini"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 2,
+    "perProvider": {
+      "openai": {
+        "model": "gpt-4.1-mini",
+        "totalPrompts": 1,
+        "errors": 1,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      },
+      "anthropic": {
+        "model": "claude-sonnet-4-5",
+        "totalPrompts": 0,
+        "errors": 2,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      },
+      "gemini": {
+        "model": "gemini-2.0-flash",
+        "totalPrompts": 0,
+        "errors": 2,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:26:33.681Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "As of May 2026, here are five top-rated free CV builders for job seekers, each offering unique features to help you create a professional and ATS-friendly resume:\n\n1. **Indeed Resume Builder**  \n   Indeed offers a completely free resume builder with simple, clean templates ideal for ATS systems. It's beginner-friendly and provides multiple ATS-ready layouts.\n\n2. **Canva**  \n   Canva provides over 14,000 templates, including ATS-friendly minimalist designs suitable for freshers applying to corporate or tech roles. It features a drag-and-drop editor, making it great for creating visually appealing yet readable resumes.\n\n3. **Rezi**  \n   Rezi is well-known for its real-time ATS scoring and keyword targeting, helping freshers tailor their resumes for job descriptions. It offers advanced ATS checks and AI suggestions for wording improvements.\n\n4. **Teal Resume Builder**  \n   Teal’s free resume builder lets you create tailored, ATS-friendly resumes, track applications, and analyze job descriptions. It provides AI-powered content guidance and unlimited free resume downloads.\n\n5. **StylingCV**  \n   StylingCV offers advanced AI-driven resume writing, ideal for newbies with limited experience. It provides smart templates optimized for ATS and includes AI-assisted fresher resumes.\n\nThese tools are designed to help you create a professional resume that stands out to employers and passes through Applicant Tracking Systems effectively.",
+      "error": null
+    },
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "startedAt": "2026-05-04T15:26:40.886Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "Command failed: claude -p What is the best free CV builder for job seekers in 2026? Give your top 5 with links. --system-prompt You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --bare --dangerously-skip-permissions --allowedTools WebSearch WebFetch\nWarning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n"
+    },
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "startedAt": "2026-05-04T15:26:45.203Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "Command failed: gemini -p You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud).\n\n---\n\nUser query: What is the best free CV builder for job seekers in 2026? Give your top 5 with links. -m gemini-2.0-flash --approval-mode yolo\nYOLO mode is enabled. All tool calls will be automatically approved.\nLoaded cached credentials.\nYOLO mode is enabled. All tool calls will be automatically approved.\nServer 'chrome-devtools' supports tool updates. Listening for changes...\nSkill conflict detected: \"find-skills\" from \"/Users/hn52/.agents/skills/find-skills/SKILL.md\" is overriding the same skill from \"/Users/hn52/.gemini/skills/find-skills/SKILL.md\".Error when talking to Gemini API Full report available at: /var/folders/_8/zx8dt1k93dd2ttm8fhk9xwh40000gn/T/gemini-client-error-Turn.run-sendMessageStream-2026-05-04T15-27-09-364Z.json ModelNotFoundError: Requested entity was not found.\n    at classifyGoogleError (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/googleQuotaErrors.js:145:16)\n    at retryWithBackoff (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:151:37)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async GeminiChat.makeApiCallAndProcessStream (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:445:32)\n    at async GeminiChat.streamWithRetries (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:265:40)\n    at async Turn.run (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/turn.js:67:30)\n    at async GeminiClient.processTurn (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/client.js:475:26)\n    at async GeminiClient.sendMessageStream (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/client.js:575:20)\n    at async file:///opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:195:34\n    at async main (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:497:9) {\n  code: 404\n}\nAn unexpected critical error occurred:[object Object]\n"
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "startedAt": "2026-05-04T15:27:09.453Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "OpenAI: An error occurred while processing your request. You can retry your request, or contact us through our help center at help.openai.com if the error persists. Please include the request ID req_8aec9aeb905b413b95545e8e28707199 in your message."
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "startedAt": "2026-05-04T15:27:18.368Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "Command failed: claude -p Recommend free resume builders that let me export PDF without forcing paid plans. --system-prompt You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud). --bare --dangerously-skip-permissions --allowedTools WebSearch WebFetch\nWarning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n"
+    },
+    {
+      "id": "P02",
+      "intent": "best-tool",
+      "prompt": "Recommend free resume builders that let me export PDF without forcing paid plans.",
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "startedAt": "2026-05-04T15:27:22.880Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "",
+      "error": "Command failed: gemini -p You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud).\n\n---\n\nUser query: Recommend free resume builders that let me export PDF without forcing paid plans. -m gemini-2.0-flash --approval-mode yolo\nYOLO mode is enabled. All tool calls will be automatically approved.\nLoaded cached credentials.\nYOLO mode is enabled. All tool calls will be automatically approved.\nServer 'chrome-devtools' supports tool updates. Listening for changes...\nSkill conflict detected: \"find-skills\" from \"/Users/hn52/.agents/skills/find-skills/SKILL.md\" is overriding the same skill from \"/Users/hn52/.gemini/skills/find-skills/SKILL.md\".Error when talking to Gemini API Full report available at: /var/folders/_8/zx8dt1k93dd2ttm8fhk9xwh40000gn/T/gemini-client-error-Turn.run-sendMessageStream-2026-05-04T15-27-44-885Z.json ModelNotFoundError: Requested entity was not found.\n    at classifyGoogleError (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/googleQuotaErrors.js:145:16)\n    at retryWithBackoff (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:151:37)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async GeminiChat.makeApiCallAndProcessStream (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:445:32)\n    at async GeminiChat.streamWithRetries (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:265:40)\n    at async Turn.run (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/turn.js:67:30)\n    at async GeminiClient.processTurn (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/client.js:475:26)\n    at async GeminiClient.sendMessageStream (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/client.js:575:20)\n    at async file:///opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:195:34\n    at async main (file:///opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:497:9) {\n  code: 404\n}\nAn unexpected critical error occurred:[object Object]\n"
+    }
+  ]
+}

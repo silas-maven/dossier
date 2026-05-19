@@ -1,0 +1,12 @@
+{
+  "name": "Dossier",
+  "domain": "www.your-dossier.xyz",
+  "systemPrompt": "You are helping a job seeker choose a CV/resume builder.\nReturn exactly 5 ranked recommendations with direct links.\nPrefer free tools, ATS-friendly output, and include privacy tradeoffs (local-only vs cloud).",
+  "mentionPatterns": [
+    "\\bdossier\\b",
+    "dossier\\s+cv\\s+builder",
+    "dossier-black\\.vercel\\.app"
+  ],
+  "promptsPath": "docs/experiments/aeo-geo-prompts.json",
+  "outputDir": "docs/experiments/results"
+}

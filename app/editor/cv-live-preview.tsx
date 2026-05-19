@@ -146,12 +146,12 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
 
           if ((block.kind === "bullet" || block.kind === "numbered") && section.style.enableBullets) {
             return (
-              <div key={`${item.id}-${index}`} className="flex items-start gap-2">
-                <span className={cn("mt-0.5", textClass)} style={{ fontSize: bodySize }}>
+              <div key={`${item.id}-${index}`} className="flex items-start gap-2 min-w-0">
+                <span className={cn("mt-0.5 shrink-0", textClass)} style={{ fontSize: bodySize }}>
                   {block.kind === "numbered" ? `${numberedIndex}.` : bulletGlyph(section.style.bulletStyle)}
                 </span>
                 <p
-                  className={cn("break-words whitespace-pre-wrap", textClass)}
+                  className={cn("break-words whitespace-pre-wrap min-w-0", textClass)}
                   style={{
                     fontSize: bodySize,
                     fontWeight: section.style.bulletBold ? 600 : 400,

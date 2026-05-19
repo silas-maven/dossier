@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "runAt": "2026-05-04T23:58:54.520Z",
+    "durationSec": 55,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "gemini"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 1,
+    "perProvider": {
+      "gemini": {
+        "model": "gemini-2.5-flash",
+        "totalPrompts": 1,
+        "errors": 0,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "startedAt": "2026-05-04T23:57:59.549Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "I will use `google_web_search` to find the best free ATS-friendly CV builders, prioritizing tools that offer local or cloud storage options for privacy. I will then compile a ranked list of 5 recommendations, including direct links and a summary of their features and privacy trade-offs.\nHere are the top 5 free CV builders for 2026, ranked by their adherence to ATS-friendliness, local-first privacy, and overall utility:\n\n1.  **OpenResume**\n    *   **Link:** [https://www.open-resume.com/](https://www.open-resume.com/)\n    *   **Details:** Free, open-source, and highly privacy-focused. All data is stored locally in your browser, requiring no sign-up. Specifically designed for ATS compatibility, especially for the U.S. job market.\n2.  **Reactive Resume**\n    *   **Link:** [https://rxresu.me/](https://rxresu.me/)\n    *   **Details:** An excellent open-source option that allows you to create and download PDFs without needing an account or payment. Supports exporting data to JSON for easy version control and local management, contributing to privacy and ATS-friendliness.\n3.  **PrivateCV**\n    *   **Link:** [https://privatecv.vercel.app/](https://privatecv.vercel.app/)\n    *   **Details:** Emphasizes a \"privacy-first\" approach by operating entirely within your browser with no servers, data storage, or tracking. It's offline-capable, stores data locally, and provides ATS-proof templates.\n4.  **CVATI**\n    *   **Link:** [https://mycloudcv.com/](https://mycloudcv.com/)\n    *   **Details:** Features a \"Privacy First\" design, allowing users to work and save resumes locally on their device without needing to sign up. Offers an optional cloud upgrade for those who desire multi-device access, providing a good balance between local control and convenience.\n5.  **HeyCV**\n    *   **Link:** [https://heycv.app/](https://heycv.app/)\n    *   **Details:** A privacy-first Progressive Web App (PWA) that saves all data locally and supports offline work, allowing for unlimited local resumes. It also includes an optional free cloud synchronization service for backup and access across devices.",
+      "error": null
+    }
+  ]
+}

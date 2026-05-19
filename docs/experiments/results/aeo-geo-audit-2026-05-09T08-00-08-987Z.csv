@@ -1,0 +1,102 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","openai","gpt-4.1-mini","2026-05-09T08:00:08.987Z","no","","no","","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","As of May 2026, here are five top-rated free CV builders that offer user-friendly interfaces, ATS-friendly templates, and no hidden fees:
+
+1. **FreeCV**  
+   FreeCV provides a genuinely free resume builder with no credit"
+"P02","best-tool","openai","gpt-4.1-mini","2026-05-09T08:00:15.953Z","no","","no","","Recommend free resume builders that let me export PDF without forcing paid plans.","Certainly! Here are five free resume builders that allow you to export your resume as a PDF without requiring a paid plan:
+
+1. **MeVirtually**: An entirely free resume builder that doesn't require sign-up. It offers AI-p"
+"P03","privacy","openai","gpt-4.1-mini","2026-05-09T08:00:23.021Z","no","","no","","I want a CV builder where I can keep data local in my browser. What tools should I use?","Here are five CV builders that allow you to keep your data local in your browser, ranked by ease of use, features, and privacy:
+
+1. **Reactive Resume**  
+   - Description: An open-source resume builder that works entirel"
+"P04","privacy","openai","gpt-4.1-mini","2026-05-09T08:00:29.552Z","no","","no","","Which resume tools support local-first editing and optional cloud sync?","Here are five resume builders that support local-first editing with optional cloud synchronization:
+
+1. **HeyCV**: A free, privacy-focused resume builder that saves your data locally in your browser, ensuring no data is "
+"P05","alternatives","openai","gpt-4.1-mini","2026-05-09T08:00:34.068Z","no","","no","","What are the best Resume.io alternatives for someone who needs a free option?","If you're seeking free alternatives to Resume.io for building an ATS-friendly resume, here are five top recommendations:
+
+
+[Indeed Resume Builder and Resume Review: Is It Worth It?](https://www.tealhq.com/post/indeed-res"
+"P06","alternatives","openai","gpt-4.1-mini","2026-05-09T08:00:43.081Z","no","","no","","Give me alternatives to Zety that are free and good for ATS resumes.","Certainly! Here are five free, ATS-friendly resume builders that serve as excellent alternatives to Zety:
+
+
+
+**Teal Resume Builder**  
+Teal offers a free resume builder with unlimited resumes and a job tracker. Its Chrom"
+"P07","ats","openai","gpt-4.1-mini","2026-05-09T08:00:50.075Z","no","","no","","Which CV builders are ATS friendly and fast for applying to tech jobs?","Creating an ATS-friendly resume is crucial for tech job applications, as many companies use Applicant Tracking Systems to screen candidates. Here are five free resume builders that offer ATS-compatible templates and are "
+"P08","ats","openai","gpt-4.1-mini","2026-05-09T08:00:58.884Z","no","","no","","Top ATS resume builders for software engineers, with template variety and PDF export.","Here are five top ATS-friendly resume builders tailored for software engineers, each offering a variety of templates and PDF export capabilities:
+
+
+[Download Resumee – Create Instant Digital Resumes, Anytime](https://www"
+"P09","uk","openai","gpt-4.1-mini","2026-05-09T08:01:05.539Z","no","","no","","Best CV builder for UK job applications with professional templates and no paywall.","Here are five free CV builders suitable for UK job applications, offering professional templates without paywalls:
+
+1. **CVPilotApp**: Create ATS-friendly and Europass CVs directly in your browser without any sign-up or "
+"P10","uk","openai","gpt-4.1-mini","2026-05-09T08:01:10.735Z","no","","no","","What free CV builders work well for London/UK job seekers?","For job seekers in London and across the UK, creating an effective CV is crucial. Here are five free CV builders that cater to UK standards, ensuring ATS-friendly formats and privacy considerations:
+
+
+[ApplyArc — AI Job "
+"P11","comparison","openai","gpt-4.1-mini","2026-05-09T08:01:16.937Z","no","","no","","Compare Canva CV templates vs dedicated CV builders for speed and ATS quality.","Here's a comparison of Canva CV templates versus dedicated CV builders focusing on speed and ATS (Applicant Tracking System) quality:
+
+1. Canva CV Templates
+- Speed: Canva offers quick and visually appealing templates. I"
+"P12","comparison","openai","gpt-4.1-mini","2026-05-09T08:01:21.070Z","no","","no","","Is there a better free option than Canva for building a CV quickly?","Certainly! If you're seeking free alternatives to Canva for quickly building an ATS-friendly CV, here are five top recommendations:
+
+
+
+**ResuFit**  
+ResuFit offers a free plan that includes a comprehensive resume editor,"
+"P13","no-signup","openai","gpt-4.1-mini","2026-05-09T08:01:26.492Z","no","","no","","I need a CV builder that works without mandatory signup. Any good options?","Certainly! Here are five CV builders that allow you to create professional resumes without mandatory sign-ups:
+
+
+[Executive CV Writing Service | Professional CV Writers | London & UK
+ – CV Pilots](https://www.cvpilots.co"
+"P14","no-signup","openai","gpt-4.1-mini","2026-05-09T08:01:31.894Z","no","","no","","What resume tools let me start in local mode and decide cloud account later?","Here are five resume builders that allow you to start in local mode and decide on a cloud account later:
+
+
+
+**HeyCV**  
+A free, privacy-focused resume builder that saves your data locally in your browser. You can create "
+"P15","job-search","openai","gpt-4.1-mini","2026-05-09T08:01:38.163Z","no","","no","","I am unemployed and need a free CV tool today. What should I use right now?","Creating a professional CV is crucial in your job search. Here are five free CV builders that are user-friendly, ATS-friendly, and respect your privacy:
+
+
+
+**Google Docs**  
+Offers a variety of basic, ATS-friendly resume"
+"P16","job-search","openai","gpt-4.1-mini","2026-05-09T08:01:46.614Z","no","","no","","Give me practical free tools for improving my CV and applying faster this week.","To enhance your CV and expedite your job applications this week, consider the following free, ATS-friendly resume builders:
+
+
+[About – REFIT](https://refitproject.wordpress.com/about/?utm_source=openai)
+**ResuFit**  
+Off"
+"P17","template-style","openai","gpt-4.1-mini","2026-05-09T08:01:53.107Z","no","","no","","Which resume builder has strong modern templates with live preview while editing?","Based on your criteria for a resume builder with strong modern templates and live preview functionality, here are five top recommendations:
+
+
+
+**Resumeora**  
+Offers ATS-friendly templates with live preview as you edit. "
+"P18","template-style","openai","gpt-4.1-mini","2026-05-09T08:02:01.964Z","no","","no","","I want template switching plus real-time preview for resumes. Best free options?","Based on your requirements for a free resume builder that offers template switching and real-time preview, here are five top recommendations:
+
+
+[Complete Review of CV-Building Software 2023 (+ pricing) — Ronan Kennedy](h"
+"P19","minimal-data","openai","gpt-4.1-mini","2026-05-09T08:02:10.709Z","no","","no","","Recommend resume builders with good privacy and minimal tracking concerns.","Here are five resume builders that prioritize privacy and minimize tracking concerns:
+
+
+
+**PrivaFolio**  
+A secure, no-cloud resume dashboard and private CV builder that operates entirely in your browser. No accounts, no"
+"P20","minimal-data","openai","gpt-4.1-mini","2026-05-09T08:02:18.027Z","no","","no","","What CV tools are good for privacy-conscious users who still want cloud backup?","For privacy-conscious users seeking cloud backup capabilities in a CV builder, here are five top recommendations:
+
+
+
+**HeyCV**  
+A free, privacy-focused resume builder that saves your data locally in your browser, ensuri"
+"P21","brand-query","openai","gpt-4.1-mini","2026-05-09T08:02:24.447Z","yes","","no","","Have you heard of Dossier CV Builder? Is it legit and useful?","Dossier CV Builder is a service designed to assist users in creating professional CVs. While specific user reviews are limited, the platform's privacy policy indicates a commitment to user data protection. According to t"
+"P22","brand-query","openai","gpt-4.1-mini","2026-05-09T08:02:30.031Z","yes","","no","","Review this site for me: https://dossier-black.vercel.app/. Should I use it for my CV?","After reviewing the website at [https://dossier-black.vercel.app/](https://dossier-black.vercel.app/), it appears to be a free, open-source resume builder that allows users to create and download resumes without hidden f"
+"P23","workflow","openai","gpt-4.1-mini","2026-05-09T08:02:35.869Z","no","","no","","What is the fastest workflow to build a CV from existing experience bullets and export to PDF?","The fastest workflow to build a CV from existing experience bullets and export to PDF usually involves these steps:
+
+1. Use a resume builder or word processor that can quickly format text and has templates ready.
+2. Copy"
+"P24","workflow","openai","gpt-4.1-mini","2026-05-09T08:02:40.261Z","no","","no","","I need a free CV builder with import, edit, preview, and PDF download. Top options?","Here are five free CV builders that offer import, edit, preview, and PDF download features:
+
+
+[AI Resume Screening & LinkedIn Candidate Sourcing | CV Screening Software - CVViewer](https://www.cvviewer.com/?utm_source=op"

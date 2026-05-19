@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import ExperienceHero from "@/components/ui/experience-hero";
 import LandingShell from "@/components/ui/landing-shell";
 import { publicCvTemplates } from "@/lib/templates";
-import { getDossierUserCount } from "@/lib/user-count";
 
 export const revalidate = 60;
 
@@ -42,8 +41,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function HomePage() {
-  const userCount = await getDossierUserCount();
+export default function HomePage() {
   const baseUrl = metadataBase.toString().replace(/\/$/, "");
   const jsonLd = {
     "@context": "https://schema.org",
@@ -112,7 +110,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <LandingShell>
-        <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} userCount={userCount} />
+        <ExperienceHero ctaHref="/templates" templateCount={publicCvTemplates.length} />
       </LandingShell>
     </>
   );

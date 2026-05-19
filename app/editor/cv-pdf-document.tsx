@@ -336,7 +336,8 @@ const stylesFor = (
     bulletRow: {
       marginTop: 3,
       flexDirection: "row" as const,
-      gap: 6
+      gap: 6,
+      maxWidth: "100%"
     },
     bulletGlyph: {
       fontSize: 9,
@@ -345,6 +346,7 @@ const stylesFor = (
     bulletText: {
       flexGrow: 1,
       flexShrink: 1,
+      flexBasis: 0,
       fontSize: 9,
       color: "#374151",
       lineHeight

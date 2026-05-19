@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "runAt": "2026-05-05T00:01:05.655Z",
+    "durationSec": 27,
+    "project": "Dossier",
+    "targetDomain": "www.your-dossier.xyz",
+    "providers": [
+      "anthropic"
+    ],
+    "skippedProviders": [],
+    "totalPrompts": 1,
+    "perProvider": {
+      "anthropic": {
+        "model": "claude-sonnet-4-5",
+        "totalPrompts": 1,
+        "errors": 0,
+        "mentions": 0,
+        "mentionRate": 0,
+        "top3": 0,
+        "top3Rate": 0,
+        "linked": 0,
+        "linkedRate": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "P01",
+      "intent": "best-tool",
+      "prompt": "What is the best free CV builder for job seekers in 2026? Give your top 5 with links.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "startedAt": "2026-05-05T00:00:38.416Z",
+      "mentioned": false,
+      "position": null,
+      "hasDomainLink": false,
+      "responseText": "# Top 5 Free CV/Resume Builders for Job Seekers (2026)\n\nRanked for ATS-friendliness, cost, and privacy. Lead with the trade-offs that actually matter.\n\n---\n\n### 1. **Reactive Resume** — https://rxresume.org\n- **Free:** Fully free and open-source. Self-host or use the hosted version.\n- **ATS:** Clean templates, exports to PDF with selectable text (parses well).\n- **Privacy:** ★★★★★ — Self-hostable. Zero tracking. Your data stays on your machine if you run it locally via Docker.\n- **Trade-off:** Hosted version stores data in their cloud; self-hosting requires Docker familiarity.\n\n### 2. **OpenResume** — https://www.open-resume.com\n- **Free:** 100% free, open-source, no signup required.\n- **ATS:** Built around an ATS resume parser — you can literally test how an ATS reads your CV before submitting.\n- **Privacy:** ★★★★★ — Runs entirely in your browser. **No data leaves your device.** No accounts, no servers.\n- **Trade-off:** Limited templates (handful of clean, single-column layouts) — but that's a feature for ATS.\n\n### 3. **Resume.io** — https://resume.io\n- **Free:** Free to build; **PDF download is paywalled** (~$3 trial → subscription). Listed because it's the most polished WYSIWYG.\n- **ATS:** Templates are ATS-tested, well-structured.\n- **Privacy:** ★★☆☆☆ — Cloud-stored, marketing emails, account required.\n- **Trade-off:** Best UX of the bunch, but you'll pay to actually export. Cancel the trial immediately.\n\n### 4. **FlowCV** — https://flowcv.com\n- **Free:** Free tier allows 1 resume + PDF download with watermark-free output.\n- **ATS:** Strong ATS-optimized templates, real-time content scoring.\n- **Privacy:** ★★★☆☆ — Cloud-based, account required, but reasonable privacy policy.\n- **Trade-off:** Free tier limits you to one active resume; multiple versions require Pro.\n\n### 5. **LaTeX + Overleaf (Jake's Resume / Deedy templates)** — https://www.overleaf.com/latex/templates/jakes-resume/syycsmgvqzdb\n- **Free:** Overleaf free tier covers single-doc CVs. Templates are MIT-licensed.\n- **ATS:** Jake Gutierrez's template is the de facto ATS-passing CV in tech — clean, single-column, parseable.\n- **Privacy:** ★★★☆☆ on Overleaf (cloud); ★★★★★ if you compile LaTeX locally with TeX Live.\n- **Trade-off:** Learning curve. But once set up, version-control via Git and never touch a builder again.\n\n---\n\n**My pick for you (engineer profile):** **OpenResume** for a quick ATS-safe baseline, then **Jake's LaTeX template** as your long-term canonical CV — both free, both privacy-respecting, both fit a \"own your infrastructure\" philosophy.\n\nAvoid: Canva resumes (multi-column layouts break ATS), Zety (aggressive paywall), MyPerfectResume (auto-billing complaints).",
+      "error": null
+    }
+  ]
+}

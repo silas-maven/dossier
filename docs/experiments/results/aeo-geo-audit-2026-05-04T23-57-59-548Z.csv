@@ -1,0 +1,2 @@
+"id","intent","provider","model","startedAt","mentioned","position","has_domain_link","error","prompt","response_preview"
+"P01","best-tool","gemini","gemini-2.5-flash","2026-05-04T23:57:59.549Z","no","","no","","What is the best free CV builder for job seekers in 2026? Give your top 5 with links.","I will use `google_web_search` to find the best free ATS-friendly CV builders, prioritizing tools that offer local or cloud storage options for privacy. I will then compile a ranked list of 5 recommendations, including d"
