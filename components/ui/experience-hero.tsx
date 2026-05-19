@@ -10,6 +10,7 @@ import {
   useFadeUp,
   useCardEntrance,
   useCardTilt,
+  useCounter,
   useMagnetic,
   useParallaxGrid,
   useBlobMouseTracking,
@@ -52,6 +53,68 @@ function TiltCard({ children }: { children: React.ReactNode }) {
   );
 }
 
+function CounterValue({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useCounter(ref, target, 1.55);
+
+  return (
+    <>
+      <span ref={ref}>0</span>
+      {suffix}
+    </>
+  );
+}
+
+function ScrambleMetricLabel({ text }: { text: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useTextScramble(ref, text, 900);
+
+  return (
+    <span
+      ref={ref}
+      className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40"
+      aria-label={text}
+    >
+      &nbsp;
+    </span>
+  );
+}
+
+function MetricCard({
+  label,
+  title,
+  lines,
+}: {
+  label: string;
+  title: React.ReactNode;
+  lines: string[];
+}) {
+  return (
+    <TiltCard>
+      <div className="flex items-center justify-between">
+        <ScrambleMetricLabel text={label} />
+      </div>
+      <div className="mt-6 flex items-end justify-between">
+        <h3 className="translate-y-1 text-3xl font-bold text-white opacity-0 [animation:metric-rise_700ms_cubic-bezier(.16,1,.3,1)_1.55s_forwards]">
+          {title}
+        </h3>
+        <div className="h-[1px] w-12 origin-left scale-x-0 bg-white/20 transition-colors group-hover:bg-white/40 [animation:metric-rule_900ms_cubic-bezier(.16,1,.3,1)_1.72s_forwards]" />
+      </div>
+      <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
+        {lines.map((line, index) => (
+          <p
+            key={line}
+            className="translate-y-2 opacity-0 [animation:metric-rise_650ms_cubic-bezier(.16,1,.3,1)_forwards]"
+            style={{ animationDelay: `${1.82 + index * 0.1}s` }}
+          >
+            {line}
+          </p>
+        ))}
+      </div>
+    </TiltCard>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main Hero                                                          */
 /* ------------------------------------------------------------------ */
@@ -89,6 +152,14 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
         @keyframes grid-pulse {
           0%, 100% { opacity: 0.04; }
           50% { opacity: 0.07; }
+        }
+        @keyframes metric-rise {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes metric-rule {
+          from { transform: scaleX(0); opacity: 0; }
+          to { transform: scaleX(1); opacity: 1; }
         }
       `}</style>
 
@@ -198,56 +269,21 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
 
           {/* Right Column: Information Cards */}
           <div ref={cardsRef} className="flex flex-col justify-center gap-6">
-            {/* Card 1 */}
-            <TiltCard>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
-                  001 // Template Library
-                </span>
-              </div>
-              <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">{templateCount}+ Styles</h3>
-                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
-              </div>
-              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
-                <p>Fintech + Consulting</p>
-                <p>Consistent PDF exports</p>
-              </div>
-            </TiltCard>
-
-            {/* Card 2 */}
-            <TiltCard>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
-                  002 // Import + Export
-                </span>
-              </div>
-              <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">PDF + DOCX In</h3>
-                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
-              </div>
-              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
-                <p>Auto-map into sections</p>
-                <p>Editable before export</p>
-              </div>
-            </TiltCard>
-
-            {/* Card 3 */}
-            <TiltCard>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
-                  003 // Community
-                </span>
-              </div>
-              <div className="mt-6 flex items-end justify-between">
-                <h3 className="text-3xl font-bold text-white">{userCount}+ Users</h3>
-                <div className="h-[1px] w-12 bg-white/20 group-hover:bg-white/40 transition-colors" />
-              </div>
-              <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">
-                <p>Live community counter</p>
-                <p>Browser-only CV data</p>
-              </div>
-            </TiltCard>
+            <MetricCard
+              label="001 // Template Library"
+              title={<><CounterValue target={templateCount} suffix="+ " />Styles</>}
+              lines={["Fintech + Consulting", "Consistent PDF exports"]}
+            />
+            <MetricCard
+              label="002 // Import + Export"
+              title="PDF + DOCX In"
+              lines={["Auto-map into sections", "Editable before export"]}
+            />
+            <MetricCard
+              label="003 // Community"
+              title={<><CounterValue target={userCount} suffix="+ " />Users</>}
+              lines={["Live community counter", "Browser-only CV data"]}
+            />
           </div>
 
         </div>
