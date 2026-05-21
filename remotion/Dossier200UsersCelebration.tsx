@@ -419,7 +419,7 @@ const AIReviewScene = () => {
           <div style={{ fontFamily: "monospace", letterSpacing: 6, color: colors.muted, fontSize: 16 }}>ATS + ROLE FIT</div>
           <div style={{ marginTop: 20, display: "flex", alignItems: "end", gap: 20 }}>
             <div style={{ color: colors.amber, fontSize: 120, lineHeight: 0.84, fontWeight: 950 }}>{score}</div>
-            <div style={{ color: colors.muted, fontSize: 24, marginBottom: 8 }}>review score</div>
+            <div style={{ color: colors.muted, fontSize: 24, marginBottom: 8 }}>review summary</div>
           </div>
           <div style={{ marginTop: 24, height: 14, borderRadius: 999, background: "rgba(255,255,255,0.09)", overflow: "hidden" }}>
             <div style={{ width: `${score}%`, height: "100%", borderRadius: 999, background: `linear-gradient(90deg, ${colors.blue}, ${colors.green})` }} />
@@ -474,7 +474,7 @@ const ExportScene = () => {
         </GlassPanel>
       </FadeSlide>
       <div style={{ position: "absolute", left: 92, bottom: 128, display: "flex", gap: 14 }}>
-        {["Text-based PDF", "ATS-safe", "No account gate"].map((tag, index) => (
+        {["Text-based PDF", "Parser-friendly", "No account gate"].map((tag, index) => (
           <div key={tag} style={{ opacity: fade(frame, 76 + index * 14), padding: "14px 18px", borderRadius: 999, border: `1px solid ${colors.line}`, background: colors.panel, color: index === 1 ? colors.green : colors.white, fontSize: 21, fontWeight: 900 }}>
             {tag}
           </div>
@@ -502,8 +502,8 @@ const FinalScene = () => {
         <GlassPanel style={{ padding: "28px 34px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 34, fontWeight: 950 }}>Dossier</div>
           <div style={{ display: "flex", gap: 12 }}>
-            {["Free", "Local-first", "ATS-strong", "AI review-ready"].map((item) => (
-              <div key={item} style={{ padding: "12px 16px", borderRadius: 999, border: `1px solid ${colors.line}`, color: item === "ATS-strong" ? colors.green : colors.white, background: "rgba(255,255,255,0.055)", fontSize: 18, fontWeight: 900 }}>{item}</div>
+            {["Free", "Local-first", "parser-friendly", "AI review-ready"].map((item) => (
+              <div key={item} style={{ padding: "12px 16px", borderRadius: 999, border: `1px solid ${colors.line}`, color: item === "parser-friendly" ? colors.green : colors.white, background: "rgba(255,255,255,0.055)", fontSize: 18, fontWeight: 900 }}>{item}</div>
             ))}
           </div>
         </GlassPanel>

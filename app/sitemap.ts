@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/resume-io-alternative",
     "/zety-alternative",
     "/ai-resume-optimizer",
+    "/ats-readiness-engine",
   ];
 
   return routes.map((route) => ({

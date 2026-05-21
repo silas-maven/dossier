@@ -16,6 +16,7 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AtsReadinessCard from "@/components/editor/ats-readiness-card";
 import { aiProviders } from "@/lib/ai/providers";
 import type {
   AiAssistAction,
@@ -72,20 +73,18 @@ export default function TailorPane({
   const [model, setModel] = useState("");
   const [jobDescription, setJobDescription] = useState("");
 
-  // Load / save provider prefs from localStorage
+  // Load / save provider preference only. API keys are session-only and never persisted.
   useEffect(() => {
     const savedProvider = localStorage.getItem("dossier-ai-provider") as AiProviderId;
-    const savedKey = localStorage.getItem("dossier-ai-key");
     if (savedProvider && aiProviders.some((p) => p.id === savedProvider)) {
       setProviderId(savedProvider);
     }
-    if (savedKey) setApiKey(savedKey);
+    localStorage.removeItem("dossier-ai-key");
   }, []);
 
   useEffect(() => {
     localStorage.setItem("dossier-ai-provider", providerId);
-    if (apiKey) localStorage.setItem("dossier-ai-key", apiKey);
-  }, [providerId, apiKey]);
+  }, [providerId]);
 
   // ── Match Analysis state ──
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
@@ -288,6 +287,13 @@ export default function TailorPane({
 
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-dark">
+        <AtsReadinessCard
+          profile={profile}
+          template={template}
+          jobDescription={jobDescription}
+          compact
+        />
+
         {/* Onboarding banner — shown when no key is set */}
         {needsSetup && !showSettings && (
           <button
@@ -357,7 +363,7 @@ export default function TailorPane({
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="h-9 w-full rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                placeholder="sk-... (stored locally in your browser only)"
+                placeholder="sk-... (session-only, never saved)"
                 autoComplete="off"
               />
             </label>
@@ -401,7 +407,7 @@ export default function TailorPane({
             {apiKey && (
               <div className="flex items-center gap-2 text-xs text-emerald-400">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Key saved — you&apos;re ready to go!
+                Key active for this session — you&apos;re ready to go!
               </div>
             )}
           </div>
@@ -586,7 +592,7 @@ export default function TailorPane({
                 {/* Score + summary */}
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                   <p className="text-sm font-semibold text-foreground">
-                    Score: {assistResult.score}/100
+                    AI review score: {assistResult.score}/100
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {assistResult.summary}

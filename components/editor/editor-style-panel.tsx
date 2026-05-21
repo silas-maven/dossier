@@ -81,7 +81,7 @@ export default function EditorStylePanel({
             </select>
             {isAtsSafe ? (
               <p className="text-xs text-muted-foreground">
-                ATS-safe templates limit decorative font choices.
+                Parser-friendly templates limit decorative font choices.
               </p>
             ) : null}
           </label>
@@ -112,7 +112,7 @@ export default function EditorStylePanel({
             </select>
             {isAtsSafe ? (
               <p className="text-xs text-muted-foreground">
-                Left-aligned summaries are enforced for ATS-safe templates.
+                Left-aligned summaries are enforced for Parser-friendly templates.
               </p>
             ) : null}
           </label>

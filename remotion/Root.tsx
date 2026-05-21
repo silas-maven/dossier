@@ -13,7 +13,7 @@ export const RemotionRoot = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          title: "Build an ATS-strong CV in minutes",
+          title: "Build an parser-friendly CV in minutes",
           subtitle: "A free alternative to Zety, Resume.io, and other paid builders for jobseekers who need a clean, parser-friendly CV fast.",
         }}
       />

@@ -49,9 +49,9 @@ const PDFViewer = dynamic(
   { ssr: false }
 );
 
-const compactMetaTone: Record<CvTemplate["atsFit"], string> = {
-  Strong: "border-emerald-500/25 bg-emerald-500/10 text-emerald-300",
-  Balanced: "border-amber-500/25 bg-amber-500/10 text-amber-200"
+const compactMetaTone: Record<CvTemplate["parserRisk"], string> = {
+  Low: "border-emerald-500/25 bg-emerald-500/10 text-emerald-300",
+  Moderate: "border-amber-500/25 bg-amber-500/10 text-amber-200"
 };
 
 function toggleValue(values: string[], value: string) {
@@ -68,7 +68,7 @@ function matchesSearch(template: CvTemplate, query: string) {
     template.shelf,
     template.experienceLevel,
     template.description,
-    template.atsFit,
+    template.parserRisk,
     template.layout,
     template.family,
     template.theme,
@@ -159,10 +159,10 @@ function TemplateCard({
               <span
                 className={cn(
                   "inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium backdrop-blur-sm",
-                  compactMetaTone[template.atsFit]
+                  compactMetaTone[template.parserRisk]
                 )}
               >
-                {template.atsFit} ATS
+                Parser risk: {template.parserRisk}
               </span>
             </div>
             <h3 className="mt-3 text-xl font-semibold tracking-tight text-white">{template.name}</h3>
@@ -174,10 +174,10 @@ function TemplateCard({
               <span
                 className={cn(
                   "inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium",
-                  compactMetaTone[template.atsFit]
+                  compactMetaTone[template.parserRisk]
                 )}
               >
-                {template.atsFit} ATS
+                Parser risk: {template.parserRisk}
               </span>
               <span className="inline-flex rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-medium text-white/82">
                 {template.layout}
@@ -233,10 +233,10 @@ function TemplateRow({
           <span
             className={cn(
               "inline-flex rounded-full border px-2.5 py-1 text-xs font-medium",
-              compactMetaTone[template.atsFit]
+              compactMetaTone[template.parserRisk]
             )}
           >
-            {template.atsFit} ATS
+            Parser risk: {template.parserRisk}
           </span>
           <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-foreground">
             {template.layout}
@@ -353,14 +353,14 @@ export default function TemplateCarousel({
       {
         id: "recommended",
         label: "Recommended",
-        description: "The safest starting points for most users: strong ATS fit, clean hierarchy, and broad role coverage.",
+        description: "The safest starting points for most users: low parser-risk layout, clean hierarchy, and broad role coverage.",
         templates: pull((template) => template.shelf === "Top Rated")
       },
       {
-        id: "ats-safe",
-        label: "ATS-safe",
+        id: "parser-safe",
+        label: "parser-friendly",
         description: "Single-column and conservative layouts for application portals and automated parsing.",
-        templates: pull((template) => template.atsMode === "safe" || template.atsFit === "Strong")
+        templates: pull((template) => template.atsMode === "safe" || template.parserRisk === "Low")
       },
       {
         id: "executive-corporate",
@@ -676,10 +676,10 @@ export default function TemplateCarousel({
                     <span
                       className={cn(
                         "rounded-full border px-2.5 py-1 text-[11px] font-medium",
-                        compactMetaTone[previewTemplate.atsFit]
+                        compactMetaTone[previewTemplate.parserRisk]
                       )}
                     >
-                      {previewTemplate.atsFit} ATS
+                      Parser risk: {previewTemplate.parserRisk}
                     </span>
                     <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                       {templateFamilyDefinitions[previewTemplate.family].label}

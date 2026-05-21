@@ -49,7 +49,7 @@ const sampleTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Professional",
     description: "Starter preset for immediate editing.",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Quick preview"],
     guidance: ["Starter preset for immediate editing."],

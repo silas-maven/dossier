@@ -68,7 +68,13 @@ export default function RootLayout({
                 href="/ai-resume-optimizer"
                 className="hover:text-foreground transition-colors"
               >
-                AI ATS Optimizer
+                AI CV Optimizer
+              </Link>
+              <Link
+                href="/ats-readiness-engine"
+                className="hover:text-foreground transition-colors"
+              >
+                ATS Readiness Engine
               </Link>
               <Link
                 href="/free-cv-builder-uk"

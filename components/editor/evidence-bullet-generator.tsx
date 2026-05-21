@@ -26,23 +26,18 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Load from local storage
+  // Persist provider preference only. API keys stay in React state for this tab/session.
   useEffect(() => {
     const savedProvider = localStorage.getItem("dossier-ai-provider") as AiProviderId;
-    const savedKey = localStorage.getItem("dossier-ai-key");
     if (savedProvider && aiProviders.some((p) => p.id === savedProvider)) {
       setProviderId(savedProvider);
     }
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
+    localStorage.removeItem("dossier-ai-key");
   }, []);
 
-  // Save to local storage
   useEffect(() => {
     localStorage.setItem("dossier-ai-provider", providerId);
-    if (apiKey) localStorage.setItem("dossier-ai-key", apiKey);
-  }, [providerId, apiKey]);
+  }, [providerId]);
 
   const handleGenerate = async () => {
     if (!action || !result) {
@@ -143,7 +138,7 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
             <h4 className="text-sm font-semibold">AI Provider Setup</h4>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               An <strong className="text-foreground">API key</strong> is a password that lets Dossier connect to an AI service on your behalf.
-              Your key stays locally in your browser.
+              Your key stays active only for this browser session and is never saved.
             </p>
           </div>
 
@@ -169,7 +164,7 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="h-9 w-full rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                placeholder="sk-..."
+                placeholder="sk-... (session-only)"
                 autoComplete="off"
               />
             </label>

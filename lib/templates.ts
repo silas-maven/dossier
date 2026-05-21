@@ -38,7 +38,7 @@ export const templateThemes = [
 
 export const templateAtsModes = ["safe", "balanced", "human-first"] as const;
 
-export const templateShelves = ["Top Rated", "Corporate", "Creative", "ATS-Safe"] as const;
+export const templateShelves = ["Top Rated", "Corporate", "Creative", "Parser-Safe"] as const;
 
 export const templateExperienceLevels = ["Student", "Professional", "Executive"] as const;
 
@@ -49,7 +49,7 @@ export type TemplateFamily = (typeof templateFamilies)[number];
 export type TemplateTheme = (typeof templateThemes)[number];
 export type TemplateAtsMode = (typeof templateAtsModes)[number];
 export type TemplateShelf = (typeof templateShelves)[number];
-export type TemplateAtsFit = "Strong" | "Balanced";
+export type TemplateParserRisk = "Low" | "Moderate";
 export type TemplateLayout = (typeof templateLayouts)[number];
 export type TemplateExperienceLevel = (typeof templateExperienceLevels)[number];
 
@@ -67,7 +67,7 @@ export type CvTemplate = {
   experienceLevel: TemplateExperienceLevel;
   previewImage: string;
   description: string;
-  atsFit: TemplateAtsFit;
+  parserRisk: TemplateParserRisk;
   layout: TemplateLayout;
   bestFor: string[];
   guidance: string[];
@@ -94,11 +94,11 @@ export const templateFamilyDefinitions: Record<
   "classic-single-column": {
     label: "Classic Single Column",
     description: "Conservative chronology-first layout for finance, consulting, and traditional corporate roles.",
-    focus: "Best when ATS safety and date visibility matter most."
+    focus: "Best when parser safety and date visibility matter most."
   },
   "structured-single-column": {
     label: "Structured Single Column",
-    description: "Modern ATS-safe layout with stronger rhythm for tech, product, analytics, and operations roles.",
+    description: "Modern parser-friendly layout with stronger rhythm for tech, product, analytics, and operations roles.",
     focus: "Best when you want clean scan speed without a second column."
   },
   "hybrid-header-two-zone": {
@@ -109,7 +109,7 @@ export const templateFamilyDefinitions: Record<
   "sidebar-human-first": {
     label: "Sidebar Human-First",
     description: "Expressive layouts with side rails, dot systems, and more visual identity for direct-share PDFs.",
-    focus: "Best for networking and human review, not strict ATS portals."
+    focus: "Best for networking and human review, not strict upload portals."
   }
 };
 
@@ -147,7 +147,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Single-column engineering resume tuned for shipped systems, stack clarity, and measurable delivery.",
     previewImage: "/card-images/gutter-minimal.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Backend", "Frontend", "Full-stack", "Platform"],
     guidance: [
@@ -178,7 +178,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Two-zone PM layout for roadmap ownership, product judgment, and cross-functional execution with a modern product-led feel.",
     previewImage: "/card-images/skills-right-pink.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Product Manager", "Growth PM", "Platform PM", "Founding PM"],
     guidance: [
@@ -194,7 +194,7 @@ export const cvTemplates: CvTemplate[] = [
       photo: false,
       accentRail: true
     },
-    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
   }),
   buildTemplate({
     id: "technical-pm-delivery",
@@ -209,7 +209,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Executive",
     description: "Navy two-zone delivery layout for stakeholder-heavy programs with cadence, governance, and implementation scope.",
     previewImage: "/card-images/sidebar-navy-right.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Technical PM", "Program Manager", "Implementation Lead", "Delivery Manager"],
     guidance: [
@@ -240,7 +240,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Executive",
     description: "Clean consulting template for structured problem solving, client impact, analysis, and executive-ready bullets.",
     previewImage: "/card-images/banded-grey.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Management Consulting", "Strategy", "Transformation", "Advisory"],
     guidance: [
@@ -271,7 +271,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Executive",
     description: "Conservative finance layout built for scan speed, metrics density, and tool visibility without visual clutter.",
     previewImage: "/card-images/blue-rules.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["FP&A", "Financial Analyst", "Commercial Finance", "Corporate Strategy"],
     guidance: [
@@ -298,11 +298,11 @@ export const cvTemplates: CvTemplate[] = [
     name: "Data Analytics Clarity",
     category: "Data",
     industry: "Data & Analytics",
-    shelf: "ATS-Safe",
+    shelf: "Parser-Safe",
     experienceLevel: "Student",
     description: "Structured split layout for SQL, BI, experimentation, dashboards, and decision-ready reporting.",
     previewImage: "/card-images/boxed-header-dots.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Data Analyst", "BI Analyst", "Insights", "Analytics Engineer"],
     guidance: [
@@ -318,7 +318,7 @@ export const cvTemplates: CvTemplate[] = [
       photo: false,
       accentRail: false
     },
-    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
   }),
   buildTemplate({
     id: "operations-execution",
@@ -333,7 +333,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Warm split-column operations layout for process design, SLA improvement, service quality, and delivery reliability.",
     previewImage: "/card-images/sidebar-tan-dots.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Operations Manager", "Process Improvement", "Service Delivery", "Business Operations"],
     guidance: [
@@ -349,7 +349,7 @@ export const cvTemplates: CvTemplate[] = [
       photo: false,
       accentRail: false
     },
-    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
   }),
   buildTemplate({
     id: "customer-success-renewal",
@@ -364,7 +364,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Two-column customer success layout with an operational sidebar for adoption, renewals, tooling, and portfolio context.",
     previewImage: "/card-images/sidebar-light.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Customer Success", "Account Management", "Implementation", "Onboarding"],
     guidance: [
@@ -380,7 +380,295 @@ export const cvTemplates: CvTemplate[] = [
       photo: false,
       accentRail: true
     },
-    recommendedFormat: "PDF for direct review, DOCX fallback for ATS portals"
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
+  }),
+  buildTemplate({
+    id: "legal-counsel-brief",
+    isPublic: false,
+    variant: "banded-grey",
+    family: "classic-single-column",
+    theme: "classic-ink",
+    atsMode: "safe",
+    name: "Legal Counsel Brief",
+    category: "Legal",
+    industry: "Legal",
+    shelf: "Corporate",
+    experienceLevel: "Executive",
+    description: "Formal single-column legal CV for bar admissions, practice areas, representative matters, and conservative screening.",
+    previewImage: "/card-images/banded-grey.jpg",
+    parserRisk: "Low",
+    layout: "Single Column",
+    bestFor: ["Legal Counsel", "Attorney", "Compliance", "Corporate Law"],
+    guidance: [
+      "Surface bar admissions, jurisdiction, practice area, and target title before broader narrative.",
+      "Use formal matter-led bullets with drafting, negotiation, advisory, governance, and risk outcomes.",
+      "Keep the layout conservative: no sidebars, icons, ratings, or decorative skill systems."
+    ],
+    guidanceProfileId: "legal-counsel",
+    recommendedIndustries: ["Legal", "Corporate Law", "Compliance"],
+    capabilities: {
+      sidebar: false,
+      ratings: false,
+      photo: false,
+      accentRail: false
+    },
+    recommendedFormat: "DOCX first, text-based PDF also safe"
+  }),
+  buildTemplate({
+    id: "sales-revenue-driver",
+    isPublic: false,
+    variant: "blue-rules",
+    family: "structured-single-column",
+    theme: "professional-blue",
+    atsMode: "safe",
+    name: "Sales Revenue Driver",
+    category: "Sales",
+    industry: "Sales",
+    shelf: "Top Rated",
+    experienceLevel: "Professional",
+    description: "Results-first sales CV built around quota attainment, revenue, pipeline, deal size, and account growth proof.",
+    previewImage: "/card-images/blue-rules.jpg",
+    parserRisk: "Low",
+    layout: "Single Column",
+    bestFor: ["Account Executive", "Sales Manager", "Business Development", "Revenue"],
+    guidance: [
+      "Lead with 3-4 metric highlights: quota, revenue, pipeline, ACV, win rate, or expansion.",
+      "Make each role prove measurable performance instead of listing generic sales responsibilities.",
+      "Keep CRM, methodology, prospecting, negotiation, and account planning keywords explicit."
+    ],
+    guidanceProfileId: "sales-revenue",
+    recommendedIndustries: ["Sales", "Revenue", "Business Development"],
+    capabilities: {
+      sidebar: false,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "DOCX first, text-based PDF also safe"
+  }),
+  buildTemplate({
+    id: "marketing-campaign-performance",
+    isPublic: false,
+    variant: "skills-right-pink",
+    family: "hybrid-header-two-zone",
+    theme: "soft-rose",
+    atsMode: "balanced",
+    name: "Marketing Campaign Performance",
+    category: "Marketing",
+    industry: "Marketing",
+    shelf: "Top Rated",
+    experienceLevel: "Professional",
+    description: "Polished marketing CV for campaign wins, channel ownership, performance metrics, tools, and growth proof.",
+    previewImage: "/card-images/skills-right-pink.jpg",
+    parserRisk: "Moderate",
+    layout: "Split Column",
+    bestFor: ["Growth Marketing", "Campaign Manager", "Lifecycle", "Content & Demand Gen"],
+    guidance: [
+      "Put campaign wins early: pipeline, CAC, ROAS, conversion, engagement, launches, or audience growth.",
+      "Use the main experience column for outcomes and the supporting zone for channels, tools, and proof points.",
+      "Keep the visual hierarchy modern but restrained so reading order stays obvious."
+    ],
+    guidanceProfileId: "marketing-performance",
+    recommendedIndustries: ["Marketing", "Growth", "Campaigns"],
+    capabilities: {
+      sidebar: true,
+      ratings: true,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
+  }),
+  buildTemplate({
+    id: "human-resources-people-partner",
+    isPublic: false,
+    variant: "sidebar-light",
+    family: "sidebar-human-first",
+    theme: "operational-emerald",
+    atsMode: "balanced",
+    name: "Human Resources People Partner",
+    category: "HR",
+    industry: "Human Resources",
+    shelf: "Corporate",
+    experienceLevel: "Professional",
+    description: "Calm, readable HR CV for people partnering, employee relations, policy, HRIS, compliance, and people-program outcomes.",
+    previewImage: "/card-images/sidebar-light.jpg",
+    parserRisk: "Moderate",
+    layout: "Split Column",
+    bestFor: ["HR Business Partner", "People Operations", "Employee Relations", "HR Manager"],
+    guidance: [
+      "Lead with HR domain, employee population, compliance context, and people-program scope.",
+      "Show headcount, retention, cycle time, employee relations, policy, HRIS, or engagement outcomes.",
+      "Keep certifications and HRIS visible without letting the sidebar carry critical evidence."
+    ],
+    guidanceProfileId: "human-resources",
+    recommendedIndustries: ["Human Resources", "People Operations", "Employee Relations"],
+    capabilities: {
+      sidebar: true,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
+  }),
+  buildTemplate({
+    id: "talent-acquisition-recruiter",
+    isPublic: false,
+    variant: "gutter-minimal",
+    family: "structured-single-column",
+    theme: "modern-slate",
+    atsMode: "balanced",
+    name: "Talent Acquisition Recruiter",
+    category: "Recruiting",
+    industry: "Talent Acquisition",
+    shelf: "Parser-Safe",
+    experienceLevel: "Professional",
+    description: "Fast-scan recruiting CV for sourcing strategy, requisition volume, funnel metrics, tools, and hiring outcomes.",
+    previewImage: "/card-images/gutter-minimal.jpg",
+    parserRisk: "Moderate",
+    layout: "Single Column",
+    bestFor: ["Recruiter", "Talent Acquisition", "Sourcing", "People Operations"],
+    guidance: [
+      "Lead with hiring scope: role families, region, requisition load, sourcing channels, and recruiting model.",
+      "Show time-to-fill, offer acceptance, pipeline conversion, diversity sourcing, or stakeholder satisfaction.",
+      "Keep ATS, CRM, sourcing tools, interviewing, and analytics keywords easy to parse."
+    ],
+    guidanceProfileId: "talent-acquisition",
+    recommendedIndustries: ["Talent Acquisition", "Recruiting", "People Operations"],
+    capabilities: {
+      sidebar: false,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "DOCX first, text-based PDF also safe"
+  }),
+  buildTemplate({
+    id: "operations-process-lead",
+    isPublic: false,
+    variant: "sidebar-tan-dots",
+    family: "sidebar-human-first",
+    theme: "warm-neutral",
+    atsMode: "balanced",
+    name: "Operations Process Lead",
+    category: "Operations",
+    industry: "Operations",
+    shelf: "Corporate",
+    experienceLevel: "Professional",
+    description: "Ordered operations CV for process wins, SLA improvement, tools, service quality, and operational reliability.",
+    previewImage: "/card-images/sidebar-tan-dots.jpg",
+    parserRisk: "Moderate",
+    layout: "Split Column",
+    bestFor: ["Operations Manager", "Process Improvement", "Service Delivery", "Business Operations"],
+    guidance: [
+      "Surface process wins early: throughput, cost, cycle time, quality, SLA, or compliance improvement.",
+      "Use modular proof points, but keep chronology and measurable experience dominant.",
+      "Group systems and methods clearly: Excel, SQL, CRM, ERP, Lean, SOP design, workflow tooling."
+    ],
+    guidanceProfileId: "operations-process",
+    recommendedIndustries: ["Operations", "Business Operations", "Service Delivery"],
+    capabilities: {
+      sidebar: true,
+      ratings: true,
+      photo: false,
+      accentRail: false
+    },
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
+  }),
+  buildTemplate({
+    id: "healthcare-care-delivery",
+    isPublic: false,
+    variant: "banded-grey",
+    family: "classic-single-column",
+    theme: "classic-ink",
+    atsMode: "safe",
+    name: "Healthcare Care Delivery",
+    category: "Healthcare",
+    industry: "Healthcare",
+    shelf: "Parser-Safe",
+    experienceLevel: "Professional",
+    description: "Credential-forward healthcare CV for care delivery, compliance, licenses, certifications, patient safety, and clinical operations.",
+    previewImage: "/card-images/banded-grey.jpg",
+    parserRisk: "Low",
+    layout: "Single Column",
+    bestFor: ["Nursing", "Care Coordination", "Clinical Operations", "Healthcare Administration"],
+    guidance: [
+      "Put credentials, licenses, care setting, patient population, and compliance signals near the top.",
+      "Show quality, safety, documentation, throughput, audit, patient-experience, or caseload outcomes.",
+      "Keep the layout formal and single-column so licenses and certifications parse cleanly."
+    ],
+    guidanceProfileId: "healthcare-delivery",
+    recommendedIndustries: ["Healthcare", "Clinical Operations", "Care Delivery"],
+    capabilities: {
+      sidebar: false,
+      ratings: false,
+      photo: false,
+      accentRail: false
+    },
+    recommendedFormat: "DOCX first, text-based PDF also safe"
+  }),
+  buildTemplate({
+    id: "education-academic-practice",
+    isPublic: false,
+    variant: "gutter-minimal",
+    family: "structured-single-column",
+    theme: "modern-slate",
+    atsMode: "balanced",
+    name: "Education Academic Practice",
+    category: "Education",
+    industry: "Education",
+    shelf: "Parser-Safe",
+    experienceLevel: "Professional",
+    description: "Clean education CV for teaching, research, service, curriculum work, credentials, and academic contribution.",
+    previewImage: "/card-images/gutter-minimal.jpg",
+    parserRisk: "Moderate",
+    layout: "Single Column",
+    bestFor: ["Teaching", "Academic Practice", "Research", "Student Support"],
+    guidance: [
+      "Lead with teaching area, learner population, research or service focus, and institution type.",
+      "Show teaching outcomes, curriculum design, assessment, research, service, or program contribution.",
+      "Use custom sections for publications, service, or selected academic work when relevant."
+    ],
+    guidanceProfileId: "education-academic",
+    recommendedIndustries: ["Education", "Academic Practice", "Teaching"],
+    capabilities: {
+      sidebar: false,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "DOCX first, text-based PDF also safe"
+  }),
+  buildTemplate({
+    id: "nonprofit-mission-delivery",
+    isPublic: false,
+    variant: "sidebar-light",
+    family: "sidebar-human-first",
+    theme: "editorial-light",
+    atsMode: "balanced",
+    name: "Nonprofit Mission Delivery",
+    category: "Nonprofit",
+    industry: "Nonprofit",
+    shelf: "Creative",
+    experienceLevel: "Professional",
+    description: "Warm but restrained nonprofit CV for mission delivery, program wins, fundraising, partnerships, and service outcomes.",
+    previewImage: "/card-images/sidebar-light.jpg",
+    parserRisk: "Moderate",
+    layout: "Split Column",
+    bestFor: ["Programme Delivery", "Fundraising", "Partnerships", "Mission Operations"],
+    guidance: [
+      "Lead with mission area, program scope, beneficiary group, funding environment, or partnership model.",
+      "Show program outcomes, grants, fundraising, partnerships, stakeholder engagement, or service delivery.",
+      "Balance warmth with operational proof and clear accountability."
+    ],
+    guidanceProfileId: "nonprofit-mission",
+    recommendedIndustries: ["Nonprofit", "Fundraising", "Programme Delivery"],
+    capabilities: {
+      sidebar: true,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
   }),
   buildTemplate({
     id: "banded-grey",
@@ -396,7 +684,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Centered header with soft section bands and a traditional single-column reading order.",
     previewImage: "/card-images/banded-grey.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["General applications", "Career pivots", "Traditional employers"],
     guidance: [
@@ -424,11 +712,11 @@ export const cvTemplates: CvTemplate[] = [
     name: "Gutter Minimal",
     category: "Minimal",
     industry: "General",
-    shelf: "ATS-Safe",
+    shelf: "Parser-Safe",
     experienceLevel: "Student",
     description: "Date gutter layout with clean typography, whitespace, and fast recruiter scanning.",
     previewImage: "/card-images/gutter-minimal.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Operations", "Engineering", "Analytics", "Modern but safe applications"],
     guidance: [
@@ -460,11 +748,11 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Rule-based single-column layout that feels structured without using tables or text boxes.",
     previewImage: "/card-images/blue-rules.jpg",
-    atsFit: "Strong",
+    parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Finance", "Program delivery", "Product", "Analytical roles"],
     guidance: [
-      "Use this when you want a slightly stronger visual rhythm but still need ATS-safe structure.",
+      "Use this when you want a slightly stronger visual rhythm but still need parser-friendly structure.",
       "Keep contact info and section titles in the main body, not decorative regions.",
       "Prioritize quantified bullets and a compact skills section."
     ],
@@ -492,12 +780,12 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Student",
     description: "Editorial split-column layout with a stronger visual feel for networking or direct-share versions.",
     previewImage: "/card-images/sidebar-light.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Portfolio send-outs", "Creative operations", "Human review first"],
     guidance: [
       "Use for direct sharing or networking when a stronger visual identity helps.",
-      "For high-volume ATS portals, keep a single-column application version ready as a fallback.",
+      "For high-volume upload portals, keep a single-column application version ready as a fallback.",
       "Do not hide critical experience details in the sidebar."
     ],
     guidanceProfileId: "general-professional",
@@ -508,7 +796,7 @@ export const cvTemplates: CvTemplate[] = [
       photo: false,
       accentRail: false
     },
-    recommendedFormat: "PDF for direct share, DOCX fallback for ATS portals"
+    recommendedFormat: "PDF for direct share, DOCX fallback for upload portals"
   }),
   buildTemplate({
     id: "sidebar-navy-right",
@@ -524,7 +812,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Executive",
     description: "High-contrast split-column layout with a more branded look for modern teams and direct review.",
     previewImage: "/card-images/sidebar-navy-right.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Fintech", "Startups", "Direct recruiter outreach"],
     guidance: [
@@ -554,15 +842,15 @@ export const cvTemplates: CvTemplate[] = [
     industry: "Consulting",
     shelf: "Creative",
     experienceLevel: "Professional",
-    description: "Icon-led split-column layout that feels presentation-ready but is less conservative for ATS portals.",
+    description: "Icon-led split-column layout that feels presentation-ready but is less conservative for upload portals.",
     previewImage: "/card-images/sidebar-icons.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Consulting networking", "Boutique firms", "Direct outreach"],
     guidance: [
       "Use when polish matters and you expect human review early in the process.",
       "Keep experience and outcomes in the main column. The sidebar should only support the story.",
-      "Have a single-column counterpart for ATS-heavy applications."
+      "Have a single-column counterpart for strict upload portals."
     ],
     guidanceProfileId: "consulting",
     recommendedIndustries: ["Consulting"],
@@ -588,11 +876,11 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Warm split-column layout with dot-rated skills for a more expressive direct-share version.",
     previewImage: "/card-images/sidebar-tan-dots.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["General networking", "Human-reviewed PDFs", "Brand-forward applications"],
     guidance: [
-      "Skill dots are visually useful for humans but not ideal for ATS-first workflows.",
+      "Skill dots are visually useful for humans but not ideal for parser-first workflows.",
       "Keep a simpler application version ready if the employer uses a strict portal.",
       "Use this when the aesthetic helps your positioning without replacing substance."
     ],
@@ -620,7 +908,7 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Executive",
     description: "Split-column consulting layout with a bold accent and a dedicated skills rail.",
     previewImage: "/card-images/skills-right-red.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Consulting", "Strategy", "Presentation-heavy roles"],
     guidance: [
@@ -650,13 +938,13 @@ export const cvTemplates: CvTemplate[] = [
     industry: "Customer & Operations",
     shelf: "Creative",
     experienceLevel: "Professional",
-    description: "Framed header and skill-dot sidebar for direct-share versions where layout matters more than ATS safety.",
+    description: "Framed header and skill-dot sidebar for direct-share versions where layout matters more than parser safety.",
     previewImage: "/card-images/boxed-header-dots.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Customer-facing roles", "Operations", "Direct recruiter review"],
     guidance: [
-      "Treat this as a human-first version and keep a simpler ATS-safe variant ready.",
+      "Treat this as a human-first version and keep a simpler parser-friendly variant ready.",
       "Do not rely on the sidebar to carry critical keywords or credentials.",
       "Use the main column for chronology and measurable wins."
     ],
@@ -684,13 +972,13 @@ export const cvTemplates: CvTemplate[] = [
     experienceLevel: "Professional",
     description: "Split-column layout with a softer accent and a right-side skills rail for expressive direct sends.",
     previewImage: "/card-images/skills-right-pink.jpg",
-    atsFit: "Balanced",
+    parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Startups", "General outreach", "Human-reviewed applications"],
     guidance: [
       "Use when you want visual differentiation but still need the main story to scan quickly.",
       "Avoid overloading the skills rail with keywords that belong in experience bullets.",
-      "Keep a single-column template ready for ATS portals."
+      "Keep a single-column template ready for upload portals."
     ],
     guidanceProfileId: "general-professional",
     recommendedIndustries: ["General", "Design & Creative Ops"],

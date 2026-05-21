@@ -331,22 +331,27 @@ const stylesFor = (
       fontSize: 9,
       color: "#374151",
       lineHeight,
-      flexShrink: 1
+      flexShrink: 1,
+      width: "100%"
     },
     bulletRow: {
       marginTop: 3,
       flexDirection: "row" as const,
       gap: 6,
-      maxWidth: "100%"
+      width: "100%",
+      maxWidth: "100%",
+      alignItems: "flex-start" as const
     },
     bulletGlyph: {
       fontSize: 9,
-      color: "#374151"
+      color: "#374151",
+      flexShrink: 0
     },
     bulletText: {
       flexGrow: 1,
       flexShrink: 1,
       flexBasis: 0,
+      minWidth: 0,
       fontSize: 9,
       color: "#374151",
       lineHeight
@@ -408,7 +413,8 @@ const stylesFor = (
     pmRow: {
       marginTop: 8,
       flexDirection: "row" as const,
-      gap: 10
+      gap: 10,
+      width: "100%"
     },
     pmDate: {
       width: 92,
@@ -416,7 +422,10 @@ const stylesFor = (
       color: "#6B7280"
     },
     pmBody: {
-      flexGrow: 1
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: 0,
+      minWidth: 0
     },
     pmLine: {
       width: 10,

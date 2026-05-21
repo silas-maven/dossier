@@ -14,6 +14,7 @@ import EditorContentPanel, {
 } from "@/components/editor/editor-content-panel";
 import EditorPreviewPanel from "@/components/editor/editor-preview-panel";
 import EditorMobileTabs, { type EditorPanelTab } from "@/components/editor/editor-mobile-tabs";
+import AtsReadinessCard from "@/components/editor/ats-readiness-card";
 
 import type { AiCvSuggestion } from "@/lib/ai/types";
 import {
@@ -1075,6 +1076,7 @@ export default function EditorForm({
           )}
         >
           <div className="mb-4 space-y-4">
+            <AtsReadinessCard profile={importCandidate ?? profile} template={selectedTemplate} />
             <details className="rounded-2xl border border-border/70 bg-card/80 p-4">
               <summary className="cursor-pointer text-sm font-semibold text-foreground">
                 Advanced formatting

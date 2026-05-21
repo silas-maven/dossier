@@ -3,21 +3,21 @@ import Link from "next/link";
 import { Bot, ShieldCheck, Target, Sparkles, ArrowUpRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "AI Resume Optimizer & ATS Review",
+  title: "AI Resume Optimizer & Readiness Review",
   description:
-    "Optimize your CV for Applicant Tracking Systems. Dossier's AI analyzes your resume for parsing risks, tailoring gaps, and keyword optimization while keeping your data secure.",
+    "Use AI to review your CV for parsing risks, tailoring gaps, keyword coverage, and recruiter clarity while keeping your data secure.",
   alternates: {
     canonical: "/ai-resume-optimizer"
   },
   openGraph: {
-    title: "AI Resume Optimizer & ATS Review: Dossier",
-    description: "Secure, BYOK AI resume optimization. Tailor your CV and run ATS checks.",
+    title: "AI Resume Optimizer & Readiness Review: Dossier",
+    description: "Secure, BYOK AI resume optimization. Tailor your CV and review readiness checks.",
     url: "/ai-resume-optimizer",
     type: "article"
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Resume Optimizer & ATS Review: Dossier",
+    title: "AI Resume Optimizer & Readiness Review: Dossier",
     description: "Analyze parsing risks, tailor bullet points, and check skills gaps securely.",
   }
 };
@@ -29,7 +29,7 @@ const jsonLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:
-    "An AI-powered tool for applicant tracking system (ATS) review, CV tailoring, and skill gap analysis. Uses a Bring-Your-Own-Key model for maximum security.",
+    "An AI-powered tool for CV readiness review, tailoring, parser-risk checks, and skill gap analysis. Uses a Bring-Your-Own-Key model for maximum security.",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -72,7 +72,7 @@ export default function AiResumeOptimizerPage() {
 
             <div className="mt-12 flex flex-col">
               <h1 className="text-[clamp(3rem,8vw,6rem)] font-black uppercase leading-[0.85] tracking-tight text-white">
-                Hack The
+                Review CV
               </h1>
               <h1 
                 className="mt-2 text-[clamp(3rem,8vw,6rem)] font-black uppercase leading-[0.85] tracking-tight"
@@ -81,7 +81,7 @@ export default function AiResumeOptimizerPage() {
                   WebkitTextStroke: "1px rgba(255,255,255,0.6)",
                 }}
               >
-                ATS System
+                Readiness
               </h1>
             </div>
 
@@ -90,7 +90,7 @@ export default function AiResumeOptimizerPage() {
               <br className="hidden sm:block" />
               AI review workflows to ensure your CV is successfully
               <br className="hidden sm:block" />
-              parsed by Enterprise Applicant Tracking Systems.
+              readable for recruiters and automated screening workflows.
             </p>
 
             {/* Features Grid */}
@@ -99,13 +99,13 @@ export default function AiResumeOptimizerPage() {
               <div className="group relative overflow-hidden rounded-[20px] border border-white/5 bg-[#0a0d14]/80 p-8 backdrop-blur-md transition-colors hover:bg-[#0d111a]">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
-                    001 // ATS Check
+                    001 // Readiness
                   </span>
                   <Bot className="h-4 w-4 text-white/40" />
                 </div>
-                <h3 className="mt-8 text-2xl font-bold text-white uppercase tracking-tight">Readability Score</h3>
+                <h3 className="mt-8 text-2xl font-bold text-white uppercase tracking-tight">Readiness Estimate</h3>
                 <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.1em] text-white/40 leading-relaxed">
-                  Simulate enterprise ATS parsing. Flag structural issues, complex formatting, and missing standard headers.
+                  Flag structural issues, complex formatting, missing standard headers, and role-fit gaps.
                 </p>
               </div>
 

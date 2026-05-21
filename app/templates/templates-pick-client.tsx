@@ -31,7 +31,7 @@ export default function TemplatesPickClient() {
           </div>
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Compare ATS-safe and human-first layouts by use case. Pick a style first, then let the builder
+          Compare parser-friendly and human-first layouts by use case. Pick a style first, then let the builder
           guide the content and AI review.
         </p>
 

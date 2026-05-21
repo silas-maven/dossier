@@ -335,7 +335,7 @@ const PromiseScene = ({ title, subtitle }: DossierHowToVideoProps) => {
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 42%, rgba(3,5,11,0.94))" }} />
             <div style={{ position: "absolute", left: 28, right: 28, bottom: 34 }}>
               <div style={{ display: "inline-flex", padding: "9px 14px", borderRadius: 999, color: colors.green, border: "1px solid rgba(110,231,183,0.35)", background: "rgba(16,185,129,0.15)", fontSize: 17, fontWeight: 900 }}>
-                ATS-strong templates
+                Parser-friendly templates
               </div>
               <div style={{ marginTop: 18, fontSize: 34, fontWeight: 950, lineHeight: 1.04 }}>
                 Choose the look when the story needs it.
@@ -475,7 +475,7 @@ const TemplateRail = () => {
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,11,0.18), transparent 44%, rgba(3,5,11,0.74))" }} />
         <div style={{ position: "absolute", left: 24, bottom: 24, display: "flex", gap: 10 }}>
-          {["ATS-safe", "Creative", "Corporate", "Human-first"].map((tag, index) => (
+          {["Parser-friendly", "Creative", "Corporate", "Human-first"].map((tag, index) => (
             <div
               key={tag}
               style={{
@@ -666,7 +666,7 @@ const ExportChecklist = () => {
         <div style={{ width: `${bar * 100}%`, height: "100%", background: `linear-gradient(90deg, ${colors.blue}, ${colors.green})`, borderRadius: 999 }} />
       </div>
       <div style={{ marginTop: 22, display: "flex", gap: 12, flexWrap: "wrap" }}>
-        {["Free export", "Text-based", "ATS-safe"].map((item) => (
+        {["Free export", "Text-based", "Parser-friendly"].map((item) => (
           <div key={item} style={{ padding: "12px 16px", borderRadius: 999, background: "rgba(94,164,255,0.12)", border: "1px solid rgba(94,164,255,0.3)", color: colors.cyan, fontWeight: 850 }}>
             {item}
           </div>
@@ -708,7 +708,7 @@ const ClosingScene = () => {
         <Eyebrow color={colors.green}>FROM ROUGH CV TO APPLICATION-READY</Eyebrow>
         <Headline maxWidth={1160}>Move faster without giving up control.</Headline>
         <BodyCopy maxWidth={850}>
-          Dossier helps you build, review, and export an ATS-strong CV without forcing an account or a paid builder workflow.
+          Dossier helps you build, review, and export an parser-friendly CV without forcing an account or a paid builder workflow.
         </BodyCopy>
       </FadeSlide>
       <div style={{ position: "absolute", left: 92, bottom: 190, display: "flex", gap: 18 }}>
@@ -735,7 +735,7 @@ const ClosingScene = () => {
         <GlassPanel style={{ width: 520, padding: 30 }}>
           <div style={{ fontFamily: "monospace", letterSpacing: 5, color: colors.cyan, fontSize: 15 }}>WHY IT EXISTS</div>
           <div style={{ marginTop: 22, display: "grid", gap: 18 }}>
-            {["Free tool for jobseekers", "ATS-strong templates", "AI edits stay review-only"].map((item, index) => (
+            {["Free tool for jobseekers", "Parser-friendly templates", "AI edits stay review-only"].map((item, index) => (
               <div key={item} style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, fontWeight: 850, opacity: fade(frame, 146 + index * 18) }}>
                 <span style={{ width: 17, height: 17, borderRadius: 999, background: index === 0 ? colors.green : colors.blue }} />
                 {item}
