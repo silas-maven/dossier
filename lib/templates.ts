@@ -14,7 +14,16 @@ export const templateVariants = [
   "sidebar-tan-dots",
   "skills-right-red",
   "boxed-header-dots",
-  "skills-right-pink"
+  "skills-right-pink",
+  "legal-formal",
+  "metrics-banner",
+  "campaign-cards",
+  "people-soft",
+  "scanner-compact",
+  "process-left",
+  "credentials-top",
+  "academic-traditional",
+  "mission-impact"
 ] as const;
 
 export const templateFamilies = [
@@ -33,7 +42,16 @@ export const templateThemes = [
   "navy-contrast",
   "warm-neutral",
   "impact-red",
-  "soft-rose"
+  "soft-rose",
+  "legal-charcoal",
+  "revenue-green",
+  "campaign-coral",
+  "people-teal",
+  "recruiter-indigo",
+  "process-slate",
+  "clinical-navy",
+  "academic-burgundy",
+  "mission-forest"
 ] as const;
 
 export const templateAtsModes = ["safe", "balanced", "human-first"] as const;
@@ -122,7 +140,16 @@ export const templateThemeLabels: Record<TemplateTheme, string> = {
   "navy-contrast": "Navy Contrast",
   "warm-neutral": "Warm Neutral",
   "impact-red": "Impact Red",
-  "soft-rose": "Soft Rose"
+  "soft-rose": "Soft Rose",
+  "legal-charcoal": "Legal Charcoal",
+  "revenue-green": "Revenue Green",
+  "campaign-coral": "Campaign Coral",
+  "people-teal": "People Teal",
+  "recruiter-indigo": "Recruiter Indigo",
+  "process-slate": "Process Slate",
+  "clinical-navy": "Clinical Navy",
+  "academic-burgundy": "Academic Burgundy",
+  "mission-forest": "Mission Forest"
 };
 
 const buildTemplate = (
@@ -385,9 +412,9 @@ export const cvTemplates: CvTemplate[] = [
   buildTemplate({
     id: "legal-counsel-brief",
     isPublic: false,
-    variant: "banded-grey",
+    variant: "legal-formal",
     family: "classic-single-column",
-    theme: "classic-ink",
+    theme: "legal-charcoal",
     atsMode: "safe",
     name: "Legal Counsel Brief",
     category: "Legal",
@@ -416,10 +443,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "sales-revenue-driver",
-    isPublic: false,
-    variant: "blue-rules",
+    isPublic: true,
+    variant: "metrics-banner",
     family: "structured-single-column",
-    theme: "professional-blue",
+    theme: "revenue-green",
     atsMode: "safe",
     name: "Sales Revenue Driver",
     category: "Sales",
@@ -448,10 +475,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "marketing-campaign-performance",
-    isPublic: false,
-    variant: "skills-right-pink",
+    isPublic: true,
+    variant: "campaign-cards",
     family: "hybrid-header-two-zone",
-    theme: "soft-rose",
+    theme: "campaign-coral",
     atsMode: "balanced",
     name: "Marketing Campaign Performance",
     category: "Marketing",
@@ -480,10 +507,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "human-resources-people-partner",
-    isPublic: false,
-    variant: "sidebar-light",
-    family: "sidebar-human-first",
-    theme: "operational-emerald",
+    isPublic: true,
+    variant: "people-soft",
+    family: "classic-single-column",
+    theme: "people-teal",
     atsMode: "balanced",
     name: "Human Resources People Partner",
     category: "HR",
@@ -503,7 +530,7 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "human-resources",
     recommendedIndustries: ["Human Resources", "People Operations", "Employee Relations"],
     capabilities: {
-      sidebar: true,
+      sidebar: false,
       ratings: false,
       photo: false,
       accentRail: true
@@ -512,10 +539,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "talent-acquisition-recruiter",
-    isPublic: false,
-    variant: "gutter-minimal",
+    isPublic: true,
+    variant: "scanner-compact",
     family: "structured-single-column",
-    theme: "modern-slate",
+    theme: "recruiter-indigo",
     atsMode: "balanced",
     name: "Talent Acquisition Recruiter",
     category: "Recruiting",
@@ -544,10 +571,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "operations-process-lead",
-    isPublic: false,
-    variant: "sidebar-tan-dots",
-    family: "sidebar-human-first",
-    theme: "warm-neutral",
+    isPublic: true,
+    variant: "process-left",
+    family: "hybrid-header-two-zone",
+    theme: "process-slate",
     atsMode: "balanced",
     name: "Operations Process Lead",
     category: "Operations",
@@ -576,10 +603,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "healthcare-care-delivery",
-    isPublic: false,
-    variant: "banded-grey",
+    isPublic: true,
+    variant: "credentials-top",
     family: "classic-single-column",
-    theme: "classic-ink",
+    theme: "clinical-navy",
     atsMode: "safe",
     name: "Healthcare Care Delivery",
     category: "Healthcare",
@@ -608,10 +635,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "education-academic-practice",
-    isPublic: false,
-    variant: "gutter-minimal",
-    family: "structured-single-column",
-    theme: "modern-slate",
+    isPublic: true,
+    variant: "academic-traditional",
+    family: "classic-single-column",
+    theme: "academic-burgundy",
     atsMode: "balanced",
     name: "Education Academic Practice",
     category: "Education",
@@ -640,10 +667,10 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "nonprofit-mission-delivery",
-    isPublic: false,
-    variant: "sidebar-light",
+    isPublic: true,
+    variant: "mission-impact",
     family: "sidebar-human-first",
-    theme: "editorial-light",
+    theme: "mission-forest",
     atsMode: "balanced",
     name: "Nonprofit Mission Delivery",
     category: "Nonprofit",
@@ -672,7 +699,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "banded-grey",
-    isPublic: false,
+    isPublic: true,
     variant: "banded-grey",
     family: "classic-single-column",
     theme: "classic-ink",

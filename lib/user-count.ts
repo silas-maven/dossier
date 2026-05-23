@@ -33,6 +33,14 @@ const ensureVisitorTable = async (sql: postgres.Sql) => {
       user_agent text
     )
   `;
+  try {
+    await sql`alter table dossier_visitors add column if not exists first_path text`;
+    await sql`alter table dossier_visitors add column if not exists last_path text`;
+    await sql`alter table dossier_visitors add column if not exists referrer text`;
+    await sql`alter table dossier_visitors add column if not exists user_agent text`;
+  } catch (e) {
+    // ignore
+  }
 };
 
 export const trackDossierVisitor = async ({

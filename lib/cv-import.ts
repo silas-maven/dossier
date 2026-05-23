@@ -209,21 +209,36 @@ const splitExperienceBlocks = (lines: string[]) => {
 };
 
 const splitProjectBlocks = (lines: string[]) => {
+  if (lines.length === 0) return [];
   const blocks: string[] = [];
   let buf: string[] = [];
+  
+  const firstIsBullet = /^[-•*]\s+/.test(lines[0]);
+  const secondIsNonBullet = lines.length > 1 && !/^[-•*]\s+/.test(lines[1]);
+  const projectsStartWithBullets = firstIsBullet && secondIsNonBullet;
+
   let seenBullet = false;
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-
     const isBullet = /^[-•*]\s+/.test(line);
-    const startsNewProject = buf.length > 0 && seenBullet && !isBullet && looksLikeProjectTitleLine(line);
+
+    let startsNewProject = false;
+
+    if (projectsStartWithBullets) {
+      if (isBullet && line.length < 100 && buf.length > 0) {
+        startsNewProject = true;
+      }
+    } else {
+      const isShortNonBullet = !isBullet && line.length < 90 && /[A-Za-z]/.test(line);
+      startsNewProject = buf.length > 0 && seenBullet && isShortNonBullet;
+    }
 
     if (startsNewProject) {
       blocks.push(buf.join("\n"));
       buf = [line];
-      seenBullet = false;
+      seenBullet = isBullet;
       continue;
     }
 
@@ -546,7 +561,7 @@ export const parseCvMarkdown = (markdown: string): ParsedCv => {
 
 const MONTH = "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
 const DATE_TAIL_RE = new RegExp(
-  `((?:${MONTH}\\s+\\d{4}(?:\\s*[—-]\\s*(?:${MONTH}\\s+\\d{4}|Present))?)|(?:\\d{4}\\s*[—-]\\s*(?:\\d{4}|Present)))$`,
+  `((?:${MONTH}\\s+\\d{4}(?:\\s*[—–-]\\s*(?:${MONTH}\\s+\\d{4}|Present))?)|(?:\\d{4}\\s*[—–-]\\s*(?:\\d{4}|Present)))$`,
   "i"
 );
 
@@ -560,7 +575,7 @@ const splitDateTail = (value: string) => {
     .slice(0, match.index)
     .replace(/[|,\s–—-]+$/, "")
     .trim();
-  const dateRange = match[1].replace(/\s*[–—-]\s*/g, " — ");
+  const dateRange = match[1].replace(/\s*[—–-]\s*/g, " — ");
   return { main, dateRange };
 };
 
@@ -596,7 +611,7 @@ const collapseBulletLines = (lines: string[]) => {
 
 const splitTitleSubtitle = (value: string) => {
   const parts = value
-    .split(",")
+    .split(/(?:[,|—–]|\s+-\s+)/)
     .map((p) => p.trim())
     .filter(Boolean);
   if (parts.length <= 1) return { title: value.trim(), subtitle: "" };
@@ -613,9 +628,10 @@ const parseExperienceHeader = (lines: string[]) => {
   if (second && !/^[-•*]\s+/.test(lines[1] ?? "")) {
     const secondSplit = splitDateTail(second);
     if (secondSplit.dateRange) {
+      const firstParts = splitTitleSubtitle(first);
       return {
-        title: first,
-        subtitle: secondSplit.main,
+        title: firstParts.title,
+        subtitle: secondSplit.main || firstParts.subtitle,
         dateRange: secondSplit.dateRange,
         detailStartIndex: 2
       };

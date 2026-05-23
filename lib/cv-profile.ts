@@ -198,6 +198,51 @@ const themeStylePresets: Record<TemplateTheme, Partial<CvStyle>> = {
     fontFamily: "sans",
     accentColor: "#F43F5E",
     sidebarColor: "#FFF1F6"
+  },
+  "legal-charcoal": {
+    fontFamily: "serif",
+    accentColor: "#1C1917",
+    sidebarColor: "#F8FAFC"
+  },
+  "revenue-green": {
+    fontFamily: "sans",
+    accentColor: "#059669",
+    sidebarColor: "#ECFDF5"
+  },
+  "campaign-coral": {
+    fontFamily: "sans",
+    accentColor: "#EA580C",
+    sidebarColor: "#FFF7ED"
+  },
+  "people-teal": {
+    fontFamily: "sans",
+    accentColor: "#0D9488",
+    sidebarColor: "#F0FDFA"
+  },
+  "recruiter-indigo": {
+    fontFamily: "sans",
+    accentColor: "#4F46E5",
+    sidebarColor: "#EEF2FF"
+  },
+  "process-slate": {
+    fontFamily: "sans",
+    accentColor: "#475569",
+    sidebarColor: "#F1F5F9"
+  },
+  "clinical-navy": {
+    fontFamily: "serif",
+    accentColor: "#1E3A5F",
+    sidebarColor: "#EFF6FF"
+  },
+  "academic-burgundy": {
+    fontFamily: "serif",
+    accentColor: "#7C2D12",
+    sidebarColor: "#FFF1F2"
+  },
+  "mission-forest": {
+    fontFamily: "sans",
+    accentColor: "#166534",
+    sidebarColor: "#14532D"
   }
 };
 

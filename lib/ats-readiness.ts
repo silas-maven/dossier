@@ -38,7 +38,15 @@ const standardSectionNames = new Set([
   "technical skills",
   "certifications",
   "certificates",
-  "projects"
+  "projects",
+  "awards",
+  "volunteering",
+  "languages",
+  "patents",
+  "publications",
+  "interests",
+  "hobbies",
+  "references"
 ]);
 
 const metricPattern = /(\d+%|\d+\+?|\$|£|€|kpi|revenue|pipeline|quota|reduced|increased|improved|saved|grew|cut|delivered|shipped)/i;
@@ -48,6 +56,7 @@ const textFromHtml = (value: string) =>
   value
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/p>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -91,7 +100,7 @@ const meaningfulJobTerms = (jobDescription: string) =>
         .replace(/[^a-z0-9+#.\s-]/g, " ")
         .split(/\s+/)
         .map((term) => term.trim())
-        .filter((term) => term.length > 3)
+        .filter((term) => term.length > 2 || /^(ai|ux|ui|qa|go|c|c\+\+|pr|hr|it|is|to)$/i.test(term) || /^[A-Z]{2,3}$/.test(term))
         .filter(
           (term) =>
             ![
@@ -107,7 +116,19 @@ const meaningfulJobTerms = (jobDescription: string) =>
               "work",
               "able",
               "must",
-              "and/or"
+              "and/or",
+              "the",
+              "and",
+              "for",
+              "are",
+              "you",
+              "our",
+              "can",
+              "all",
+              "any",
+              "not",
+              "but",
+              "has"
             ].includes(term)
         )
     )
@@ -195,7 +216,7 @@ const buildStructureGroup = (profile: CvProfile): AtsReadinessGroup => {
     {
       id: "standard-headings",
       label: "Standard section headings",
-      passed: normalizedTitles.every((title) => title === "" || standardSectionNames.has(title) || title.length <= 32),
+      passed: normalizedTitles.every((title) => title === "" || standardSectionNames.has(title)),
       detail: "Standard headings are easier for parsers and recruiters to classify."
     }
   ];
