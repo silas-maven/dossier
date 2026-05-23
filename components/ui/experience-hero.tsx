@@ -84,12 +84,14 @@ function MetricCard({
   label,
   title,
   lines,
+  href,
 }: {
   label: string;
   title: React.ReactNode;
   lines: string[];
+  href?: string;
 }) {
-  return (
+  const cardContent = (
     <TiltCard>
       <div className="flex items-center justify-between">
         <ScrambleMetricLabel text={label} />
@@ -113,6 +115,16 @@ function MetricCard({
       </div>
     </TiltCard>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="block w-full">
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 }
 
 /* ------------------------------------------------------------------ */
@@ -273,6 +285,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               label="001 // Template Library"
               title={<><CounterValue target={templateCount} suffix="+ " />Styles</>}
               lines={["Fintech + Consulting", "Consistent PDF exports"]}
+              href={ctaHref}
             />
             <MetricCard
               label="002 // Import + Export"

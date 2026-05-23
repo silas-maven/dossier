@@ -16,26 +16,31 @@ export async function GET() {
   const baseUrl = resolveBaseUrl();
 
   const body = [
-    "# Dossier CV Builder",
+    "# Dossier",
     "",
-    "Dossier is a local-first web app for creating ATS-friendly CVs with professional templates.",
-    "It supports live editing, template switching, PDF export, and optional session-only AI review.",
+    "> Dossier is a browser-based resume builder that lets users create and edit professional CVs with data stored locally on their device.",
     "",
-    "## Public URLs",
-    `- Home: ${baseUrl}/`,
-    `- Templates: ${baseUrl}/templates`,
-    `- Resume.io alternative: ${baseUrl}/resume-io-alternative`,
-    `- Zety alternative: ${baseUrl}/zety-alternative`,
-    `- Free CV builder UK: ${baseUrl}/free-cv-builder-uk`,
+    "The tool provides industry‑specific templates and lets users download finished resumes as PDF or DOCX files.",
     "",
-    "## Usage",
-    "1. Pick a template from /templates.",
-    "2. Edit content in /editor with local browser autosave.",
-    "3. Optionally run AI review with a session-only provider key, then export PDF.",
+    "## Product",
+    `- [Home](${baseUrl}): overview of the resume builder service.`,
+    `- [Editor](${baseUrl}/editor): web interface for creating and editing resumes.`,
+    `- [Templates](${baseUrl}/templates): collection of industry‑specific resume templates.`,
     "",
-    "## Attribution",
-    "Builder: Hamza Ntwari",
-    "Portfolio: https://hntwari.vercel.app"
+    "## Alternatives",
+    `- [Resume.io alternative](${baseUrl}/resume-io-alternative): comparison of Dossier with Resume.io.`,
+    `- [Zety alternative](${baseUrl}/zety-alternative): comparison of Dossier with Zety.`,
+    "",
+    "## Features",
+    `- [AI resume optimizer](${baseUrl}/ai-resume-optimizer): description of AI‑based resume improvement tool.`,
+    `- [ATS readiness engine](${baseUrl}/ats-readiness-engine): details on applicant‑tracking‑system compatibility checks.`,
+    `- [Free CV builder UK](${baseUrl}/free-cv-builder-uk): free version of the resume builder for UK users.`,
+    "",
+    "## Documentation",
+    `- [Storage](${baseUrl}/storage): information on local storage of resume data.`,
+    "",
+    "## Optional",
+    `- [Sitemap](${baseUrl}/sitemap.xml): XML sitemap listing site pages.`
   ].join("\n");
 
   return new Response(body, {
