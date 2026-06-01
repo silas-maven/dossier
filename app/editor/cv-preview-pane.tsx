@@ -111,9 +111,13 @@ export default function CvPreviewPane({
   }, [mode, nextSnapshot, profile]);
 
   const fileName = useMemo(() => {
-    const safeName = (profile.basics.name || "CV").replace(/[^\w.-]+/g, "_");
-    return `${safeName}_${profile.templateId}.pdf`;
-  }, [profile.basics.name, profile.templateId]);
+    let rawName = profile.name;
+    if (!rawName || rawName === "My CV Profile" || rawName.trim() === "") {
+      rawName = profile.basics.name || "CV";
+    }
+    const safeName = rawName.replace(/[^\w.-]+/g, "_");
+    return `${safeName}.pdf`;
+  }, [profile.name, profile.basics.name]);
 
   const downloadPdf = async () => {
     const mod = await import("@react-pdf/renderer");

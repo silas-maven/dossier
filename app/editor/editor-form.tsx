@@ -438,6 +438,7 @@ export default function EditorForm({
       const applied = normalizeProfileShape(templateId, {
         ...json.profile,
         id: profile.id,
+        name: file.name.replace(/\.[^/.]+$/, ""),
         templateId
       });
       setProfile(applied);

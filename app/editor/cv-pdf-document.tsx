@@ -849,7 +849,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View minPresenceAhead={96} wrap={false}>
                     <Text style={{ fontFamily: headingFont, fontSize: 13, letterSpacing: 1.7, color: accent }}>
                       {sectionTitleLabel(section)}
@@ -908,7 +908,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 </View>
               ) : null}
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                     <Text style={styles.sectionTitle}>{sectionTitleLabel(section)}</Text>
                   </View>
@@ -1044,7 +1044,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }} minPresenceAhead={96} wrap={false}>
                     <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: accent }} />
                     <Text style={{ fontFamily: headingFont, fontSize: 12, letterSpacing: 1.6, color: accent }}>
@@ -1146,7 +1146,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                     <Text style={[styles.sectionTitle, { color: profile.style.accentColor || "#B08968" }]}>
                       {sectionTitleLabel(section)}
@@ -1200,7 +1200,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {sections.map((section) => (
-            <View key={section.id} style={styles.section} minPresenceAhead={160}>
+            <View key={section.id} style={styles.section}>
               <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                 <Text style={styles.sectionTitle}>{sectionTitleLabel(section)}</Text>
               </View>
@@ -1248,7 +1248,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {sections.map((section) => (
-            <View key={section.id} style={styles.section} minPresenceAhead={160}>
+            <View key={section.id} style={styles.section}>
               <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                 <Text style={[styles.sectionTitle, { fontSize: sectionTitleSize(section) }]}>
                   {sectionTitleLabel(section)}
@@ -1354,7 +1354,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                     <Text style={styles.sectionTitle}>{sectionTitleLabel(section)}</Text>
                   </View>
@@ -1487,7 +1487,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
                     <Text style={styles.sectionTitle}>{sectionTitleLabel(section)}</Text>
                   </View>
@@ -1553,7 +1553,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {mainSections.map((section) => (
-                <View key={section.id} style={styles.section} minPresenceAhead={160}>
+                <View key={section.id} style={styles.section}>
                   <View
                     style={[
                       styles.sectionHeader,
@@ -1663,7 +1663,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               ) : null}
 
               {sections.map((section) => (
-                <View key={section.id} style={{ marginTop: 16 }} minPresenceAhead={160}>
+                <View key={section.id} style={{ marginTop: 16 }}>
                   <View style={{ marginBottom: 8 }} minPresenceAhead={96} wrap={false}>
                     <Text style={{ fontSize: 10, fontFamily: headingFont, color: accent, textTransform: "uppercase", letterSpacing: 0.5, paddingBottom: 3 }}>
                       {sectionTitleLabel(section)}
@@ -1770,7 +1770,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {otherSections.map((section) => (
-            <View key={section.id} style={{ marginBottom: 16 }} minPresenceAhead={160}>
+            <View key={section.id} style={{ marginBottom: 16 }}>
               <View style={{ marginBottom: 8, borderBottomWidth: 2, borderBottomColor: accent, paddingBottom: 4 }} minPresenceAhead={96} wrap={false}>
                 <Text style={{ fontSize: 11, fontFamily: headingFont, color: accent, textTransform: "uppercase" }}>
                   {sectionTitleLabel(section)}
@@ -1866,7 +1866,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           <View style={{ flexDirection: "row", gap: 24 }}>
             <View style={{ flex: 2 }}>
               {mainSections.map((section) => (
-                <View key={section.id} style={{ marginBottom: 16 }} minPresenceAhead={160}>
+                <View key={section.id} style={{ marginBottom: 16 }}>
                   <View style={{ marginBottom: 12, backgroundColor: accent, borderRadius: 12, paddingVertical: 4, paddingHorizontal: 12, alignSelf: "flex-start" }} minPresenceAhead={96} wrap={false}>
                     <Text style={{ fontSize: 10, fontFamily: headingFont, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: 0.5 }}>
                       {sectionTitleLabel(section)}
@@ -1907,7 +1907,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {railSections.map((section) => {
                 const isCampaignSection = isCampaign(section.title);
                 return (
-                  <View key={section.id} style={{ marginBottom: 16 }} minPresenceAhead={120}>
+                  <View key={section.id} style={{ marginBottom: 16 }}>
                     <View style={{ marginBottom: 10, borderBottomWidth: 1, borderBottomColor: "#E5E7EB", paddingBottom: 4 }} minPresenceAhead={96} wrap={false}>
                       <Text style={{ fontSize: 10, fontFamily: headingFont, color: "#111827", textTransform: "uppercase" }}>
                         {sectionTitleLabel(section)}
@@ -1982,7 +1982,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {sections.map((section) => (
-            <View key={section.id} style={{ marginBottom: 20 }} minPresenceAhead={160}>
+            <View key={section.id} style={{ marginBottom: 20 }}>
               <View style={{ marginBottom: 12, borderBottomWidth: 1, borderBottomColor: accent, paddingBottom: 6, alignItems: "center" }} minPresenceAhead={96} wrap={false}>
                 <Text style={{ fontSize: 12, fontFamily: headingFont, color: accent, textTransform: "uppercase", letterSpacing: 1 }}>
                   {sectionTitleLabel(section)}
@@ -2061,7 +2061,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
             {sections.map((section) => (
-              <View key={section.id} style={{ width: "100%", marginBottom: 12 }} minPresenceAhead={120}>
+              <View key={section.id} style={{ width: "100%", marginBottom: 12 }}>
                 <View style={{ backgroundColor: "#F3F4F6", paddingVertical: 4, paddingHorizontal: 8, marginBottom: 8 }} minPresenceAhead={96} wrap={false}>
                   <Text style={{ fontSize: 10, fontFamily: headingFont, color: "#111827", textTransform: "uppercase", letterSpacing: 1 }}>
                     {sectionTitleLabel(section)}
@@ -2149,7 +2149,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           <View style={{ flexDirection: "row", gap: 24 }}>
             <View style={{ width: "30%" }}>
               {railSections.map((section) => (
-                <View key={section.id} style={{ marginBottom: 20 }} minPresenceAhead={100}>
+                <View key={section.id} style={{ marginBottom: 20 }}>
                   <Text style={{ fontSize: 10, fontFamily: headingFont, color: accent, textTransform: "uppercase", marginBottom: 8, letterSpacing: 1 }}>
                     {sectionTitleLabel(section)}
                   </Text>
@@ -2169,7 +2169,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
 
             <View style={{ width: "70%", borderLeftWidth: 1, borderLeftColor: "#E5E7EB", paddingLeft: 16 }}>
               {mainSections.map((section) => (
-                <View key={section.id} style={{ marginBottom: 20 }} minPresenceAhead={160}>
+                <View key={section.id} style={{ marginBottom: 20 }}>
                   <View style={{ marginBottom: 12 }} minPresenceAhead={96} wrap={false}>
                     <Text style={{ fontSize: 12, fontFamily: headingFont, color: "#111827", textTransform: "uppercase", letterSpacing: 0.5 }}>
                       {sectionTitleLabel(section)}
@@ -2253,7 +2253,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {orderedSections.map((section) => (
-            <View key={section.id} style={{ marginBottom: 16 }} minPresenceAhead={160}>
+            <View key={section.id} style={{ marginBottom: 16 }}>
               <View style={{ backgroundColor: accent, paddingVertical: 4, paddingHorizontal: 8, marginBottom: 8 }} minPresenceAhead={96} wrap={false}>
                 <Text style={{ fontSize: 10, fontFamily: headingFont, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: 1 }}>
                   {sectionTitleLabel(section)}
@@ -2331,7 +2331,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
           ) : null}
 
           {sections.map((section) => (
-            <View key={section.id} style={{ marginBottom: 16 }} minPresenceAhead={160}>
+            <View key={section.id} style={{ marginBottom: 16 }}>
               <View style={{ marginBottom: 8, alignItems: "center" }} minPresenceAhead={96} wrap={false}>
                 <Text style={{ fontSize: 12, fontFamily: headingFont, color: accent, textTransform: "uppercase", letterSpacing: 1 }}>
                   {sectionTitleLabel(section)}
@@ -2407,7 +2407,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
             </Text>
             
             {sidebarSections.map((section) => (
-              <View key={section.id} style={{ marginBottom: 20 }} minPresenceAhead={100}>
+              <View key={section.id} style={{ marginBottom: 20 }}>
                 <View style={{ marginBottom: 10, borderBottomWidth: 1, borderBottomColor: accent, paddingBottom: 4 }} minPresenceAhead={96} wrap={false}>
                   <Text style={{ fontSize: 10, fontFamily: headingFont, color: accent, textTransform: "uppercase", letterSpacing: 0.5 }}>
                     {sectionTitleLabel(section)}
@@ -2465,7 +2465,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
             ) : null}
 
             {mainSections.map((section) => (
-              <View key={section.id} style={{ marginBottom: 24 }} minPresenceAhead={160}>
+              <View key={section.id} style={{ marginBottom: 24 }}>
                 <View style={{ marginBottom: 12, borderBottomWidth: 1, borderBottomColor: "#E5E7EB", paddingBottom: 6 }} minPresenceAhead={96} wrap={false}>
                   <Text style={{ fontSize: 12, fontFamily: headingFont, color: accent, textTransform: "uppercase", letterSpacing: 0.5 }}>
                     {sectionTitleLabel(section)}
@@ -2520,7 +2520,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
         ) : null}
 
         {sections.map((section) => (
-          <View key={section.id} style={styles.section} minPresenceAhead={160}>
+          <View key={section.id} style={styles.section}>
             <View style={[styles.sectionHeader, !sectionShowDivider(section) ? { borderBottomWidth: 0, paddingBottom: 0 } : {}]} minPresenceAhead={96} wrap={false}>
               <Text style={[styles.sectionTitle, { fontSize: sectionTitleSize(section) }]}>
                 {sectionTitleLabel(section)}
