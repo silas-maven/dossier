@@ -623,14 +623,15 @@ const splitTitleSubtitle = (value: string) => {
 
 const parseExperienceHeader = (lines: string[]) => {
   const first = stripListMarker(lines[0] ?? "");
+  const secondHasBullet = /^[-•*]\s+/.test(lines[1] ?? "");
   const second = stripListMarker(lines[1] ?? "");
 
-  if (second && !/^[-•*]\s+/.test(lines[1] ?? "")) {
+  if (second && !secondHasBullet) {
     const secondSplit = splitDateTail(second);
     if (secondSplit.dateRange) {
       const firstParts = splitTitleSubtitle(first);
       return {
-        title: firstParts.title,
+        title: secondSplit.main ? first : firstParts.title,
         subtitle: secondSplit.main || firstParts.subtitle,
         dateRange: secondSplit.dateRange,
         detailStartIndex: 2
@@ -640,11 +641,13 @@ const parseExperienceHeader = (lines: string[]) => {
 
   const firstSplit = splitDateTail(first);
   const firstParts = splitTitleSubtitle(firstSplit.main);
+  const useSecondAsSubtitle = second && !secondHasBullet;
+
   return {
-    title: firstParts.title,
-    subtitle: second || firstParts.subtitle,
+    title: useSecondAsSubtitle ? firstSplit.main : firstParts.title,
+    subtitle: useSecondAsSubtitle ? second : firstParts.subtitle,
     dateRange: firstSplit.dateRange,
-    detailStartIndex: second && second !== firstParts.subtitle ? 2 : 1
+    detailStartIndex: useSecondAsSubtitle ? 2 : 1
   };
 };
 
@@ -755,13 +758,12 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 20).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const header = stripListMarker(lines[0] ?? "");
-        const { main, dateRange } = splitDateTail(header);
-        const ts = splitTitleSubtitle(main);
-        item.title = ts.title;
-        item.subtitle = stripListMarker(lines[1] || ts.subtitle);
-        item.dateRange = dateRange;
-        item.description = lines.slice(item.subtitle ? 2 : 1).join("\n");
+        const header = parseExperienceHeader(lines);
+        item.title = header.title;
+        item.subtitle = header.subtitle;
+        item.dateRange = header.dateRange;
+        const bullets = collapseBulletLines(lines.slice(header.detailStartIndex));
+        item.description = bullets.map((l) => `- ${l}`).join("\n");
         item.visible = true;
         return item;
       });
@@ -772,13 +774,12 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 30).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const header = stripListMarker(lines[0] ?? "");
-        const { main, dateRange } = splitDateTail(header);
-        const ts = splitTitleSubtitle(main);
-        item.title = ts.title;
-        item.subtitle = ts.subtitle;
-        item.dateRange = dateRange;
-        item.description = lines.slice(1).join("\n");
+        const header = parseExperienceHeader(lines);
+        item.title = header.title;
+        item.subtitle = header.subtitle;
+        item.dateRange = header.dateRange;
+        const bullets = collapseBulletLines(lines.slice(header.detailStartIndex));
+        item.description = bullets.map((l) => `- ${l}`).join("\n");
         item.visible = true;
         return item;
       });
@@ -789,11 +790,8 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
       s.items = section.blocks.slice(0, 30).map((block) => {
         const item = createEmptyItem();
         const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-        const title = stripListMarker(lines[0] ?? "");
-        const maybeMeta = stripListMarker(lines[1] ?? "");
-        const { main, dateRange } = splitDateTail(maybeMeta);
-        const detailStartIndex = maybeMeta ? 2 : 1;
-        const rawDetailLines = lines.slice(detailStartIndex);
+        const header = parseExperienceHeader(lines);
+        const rawDetailLines = lines.slice(header.detailStartIndex);
         const summaryLines: string[] = [];
         const bulletLines: string[] = [];
 
@@ -805,9 +803,9 @@ export const profileFromParsedCv = (templateId: string, parsed: ParsedCv): CvPro
           }
         }
 
-        item.title = title;
-        item.subtitle = main;
-        item.dateRange = dateRange;
+        item.title = header.title;
+        item.subtitle = header.subtitle;
+        item.dateRange = header.dateRange;
         item.description = [
           ...summaryLines,
           ...bulletLines.map((line) => `- ${line}`)
