@@ -8,7 +8,9 @@ export const callOpenAiCompatible = async ({
   model,
   system,
   user,
-  jsonMode = true
+  jsonMode = true,
+  maxTokens,
+  timeoutMs
 }: {
   provider: AiProviderConfig;
   apiKey: string;
@@ -16,29 +18,41 @@ export const callOpenAiCompatible = async ({
   system: string;
   user: string;
   jsonMode?: boolean;
+  maxTokens?: number;
+  timeoutMs?: number;
 }) => {
-  const res = await fetch(`${provider.baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${apiKey}`,
-      ...(provider.id === "openrouter"
-        ? {
-            "HTTP-Referer": "https://www.your-dossier.xyz",
-            "X-Title": "Dossier CV Builder"
-          }
-        : {})
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: jsonMode ? `${JSON_INSTRUCTION}\n\n${user}` : user }
-      ]
-    })
-  });
+  // Optional hard timeout so a slow/hung model fails fast (used by the managed fallback chain).
+  const controller = timeoutMs ? new AbortController() : undefined;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+  let res: Response;
+  try {
+    res = await fetch(`${provider.baseUrl}/chat/completions`, {
+      method: "POST",
+      signal: controller?.signal,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${apiKey}`,
+        ...(provider.id === "openrouter"
+          ? {
+              "HTTP-Referer": "https://www.your-dossier.xyz",
+              "X-Title": "Dossier CV Builder"
+            }
+          : {})
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        ...(maxTokens ? { max_tokens: maxTokens } : {}),
+        ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: jsonMode ? `${JSON_INSTRUCTION}\n\n${user}` : user }
+        ]
+      })
+    });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");

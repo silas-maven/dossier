@@ -16,6 +16,7 @@ import {
 import type { CvProfile } from "@/lib/cv-profile";
 import CvLivePreview from "@/app/editor/cv-live-preview";
 import CvPdfDocument from "@/app/editor/cv-pdf-document";
+import { TrackrPromoDialog, hasSeenTrackrPromo, markTrackrPromoSeen } from "@/components/editor/trackr-promo";
 import { cn } from "@/lib/utils";
 
 const PDFViewer = dynamic(
@@ -83,6 +84,7 @@ export default function CvPreviewPane({
   className
 }: CvPreviewPaneProps) {
   const [mode, setMode] = useState<PreviewMode>(defaultMode);
+  const [trackrPromoOpen, setTrackrPromoOpen] = useState(false);
   const htmlPreviewProfile = useDebouncedValue(profile, 250);
   const [pdfPreviewProfile, setPdfPreviewProfile] = useState(profile);
   const [pdfSnapshot, setPdfSnapshot] = useState(() => profileSnapshotHash(profile));
@@ -132,6 +134,11 @@ export default function CvPreviewPane({
       a.remove();
     } finally {
       URL.revokeObjectURL(url);
+    }
+    // After the first successful download, surface the Trackr handoff once.
+    if (!hasSeenTrackrPromo()) {
+      markTrackrPromoSeen();
+      window.setTimeout(() => setTrackrPromoOpen(true), 600);
     }
   };
 
@@ -220,6 +227,8 @@ export default function CvPreviewPane({
       ) : (
         <CvLivePreview profile={previewProfile} templateName={templateName} />
       )}
+
+      <TrackrPromoDialog open={trackrPromoOpen} onOpenChange={setTrackrPromoOpen} />
     </div>
   );
 }

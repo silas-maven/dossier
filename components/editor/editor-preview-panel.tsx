@@ -1,6 +1,7 @@
 "use client";
 
 import CvPreviewPane from "@/app/editor/cv-preview-pane";
+import { TrackrSideLink } from "@/components/editor/trackr-promo";
 import type { CvProfile } from "@/lib/cv-profile";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export default function EditorPreviewPanel({ profile, templateName, className }:
         defaultMode="pdf"
         variant="editorDark"
       />
+      <TrackrSideLink />
     </div>
   );
 }

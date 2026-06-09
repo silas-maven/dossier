@@ -7,7 +7,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/editor/api/"],
+      // /editor is the app surface, not indexable content (this also covers /editor/api/).
+      disallow: ["/api/", "/editor"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

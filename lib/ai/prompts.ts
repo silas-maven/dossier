@@ -1,5 +1,6 @@
 import type { CvProfile } from "@/lib/cv-profile";
 import { getTemplateGuidanceProfile } from "@/lib/template-guidance";
+import { createRedactor } from "@/lib/ai/sanitize";
 import type { AiAssistAction, AiCvAssistContext } from "@/lib/ai/types";
 
 const actionLabels: Record<AiAssistAction, string> = {
@@ -10,27 +11,32 @@ const actionLabels: Record<AiAssistAction, string> = {
   skills_gap: "identify missing or under-emphasized skills for the target role"
 };
 
-const flattenProfileForPrompt = (profile: CvProfile) => ({
-  basics: {
-    headline: profile.basics.headline,
-    summary: profile.basics.summary,
-  },
-  sections: profile.sections.map((section) => ({
-    id: section.id,
-    type: section.type,
-    title: section.title,
-    items: section.items
-      .filter((item) => item.visible)
-      .map((item) => ({
-        id: item.id,
-        title: item.title,
-        subtitle: item.subtitle,
-        dateRange: item.dateRange,
-        description: item.description,
-        tags: item.tags
-      }))
-  }))
-});
+// Drops the contact block entirely and redacts any contact PII that reappears in the
+// free-text body before it becomes prompt text. dateRange is preserved (dates are not PII).
+const flattenProfileForPrompt = (profile: CvProfile) => {
+  const redact = createRedactor(profile.basics);
+  return {
+    basics: {
+      headline: redact(profile.basics.headline),
+      summary: redact(profile.basics.summary),
+    },
+    sections: profile.sections.map((section) => ({
+      id: section.id,
+      type: section.type,
+      title: redact(section.title),
+      items: section.items
+        .filter((item) => item.visible)
+        .map((item) => ({
+          id: item.id,
+          title: redact(item.title),
+          subtitle: redact(item.subtitle),
+          dateRange: item.dateRange,
+          description: redact(item.description),
+          tags: item.tags.map(redact)
+        }))
+    }))
+  };
+};
 
 export const buildCvAssistPrompt = ({
   action,
@@ -85,6 +91,55 @@ export const buildCvAssistPrompt = ({
     null,
     2
   );
+
+  return { system, user };
+};
+
+export const buildMatchJdPrompt = (profileText: string, jobDescription: string) => {
+  const system = `You are an expert ATS (Applicant Tracking System) optimizer. Your goal is to analyze a candidate's resume text against a provided Job Description (JD).
+You must output a JSON object with the following schema:
+{
+  "matchScore": number (0-100 representing how well the resume matches the JD),
+  "missingKeywords": string[] (a list of important keywords or skills from the JD that are completely missing from the resume),
+  "suggestions": string[] (2-3 actionable suggestions on how the candidate can better tailor their resume to the JD)
+}`;
+
+  const user = `--- JOB DESCRIPTION ---
+${jobDescription}
+
+--- CANDIDATE RESUME ---
+${profileText}
+
+Please analyze the match and output the JSON response now.`;
+
+  return { system, user };
+};
+
+export const buildGenerateBulletPrompt = ({
+  action,
+  metric,
+  result,
+  roleTitle
+}: {
+  action: string;
+  metric?: string;
+  result: string;
+  roleTitle?: string;
+}) => {
+  const system = `You are an expert resume writer. Your job is to write a single, high-impact, ATS-friendly resume bullet point based on the user's input.
+Rules:
+1. Start with a strong action verb in the past tense.
+2. Incorporate the action, metric/scope, and result provided.
+3. Keep it to a single sentence without trailing periods.
+4. Do not include any introductory text, labels, or markdown bullets (e.g. no "Here is the bullet:"). Just the raw text.
+5. If a metric is provided, make sure it stands out.`;
+
+  const user = `Context (Role/Title): ${roleTitle || "Not specified"}
+Action taken: ${action}
+Metric/Scope: ${metric || "None provided"}
+Result/Outcome: ${result}
+
+Please generate the resume bullet point now.`;
 
   return { system, user };
 };

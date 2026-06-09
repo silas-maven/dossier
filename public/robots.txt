@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /templates
-Disallow: /editor
-Disallow: /api/
-
-Sitemap: https://www.your-dossier.xyz/sitemap.xml

@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AtsReadinessCard from "@/components/editor/ats-readiness-card";
+import { AiModeBar } from "@/components/editor/ai-mode-bar";
+import { useManagedAi } from "@/components/editor/use-managed-ai";
+import { sanitizeProfileForAi } from "@/lib/ai/sanitize";
 import { aiProviders } from "@/lib/ai/providers";
 import type {
   AiAssistAction,
@@ -72,6 +75,7 @@ export default function TailorPane({
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const managed = useManagedAi();
 
   // Load / save provider preference only. API keys are session-only and never persisted.
   useEffect(() => {
@@ -108,9 +112,13 @@ export default function TailorPane({
       setMatchError("Please paste a job description.");
       return;
     }
-    if (!apiKey) {
+    if (managed.mode === "byok" && !apiKey) {
       setMatchError("Set your API key in the settings first.");
       setShowSettings(true);
+      return;
+    }
+    if (managed.mode === "dossier" && !managed.token) {
+      setMatchError("Could not initialise Dossier AI. Try reloading.");
       return;
     }
 
@@ -118,9 +126,11 @@ export default function TailorPane({
     setMatchError("");
     setMatchResult(null);
 
+    // Strip contact PII before the CV ever leaves the device.
+    const safeProfile = sanitizeProfileForAi(profile);
     const profileText = JSON.stringify({
-      basics: profile.basics,
-      sections: profile.sections.map((s) => ({
+      basics: safeProfile.basics,
+      sections: safeProfile.sections.map((s) => ({
         type: s.type,
         title: s.title,
         items: s.items
@@ -135,14 +145,28 @@ export default function TailorPane({
     }, null, 2);
 
     try {
-      const res = await fetch("/api/ai/match-jd", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ providerId, apiKey, jobDescription, profileText })
-      });
+      const res =
+        managed.mode === "dossier"
+          ? await fetch("/api/ai/run", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: managed.token, feature: "match_jd", profileText, jobDescription })
+            })
+          : await fetch("/api/ai/match-jd", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ providerId, apiKey, jobDescription, profileText })
+            });
       const data = await res.json();
+      if (res.status === 402) {
+        managed.setCredits(0);
+        throw new Error("You're out of Dossier AI credits.");
+      }
       if (!res.ok) throw new Error(data.error || "Analysis failed");
       setMatchResult(data);
+      if (managed.mode === "dossier" && typeof data.creditsRemaining === "number") {
+        managed.setCredits(data.creditsRemaining);
+      }
     } catch (err: unknown) {
       setMatchError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -153,42 +177,64 @@ export default function TailorPane({
   const handleRunAssist = async () => {
     setAssistError(null);
     setAssistResult(null);
-    if (!apiKey.trim()) {
+    if (managed.mode === "byok" && !apiKey.trim()) {
       setAssistError("Set your API key in the settings first.");
       setShowSettings(true);
+      return;
+    }
+    if (managed.mode === "dossier" && !managed.token) {
+      setAssistError("Could not initialise Dossier AI. Try reloading.");
       return;
     }
 
     setAssistLoading(true);
     try {
-      const res = await fetch("/api/ai/cv-assist", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          providerId,
-          apiKey,
-          model: model.trim() || undefined,
-          action: assistAction,
-          profile,
-          context: {
-            templateId: template.id,
-            templateName: template.name,
-            guidanceProfileId: template.guidanceProfileId,
-            industry: template.industry,
-            atsMode: template.atsMode,
-            jobType,
-            seniority,
-            market,
-            jobDescription
-          }
-        })
-      });
-      const json = (await res.json().catch(() => ({}))) as AiCvAssistResponse & { error?: string };
+      const context = {
+        templateId: template.id,
+        templateName: template.name,
+        guidanceProfileId: template.guidanceProfileId,
+        industry: template.industry,
+        atsMode: template.atsMode,
+        jobType,
+        seniority,
+        market,
+        jobDescription
+      };
+      const res =
+        managed.mode === "dossier"
+          ? await fetch("/api/ai/run", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ token: managed.token, feature: "cv_assist", action: assistAction, profile, context })
+            })
+          : await fetch("/api/ai/cv-assist", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                providerId,
+                apiKey,
+                model: model.trim() || undefined,
+                action: assistAction,
+                profile,
+                context
+              })
+            });
+      const json = (await res.json().catch(() => ({}))) as AiCvAssistResponse & {
+        error?: string;
+        creditsRemaining?: number;
+      };
+      if (res.status === 402) {
+        managed.setCredits(0);
+        throw new Error("You're out of Dossier AI credits.");
+      }
       if (!res.ok) throw new Error(json.error || "AI review failed.");
       setAssistResult(json);
       setDrafts(
         Object.fromEntries((json.suggestions ?? []).map((s) => [s.id, s.replacement]))
       );
+      if (managed.mode === "dossier" && typeof json.creditsRemaining === "number") {
+        managed.setCredits(json.creditsRemaining);
+      }
     } catch (err: unknown) {
       setAssistError(err instanceof Error ? err.message : "AI review failed.");
     } finally {
@@ -210,8 +256,8 @@ export default function TailorPane({
     );
   };
 
-  // Auto-open settings if no key is set
-  const needsSetup = !apiKey.trim();
+  // Auto-open settings only when using your own key and none is set.
+  const needsSetup = managed.mode === "byok" && !apiKey.trim();
 
   // Provider key links
   const providerKeyLinks: Record<string, string> = {
@@ -287,6 +333,13 @@ export default function TailorPane({
 
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-dark">
+        <AiModeBar
+          mode={managed.mode}
+          setMode={managed.setMode}
+          credits={managed.credits}
+          token={managed.token}
+        />
+
         <AtsReadinessCard
           profile={profile}
           template={template}

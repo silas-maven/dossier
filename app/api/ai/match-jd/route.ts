@@ -7,6 +7,8 @@ import {
   callOpenAiCompatible
 } from "@/lib/ai/callers";
 import { getAiProvider } from "@/lib/ai/providers";
+import { buildMatchJdPrompt } from "@/lib/ai/prompts";
+import { scrubFreeText } from "@/lib/ai/sanitize";
 import { aiProviderIds, type AiProviderId } from "@/lib/ai/types";
 
 export const runtime = "nodejs";
@@ -54,21 +56,10 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Unsupported AI provider." }, { status: 400 });
     }
 
-    const system = `You are an expert ATS (Applicant Tracking System) optimizer. Your goal is to analyze a candidate's resume text against a provided Job Description (JD).
-You must output a JSON object with the following schema:
-{
-  "matchScore": number (0-100 representing how well the resume matches the JD),
-  "missingKeywords": string[] (a list of important keywords or skills from the JD that are completely missing from the resume),
-  "suggestions": string[] (2-3 actionable suggestions on how the candidate can better tailor their resume to the JD)
-}`;
-
-    const user = `--- JOB DESCRIPTION ---
-${payload.jobDescription}
-
---- CANDIDATE RESUME ---
-${payload.profileText}
-
-Please analyze the match and output the JSON response now.`;
+    // Defense in depth: the client already sanitizes, but scrub any contact PII that
+    // slips through (emails/phones/URLs) before it reaches the provider.
+    const safeProfileText = scrubFreeText(payload.profileText);
+    const { system, user } = buildMatchJdPrompt(safeProfileText, payload.jobDescription);
 
     const model = payload.model || provider.defaultModel;
 

@@ -1,5 +1,9 @@
 import type { CvProfile, CvSection, CvItem } from "@/lib/cv-profile";
 import type { CvTemplate } from "@/lib/templates";
+import { containsTerm } from "@/lib/text-match";
+
+// Re-exported for existing tests/imports that reference it from this module.
+export { containsTerm };
 
 export type AtsReadinessBand = "Excellent" | "Good" | "Needs work" | "Risky";
 
@@ -24,6 +28,9 @@ export type AtsReadinessResult = {
   summary: string;
   disclaimer: string;
   groups: AtsReadinessGroup[];
+  // Role terms extracted from the job description that did NOT appear in the CV.
+  // Empty when no job description (or no terms) is supplied.
+  missingKeywords: string[];
 };
 
 const standardSectionNames = new Set([
@@ -49,7 +56,11 @@ const standardSectionNames = new Set([
   "references"
 ]);
 
-const metricPattern = /(\d+%|\d+\+?|\$|£|€|kpi|revenue|pipeline|quota|reduced|increased|improved|saved|grew|cut|delivered|shipped)/i;
+// Measurable-outcome detector. Requires real numeric/quantitative context (percent,
+// multiplier, currency, scale) or an outcome verb. A bare integer is NOT a metric on
+// its own, so dates like "2019" or "1 year" no longer pass as outcomes.
+const metricPattern =
+  /(\d+\s*%|\b\d+(?:\.\d+)?\s*x\b|[\$£€]\s*\d|\b\d+(?:\.\d+)?\s*(?:k|m|bn|million|billion)\b|kpi|revenue|pipeline|quota|reduced|increased|improved|saved|grew|cut|delivered|shipped)/i;
 const datePattern = /\b(present|current|20\d{2}|19\d{2}|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i;
 
 const textFromHtml = (value: string) =>
@@ -62,6 +73,154 @@ const textFromHtml = (value: string) =>
     .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
     .trim();
+
+// Detects bullet/list structure from the ORIGINAL html, before textFromHtml collapses
+// whitespace (which would otherwise erase the newlines inserted for <br>/</p> and make
+// list structure invisible). A hyphen only counts as a bullet when it starts a line, so
+// "well-known" inside prose is not mistaken for a bullet.
+const htmlHasBullets = (html: string) =>
+  /<li[\s>]/i.test(html) ||
+  /<\/p>\s*<p[\s>]/i.test(html) ||
+  /<br\s*\/?>/i.test(html) ||
+  /(^|\n)\s*[•▪‣◦*]/.test(html) ||
+  /(^|\n)\s*[-–—]\s+/.test(html);
+
+const SHORT_TERM_WHITELIST = /^(ai|ux|ui|qa|go|c|c\+\+|pr|hr)$/i;
+
+const JOB_STOPWORDS = new Set([
+  "with",
+  "that",
+  "this",
+  "from",
+  "will",
+  "your",
+  "have",
+  "role",
+  "team",
+  "work",
+  "able",
+  "must",
+  "and/or",
+  "the",
+  "and",
+  "for",
+  "are",
+  "you",
+  "our",
+  "can",
+  "all",
+  "any",
+  "not",
+  "but",
+  "has"
+]);
+
+export const meaningfulJobTerms = (jobDescription: string) => {
+  // Acronyms (AWS, SQL, ML, ...) must be lifted from the ORIGINAL text before lowercasing,
+  // otherwise the case signal is gone. These bypass the length floor so 2-letter skills
+  // (ML, QA) survive; they still respect the stopword list.
+  const acronyms = (jobDescription.match(/\b[A-Z]{2,4}(?:\+\+|#)?\b/g) ?? [])
+    .map((value) => value.toLowerCase())
+    .filter((value) => !JOB_STOPWORDS.has(value));
+
+  const tokens = jobDescription
+    .toLowerCase()
+    .replace(/[^a-z0-9+#.\s-]/g, " ")
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 2 || SHORT_TERM_WHITELIST.test(term))
+    .filter((term) => !JOB_STOPWORDS.has(term));
+
+  return Array.from(new Set([...acronyms, ...tokens])).slice(0, 40);
+};
+
+// --- Light stemming + synonyms for keyword coverage ---------------------------------
+
+const STEM_SUFFIXES = [
+  "ization",
+  "isation",
+  "ication",
+  "ation",
+  "ements",
+  "ement",
+  "ments",
+  "ment",
+  "ingly",
+  "edly",
+  "ings",
+  "ing",
+  "ers",
+  "er",
+  "ed",
+  "es",
+  "s",
+  "ly"
+];
+
+// Iterates to a stable stem so inflections of the same word collapse consistently
+// (manage/managed/management -> "manag", develop/developer/development -> "develop"),
+// regardless of input length.
+const stem = (word: string): string => {
+  let current = word;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const suffix of STEM_SUFFIXES) {
+      if (current.endsWith(suffix) && current.length - suffix.length >= 3) {
+        current = current.slice(0, -suffix.length);
+        changed = true;
+        break;
+      }
+    }
+  }
+  return current.replace(/e$/, "");
+};
+
+const SYNONYMS: Record<string, string[]> = {
+  javascript: ["js"],
+  js: ["javascript"],
+  typescript: ["ts"],
+  ts: ["typescript"],
+  kubernetes: ["k8s"],
+  k8s: ["kubernetes"],
+  postgresql: ["postgres", "psql"],
+  postgres: ["postgresql", "psql"],
+  react: ["reactjs"],
+  reactjs: ["react"],
+  node: ["nodejs"],
+  nodejs: ["node"],
+  cicd: ["ci/cd"],
+  "ci/cd": ["cicd"],
+  aws: ["amazon web services"],
+  gcp: ["google cloud platform", "google cloud"],
+  ml: ["machine learning"],
+  "machine learning": ["ml"]
+};
+
+const tokenStems = (text: string): Set<string> => {
+  const set = new Set<string>();
+  for (const token of text.split(/[^a-z0-9+#]+/)) {
+    if (!token) continue;
+    set.add(token);
+    set.add(stem(token));
+  }
+  return set;
+};
+
+// A term matches the text if it appears verbatim (handles phrases and c++/c#), if any
+// synonym appears, or if its stem (or a synonym's stem) is present among the text's
+// token stems.
+const termMatches = (term: string, text: string, stems: Set<string>): boolean => {
+  if (containsTerm(text, term)) return true;
+  const synonyms = SYNONYMS[term] ?? [];
+  if (synonyms.some((syn) => containsTerm(text, syn))) return true;
+  const termStem = stem(term);
+  if (termStem.length >= 3 && stems.has(termStem)) return true;
+  return synonyms.some((syn) => {
+    const synStem = stem(syn);
+    return synStem.length >= 3 && stems.has(synStem);
+  });
+};
 
 const visibleSections = (profile: CvProfile) =>
   profile.sections.filter((section) => section.items.some((item) => item.visible !== false));
@@ -92,50 +251,32 @@ const cvText = (profile: CvProfile) =>
     .join(" ")
     .toLowerCase();
 
-const meaningfulJobTerms = (jobDescription: string) =>
-  Array.from(
-    new Set(
-      jobDescription
-        .toLowerCase()
-        .replace(/[^a-z0-9+#.\s-]/g, " ")
-        .split(/\s+/)
-        .map((term) => term.trim())
-        .filter((term) => term.length > 2 || /^(ai|ux|ui|qa|go|c|c\+\+|pr|hr|it|is|to)$/i.test(term) || /^[A-Z]{2,3}$/.test(term))
-        .filter(
-          (term) =>
-            ![
-              "with",
-              "that",
-              "this",
-              "from",
-              "will",
-              "your",
-              "have",
-              "role",
-              "team",
-              "work",
-              "able",
-              "must",
-              "and/or",
-              "the",
-              "and",
-              "for",
-              "are",
-              "you",
-              "our",
-              "can",
-              "all",
-              "any",
-              "not",
-              "but",
-              "has"
-            ].includes(term)
-        )
-    )
-  ).slice(0, 40);
+const skillsText = (profile: CvProfile) =>
+  visibleSections(profile)
+    .filter((section) => section.type === "skills")
+    .flatMap((section) => [
+      section.title,
+      ...visibleItems(section).flatMap((item) => [
+        item.title,
+        item.subtitle,
+        textFromHtml(item.description),
+        item.tags.join(" ")
+      ])
+    ])
+    .join(" ")
+    .toLowerCase();
 
 const scoreChecks = (checks: AtsReadinessCheck[], maxScore: number) =>
   Math.round((checks.filter((check) => check.passed).length / checks.length) * maxScore);
+
+const emailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+
+const phoneValid = (phone: string) => {
+  const trimmed = phone.trim();
+  if (!/^[+()\-.\s\d]+$/.test(trimmed)) return false;
+  const digits = trimmed.replace(/\D/g, "");
+  return digits.length >= 7 && digits.length <= 15;
+};
 
 const buildParserGroup = (profile: CvProfile, template: CvTemplate): AtsReadinessGroup => {
   const sections = visibleSections(profile);
@@ -148,6 +289,15 @@ const buildParserGroup = (profile: CvProfile, template: CvTemplate): AtsReadines
         template.parserRisk === "Low"
           ? "The selected template uses a simpler reading order."
           : "The selected template has stronger visual hierarchy, so export validation matters more."
+    },
+    {
+      id: "single-column-layout",
+      label: "Single-column reading order",
+      passed: template.layout === "Single Column" && !template.capabilities.sidebar,
+      detail:
+        template.layout === "Single Column" && !template.capabilities.sidebar
+          ? "A single-column layout keeps reading order linear for stricter parsers."
+          : "Multi-column or sidebar layouts can scramble reading order in stricter parsers; prefer a single-column template for upload portals."
     },
     {
       id: "standard-alignment",
@@ -182,12 +332,24 @@ const buildStructureGroup = (profile: CvProfile): AtsReadinessGroup => {
   const sections = visibleSections(profile);
   const normalizedTitles = sections.map((section) => section.title.trim().toLowerCase());
   const hasSectionType = (type: CvSection["type"]) => sections.some((section) => section.type === type);
+  const email = profile.basics.email.trim();
+  const phone = profile.basics.phone.trim();
+  const contactPresent = Boolean(email || phone);
+  const contactWellFormed = contactPresent && (email ? emailValid(email) : true) && (phone ? phoneValid(phone) : true);
   const checks: AtsReadinessCheck[] = [
     {
       id: "contact",
       label: "Core contact details",
-      passed: Boolean(profile.basics.name.trim() && (profile.basics.email.trim() || profile.basics.phone.trim())),
+      passed: Boolean(profile.basics.name.trim() && contactPresent),
       detail: "Name plus email or phone should be present before exporting."
+    },
+    {
+      id: "contact-format",
+      label: "Valid contact format",
+      passed: contactWellFormed,
+      detail: contactWellFormed
+        ? "Contact details parse as a real email and/or phone number."
+        : "Add a well-formed email (name@domain.tld) or phone number so screeners can reach you."
     },
     {
       id: "target-title",
@@ -237,7 +399,8 @@ const buildEvidenceGroup = (profile: CvProfile): AtsReadinessGroup => {
   const descriptions = experienceItems.map((item) => textFromHtml(item.description)).filter(Boolean);
   const hasMetric = descriptions.some((description) => metricPattern.test(description));
   const hasDates = experienceItems.some((item) => datePattern.test(item.dateRange));
-  const hasBullets = descriptions.some((description) => /(^|\n|•|-)\s*\w/.test(description) || description.split(".").length >= 3);
+  // Detect bullets from the raw html, not the whitespace-collapsed text.
+  const hasBullets = experienceItems.some((item) => htmlHasBullets(item.description));
   const checks: AtsReadinessCheck[] = [
     {
       id: "evidence-items",
@@ -280,12 +443,49 @@ const buildEvidenceGroup = (profile: CvProfile): AtsReadinessGroup => {
   };
 };
 
-const buildJobMatchGroup = (profile: CvProfile, jobDescription?: string): AtsReadinessGroup => {
+type JobMatch = {
+  group: AtsReadinessGroup;
+  hasJob: boolean;
+  missingKeywords: string[];
+};
+
+const buildJobMatch = (profile: CvProfile, jobDescription?: string): JobMatch => {
   const terms = meaningfulJobTerms(jobDescription ?? "");
-  const text = cvText(profile);
-  const matched = terms.filter((term) => text.includes(term));
   const hasJob = terms.length > 0;
-  const matchRatio = hasJob ? matched.length / terms.length : 0;
+  const allText = cvText(profile);
+  const skillText = skillsText(profile);
+  const allStems = tokenStems(allText);
+  const skillStems = tokenStems(skillText);
+
+  const matched: string[] = [];
+  const missingKeywords: string[] = [];
+  // Skills-section matches are weighted higher than body-only matches.
+  let weightedCoverage = 0;
+  for (const term of terms) {
+    const inSkills = termMatches(term, skillText, skillStems);
+    const inBody = inSkills || termMatches(term, allText, allStems);
+    if (inSkills) {
+      weightedCoverage += 1;
+      matched.push(term);
+    } else if (inBody) {
+      weightedCoverage += 0.7;
+      matched.push(term);
+    } else {
+      missingKeywords.push(term);
+    }
+  }
+  const coverage = hasJob ? weightedCoverage / terms.length : 0;
+
+  const termSet = new Set(terms);
+  const termStemSet = new Set(terms.map(stem));
+  const headlineTokens = profile.basics.headline
+    .toLowerCase()
+    .split(/\s+/)
+    .map((token) => token.replace(/[^a-z0-9+#]/g, ""))
+    .filter(Boolean);
+  const headlineAligned =
+    hasJob && headlineTokens.some((token) => termSet.has(token) || termStemSet.has(stem(token)));
+
   const checks: AtsReadinessCheck[] = [
     {
       id: "job-description",
@@ -296,7 +496,7 @@ const buildJobMatchGroup = (profile: CvProfile, jobDescription?: string): AtsRea
     {
       id: "keyword-coverage",
       label: "Keyword coverage",
-      passed: hasJob && matchRatio >= 0.45,
+      passed: hasJob && coverage >= 0.45,
       detail: hasJob
         ? `${matched.length} of ${terms.length} extracted role terms appear in the CV.`
         : "Job-match scoring is skipped until a job description is supplied."
@@ -304,17 +504,24 @@ const buildJobMatchGroup = (profile: CvProfile, jobDescription?: string): AtsRea
     {
       id: "headline-match",
       label: "Headline aligns to role",
-      passed: hasJob && profile.basics.headline.split(/\s+/).some((term) => terms.includes(term.toLowerCase())),
+      passed: headlineAligned,
       detail: "The headline should echo the role family without keyword stuffing."
     }
   ];
 
+  const headlineCheck = checks.find((check) => check.id === "headline-match");
+  const score = hasJob ? Math.round(coverage * 14) + (headlineCheck?.passed ? 6 : 0) : 0;
+
   return {
-    id: "jobMatch",
-    label: "Job match",
-    maxScore: 20,
-    score: hasJob ? Math.round(matchRatio * 14) + (checks[2].passed ? 6 : 0) : 0,
-    checks
+    group: {
+      id: "jobMatch",
+      label: "Job match",
+      maxScore: 20,
+      score,
+      checks
+    },
+    hasJob,
+    missingKeywords: hasJob ? missingKeywords : []
   };
 };
 
@@ -330,16 +537,24 @@ export const analyzeAtsReadiness = (
   template: CvTemplate,
   jobDescription?: string
 ): AtsReadinessResult => {
-  const groups = [
+  const jobMatch = buildJobMatch(profile, jobDescription);
+  // Gate on extracted terms, not raw text: a paste of only short/stopwords yields no
+  // terms, so the 20-point jobMatch group must drop out of the denominator rather than
+  // sit there with unearnable points and silently tank the score.
+  const hasJobDescription = jobMatch.hasJob;
+
+  const groups: AtsReadinessGroup[] = [
     buildParserGroup(profile, template),
     buildStructureGroup(profile),
-    buildEvidenceGroup(profile),
-    buildJobMatchGroup(profile, jobDescription)
+    buildEvidenceGroup(profile)
   ];
-  const hasJobDescription = Boolean(jobDescription?.trim());
-  const activeGroups = hasJobDescription ? groups : groups.filter((group) => group.id !== "jobMatch");
-  const maxScore = activeGroups.reduce((sum, group) => sum + group.maxScore, 0);
-  const rawScore = activeGroups.reduce((sum, group) => sum + group.score, 0);
+  if (hasJobDescription) groups.push(jobMatch.group);
+
+  // Group scores are individually rounded for display. The headline normalizes their sum
+  // over the active max (100 with a job description, 80 without), so displayed group
+  // scores reconcile exactly when a job description is present and scale by 1.25 otherwise.
+  const maxScore = groups.reduce((sum, group) => sum + group.maxScore, 0);
+  const rawScore = groups.reduce((sum, group) => sum + group.score, 0);
   const score = Math.round((rawScore / maxScore) * 100);
   const band = bandForScore(score);
 
@@ -352,5 +567,6 @@ export const analyzeAtsReadiness = (
     disclaimer:
       "This is not a Workday, Greenhouse, Lever, Taleo, iCIMS, or Ashby score. It is Dossier's readiness estimate based on transparent checks.",
     groups,
+    missingKeywords: hasJobDescription ? jobMatch.missingKeywords : []
   };
 };

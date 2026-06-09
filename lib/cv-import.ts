@@ -126,11 +126,15 @@ const looksLikeCustomSectionHeading = (line: string) => {
 };
 
 const looksLikeHeading = (line: string) => {
-  if (line.length > 50) return false;
   const alpha = line.replace(/[^A-Za-z]/g, "");
   if (alpha.length < 4) return false;
   const upperRatio = alpha.replace(/[^A-Z]/g, "").length / alpha.length;
-  return upperRatio > 0.7 || /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*$/.test(line);
+  // ALL-CAPS lines are almost always section headings, even long descriptive ones such as
+  // "CORE FIT FOR <ROLE>" that AI-generated CVs produce. Title-case lines keep the tighter
+  // length cap so ordinary prose sentences aren't mistaken for headings.
+  if (upperRatio > 0.7) return line.length <= 90;
+  if (line.length > 50) return false;
+  return /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*$/.test(line);
 };
 
 const looksLikeLocationDateLine = (line: string) => {

@@ -7,6 +7,7 @@ import {
   callOpenAiCompatible
 } from "@/lib/ai/callers";
 import { getAiProvider } from "@/lib/ai/providers";
+import { buildGenerateBulletPrompt } from "@/lib/ai/prompts";
 import { aiProviderIds, type AiProviderId } from "@/lib/ai/types";
 
 export const runtime = "nodejs";
@@ -58,20 +59,12 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Unsupported AI provider." }, { status: 400 });
     }
 
-    const system = `You are an expert resume writer. Your job is to write a single, high-impact, ATS-friendly resume bullet point based on the user's input.
-Rules:
-1. Start with a strong action verb in the past tense.
-2. Incorporate the action, metric/scope, and result provided.
-3. Keep it to a single sentence without trailing periods.
-4. Do not include any introductory text, labels, or markdown bullets (e.g. no "Here is the bullet:"). Just the raw text.
-5. If a metric is provided, make sure it stands out.`;
-
-    const user = `Context (Role/Title): ${payload.roleTitle || "Not specified"}
-Action taken: ${payload.action}
-Metric/Scope: ${payload.metric || "None provided"}
-Result/Outcome: ${payload.result}
-
-Please generate the resume bullet point now.`;
+    const { system, user } = buildGenerateBulletPrompt({
+      action: payload.action,
+      metric: payload.metric,
+      result: payload.result,
+      roleTitle: payload.roleTitle
+    });
 
     const model = payload.model || provider.defaultModel;
 

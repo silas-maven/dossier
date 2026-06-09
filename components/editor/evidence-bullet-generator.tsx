@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Plus, RefreshCw, Settings, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AiModeBar } from "@/components/editor/ai-mode-bar";
+import { useManagedAi } from "@/components/editor/use-managed-ai";
 import { aiProviders } from "@/lib/ai/providers";
 import type { AiProviderId } from "@/lib/ai/types";
 
@@ -17,6 +19,7 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
 
   const [providerId, setProviderId] = useState<AiProviderId>("openai");
   const [apiKey, setApiKey] = useState("");
+  const managed = useManagedAi();
 
   const [action, setAction] = useState("");
   const [metric, setMetric] = useState("");
@@ -44,9 +47,13 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
       setError("Action and Result are required.");
       return;
     }
-    if (!apiKey) {
+    if (managed.mode === "byok" && !apiKey) {
       setError("Please set your API key in the settings first.");
       setShowSettings(true);
+      return;
+    }
+    if (managed.mode === "dossier" && !managed.token) {
+      setError("Could not initialise Dossier AI. Try reloading.");
       return;
     }
 
@@ -55,23 +62,30 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
     setGeneratedBullet("");
 
     try {
-      const res = await fetch("/api/ai/generate-bullet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          providerId,
-          apiKey,
-          action,
-          metric,
-          result,
-          roleTitle
-        })
-      });
+      const res =
+        managed.mode === "dossier"
+          ? await fetch("/api/ai/run", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: managed.token, feature: "generate_bullet", action, metric, result, roleTitle })
+            })
+          : await fetch("/api/ai/generate-bullet", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ providerId, apiKey, action, metric, result, roleTitle })
+            });
 
       const data = await res.json();
+      if (res.status === 402) {
+        managed.setCredits(0);
+        throw new Error("You're out of Dossier AI credits.");
+      }
       if (!res.ok) throw new Error(data.error || "Generation failed");
 
       setGeneratedBullet(data.bullet);
+      if (managed.mode === "dossier" && typeof data.creditsRemaining === "number") {
+        managed.setCredits(data.creditsRemaining);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -132,7 +146,14 @@ export default function EvidenceBulletGenerator({ roleTitle, onAppend }: Props) 
         </div>
       </div>
 
-      {showSettings && (
+      <AiModeBar
+        mode={managed.mode}
+        setMode={managed.setMode}
+        credits={managed.credits}
+        token={managed.token}
+      />
+
+      {managed.mode === "byok" && showSettings && (
         <div className="space-y-4 rounded-xl bg-background p-4 border shadow-sm">
           <div>
             <h4 className="text-sm font-semibold">AI Provider Setup</h4>

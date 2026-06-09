@@ -63,7 +63,10 @@ export default function RootLayout({
           <VisitorTracker />
           <div className="flex-1">{children}</div>
           <footer className="border-t border-white/10 bg-background/80 px-4 py-4 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/blog" className="hover:text-foreground transition-colors">
+                Blog
+              </Link>
               <Link
                 href="/ai-resume-optimizer"
                 className="hover:text-foreground transition-colors"

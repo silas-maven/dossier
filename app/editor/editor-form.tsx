@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Copy, Plus, Trash2, Bot } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1045,14 +1045,23 @@ export default function EditorForm({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {!tailorMode && (
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              Match score, rewrite &amp; tailor with AI
+            </span>
+          )}
           <Button
             variant={tailorMode ? "default" : "secondary"}
             size="sm"
             onClick={() => setTailorMode(!tailorMode)}
-            className="gap-2"
+            className={cn(
+              "font-semibold",
+              tailorMode
+                ? "ring-2 ring-blue-400/50"
+                : "ai-pulse border border-blue-400/40 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-100 shadow-sm hover:from-blue-500/30 hover:to-indigo-500/30 hover:text-white"
+            )}
           >
-            <Bot className="h-4 w-4" />
-            AI Workspace
+            {tailorMode ? "AI Workspace" : "Open AI Workspace"}
           </Button>
         </div>
       </div>

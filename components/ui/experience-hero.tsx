@@ -266,7 +266,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
             </p>
 
             {/* CTA — magnetic + fill animation */}
-            <div ref={ctaRef} className="mt-14 flex items-center" style={{ opacity: 0 }}>
+            <div ref={ctaRef} className="mt-14 flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
               <Link
                 href={ctaHref}
                 className="group relative inline-flex h-16 items-center justify-center gap-4 overflow-hidden rounded-full bg-white px-10 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-black transition-transform hover:scale-105 active:scale-95"
@@ -275,6 +275,14 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
                 <span className="relative z-10">Browse Templates</span>
                 <ArrowUpRight className="relative z-10 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 <div className="absolute inset-0 z-0 bg-gradient-to-r from-white via-white to-neutral-200 transition-opacity" />
+              </Link>
+              <Link
+                href="/blog"
+                className="group inline-flex h-16 items-center justify-center gap-3 rounded-full border border-white/15 px-8 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white/75 transition-colors hover:border-white/40 hover:text-white"
+                aria-label="Read the blog"
+              >
+                <span>Read the blog</span>
+                <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
             </div>
           </div>
