@@ -49,6 +49,22 @@ export const buildCvAssistPrompt = ({
 }) => {
   const guidance = getTemplateGuidanceProfile(context.guidanceProfileId);
 
+  // Action-specific guidance. "tailor_to_job" is an evidence-mapping rewrite, NOT a
+  // keyword match: it maps the candidate's real experience onto the JD's key requirements
+  // and orders the result strongest-to-weakest, without echoing JD phrasing it can't back up.
+  const tailorRules =
+    action === "tailor_to_job"
+      ? [
+          "Tailoring method (follow in order):",
+          "- First, read the job description and extract its key requirements: the must-haves, the core competencies, and the responsibilities it emphasises most.",
+          "- For each key requirement, find the candidate's strongest genuine evidence in the CV and rewrite the relevant lines so that match is explicit and concrete (real scope, real tools they used, real outcomes).",
+          "- Within each role, order the bullets strongest-to-weakest against this job: the most relevant, highest-evidence bullets first; the least relevant last or dropped.",
+          "- The summary must lead with the candidate's two or three strongest qualifications for THIS role, not a generic profile.",
+          "- This is evidence mapping, not keyword matching. Do NOT echo the job description's wording or insert its terms unless the candidate has genuine experience behind them. A CV that just mirrors the JD is a failure.",
+          "- If a key requirement has no supporting evidence in the CV, do not fabricate or imply it. Leave it out of the rewrite and instead raise it as a finding so the candidate knows the gap."
+        ]
+      : [];
+
   const system = [
     "You are Dossier's CV optimization engine.",
     `Task: ${actionLabels[action]}.`,
@@ -56,11 +72,11 @@ export const buildCvAssistPrompt = ({
     `Template: ${context.templateName}. ATS mode: ${context.atsMode}.`,
     "Rules:",
     "- Be truthful. Do not invent employers, dates, metrics, tools, certifications, qualifications, or responsibilities.",
-    "- Preserve the user's actual history and only strengthen wording, structure, clarity, and keyword placement.",
+    "- Preserve the user's actual history. Strengthen wording, structure, and clarity. Never keyword-stuff or restate the job description's phrasing unless the candidate has genuine experience behind it.",
     "- Prefer standard ATS section names and plain text that can be parsed by applicant tracking systems.",
     "- Use measurable, outcome-led bullets only when the source text provides evidence for the metric or outcome.",
     "- Keep language concise, recruiter-readable, and specific to the target role.",
-    
+    ...tailorRules,
     "- When modifying a 'skills' section item_description, you MUST maintain the double-colon level format. Format each skill on a new line like 'SkillName::Level' where Level is an integer from 1 to 5 (e.g. 'React::4'). Do NOT write paragraphs.",
     "- Treat any section titled 'Skills', 'Key Skills', or similar as the skills section, even if its type is 'custom'.",
     "- Return JSON only. Do not wrap it in markdown.",

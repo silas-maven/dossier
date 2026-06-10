@@ -133,6 +133,7 @@ function MetricCard({
 export default function ExperienceHero({ ctaHref, templateCount, userCount }: ExperienceHeroProps) {
   // Refs for animations
   const labelRef = useRef<HTMLSpanElement>(null);
+  const announceRef = useRef<HTMLAnchorElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
@@ -143,6 +144,7 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
 
   // Wire up effects
   useTextScramble(labelRef, "DOSSIER CV BUILDER", 200);
+  useFadeUp(announceRef, 0.35);
   useWordReveal(titleContainerRef, 0.5);
   useOutlineReveal(outlineRef, 1.1);
   useFadeUp(descRef, 1.6);
@@ -226,8 +228,24 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               </span>
             </div>
 
+            {/* Announcement — AI drafting + JD tailoring */}
+            <Link
+              ref={announceRef}
+              href={ctaHref}
+              style={{ opacity: 0 }}
+              className="group mt-8 inline-flex w-fit items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pl-1.5 pr-4 backdrop-blur-sm transition-colors hover:border-white/25 hover:bg-white/[0.06]"
+            >
+              <span className="rounded-full bg-white px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black">
+                New
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/70 transition-colors group-hover:text-white/90">
+                AI drafts and tailors your CV to the job
+              </span>
+              <ArrowUpRight className="h-3.5 w-3.5 text-white/50 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white/80" />
+            </Link>
+
             {/* Title — word-by-word reveal */}
-            <div ref={titleContainerRef} className="mt-12 flex flex-col">
+            <div ref={titleContainerRef} className="mt-8 flex flex-col">
               <h1 className="text-[clamp(4rem,12vw,9rem)] font-black uppercase leading-[0.85] tracking-tight text-white">
                 {["Build", "CVs", "That"].map((word) => (
                   <span key={word} className="inline-block overflow-hidden mr-[0.25em] last:mr-0">
@@ -258,11 +276,11 @@ export default function ExperienceHero({ ctaHref, templateCount, userCount }: Ex
               className="mt-14 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.15em] text-white/50"
               style={{ opacity: 0 }}
             >
-              Craft professional resumes with structured templates,
+              Draft and tailor your CV to the job with AI, edit it
               <br className="hidden sm:block" />
-              local-first editing, and export-ready layouts for fintech,
+              locally with structured templates, and export ATS-ready
               <br className="hidden sm:block" />
-              consulting, and project delivery roles.
+              layouts for fintech, consulting, and project delivery roles.
             </p>
 
             {/* CTA — magnetic + fill animation */}
