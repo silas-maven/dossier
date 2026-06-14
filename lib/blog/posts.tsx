@@ -114,7 +114,7 @@ export const blogPosts: BlogPost[] = [
 
         <H2>Where Trackr Pro fits</H2>
         <P>
-          <A href="https://trackr-pro.com">Trackr Pro</A> is built as exactly this: a candidate-side ATS for
+          <A href="https://trackr-pro.com/dossier">Trackr Pro</A> is built as exactly this: a candidate-side ATS for
           the modern search. It captures the role, company, salary, recruiter, and CV version the moment you
           click apply, turning every later email, call, and interview into a prepared conversation rather than
           a memory test.
@@ -159,7 +159,7 @@ export const blogPosts: BlogPost[] = [
           title="Run your search like the other side does"
           body="Trackr Pro captures every application, reads its strength against the role, and preps you for the interview. Private by design, one click from the browser."
           cta="Explore Trackr Pro"
-          href="https://trackr-pro.com"
+          href="https://trackr-pro.com/dossier"
         />
       </>
     )

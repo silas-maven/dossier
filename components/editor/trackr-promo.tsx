@@ -12,7 +12,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const TRACKR_BASE_URL = "https://trackr-pro.com/";
+const TRACKR_BASE_URL = "https://trackr-pro.com/dossier";
 
 // Tagged link so Dossier -> Trackr referrals are measurable.
 export const trackrUrl = (campaign: string) =>
