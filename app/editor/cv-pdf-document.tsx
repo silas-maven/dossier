@@ -2408,8 +2408,11 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
   if (variant === "data-ledger") {
     const accent = profile.style.accentColor || "#334155";
     const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
-    const skills = sections.filter((section) => section.type === "skills");
-    const mainSections = sections.filter((section) => section.type !== "skills");
+    const sectionNumberById = new Map(
+      sections
+        .filter((section) => section.type !== "skills")
+        .map((section, index) => [section.id, index + 1])
+    );
 
     return (
       <Document>
@@ -2442,52 +2445,64 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
             </View>
           ) : null}
 
-          {skills.map((section) => (
-            <View key={section.id} style={{ borderBottomWidth: 0.5, borderBottomColor: "#E2E8F0", paddingVertical: 10 }}>
-              <Text style={{ fontFamily: "Courier-Bold", fontSize: 7, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
-                {sectionTitleLabel(section)}
-              </Text>
-              {section.items.filter((item) => item.visible !== false).map((item) => (
-                <View key={item.id} style={{ marginTop: 6, flexDirection: "row" }} wrap={false}>
-                  <Text style={{ width: 82, fontFamily: headingFont, fontSize: 8.2, color: "#1E293B" }}>{item.title || "Stack"}</Text>
-                  <Text style={{ flex: 1, fontFamily: bodyFont, fontSize: 8, color: "#64748B" }}>
-                    {skillEvidenceDetails(item).map((entry) => entry.name).join(" / ")}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ))}
-
-          {mainSections.map((section, sectionIndex) => (
-            <View key={section.id} style={{ marginTop: 14 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 9 }} minPresenceAhead={90} wrap={false}>
-                <Text style={{ fontFamily: "Courier-Bold", fontSize: 7.2, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
-                  {String(sectionIndex + 1).padStart(2, "0")} / {sectionTitleLabel(section)}
+          {sections.map((section, sectionIndex) =>
+            section.type === "skills" ? (
+              <View
+                key={section.id}
+                style={{
+                  marginTop: sectionIndex === 0 ? 0 : 4,
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: "#E2E8F0",
+                  paddingVertical: 10
+                }}
+              >
+                <Text style={{ fontFamily: "Courier-Bold", fontSize: 7, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                  {sectionTitleLabel(section)}
                 </Text>
-                <View style={{ marginLeft: 9, height: 0.5, flex: 1, backgroundColor: "#E2E8F0" }} />
-              </View>
-              {section.items.filter((item) => item.visible !== false).map((item) => (
-                <View key={item.id} style={{ marginBottom: 11 }} wrap={false}>
-                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ width: "74%" }}>
-                      <Text style={{ fontFamily: headingFont, fontSize: 10, color: "#16202D" }}>{item.title}</Text>
-                      {item.subtitle ? <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8, color: accent }}>{item.subtitle}</Text> : null}
-                    </View>
-                    <Text style={{ width: "24%", fontFamily: "Courier", fontSize: 7, textAlign: "right", color: "#94A3B8" }}>{fmtDate(item.dateRange)}</Text>
+                {section.items.filter((item) => item.visible !== false).map((item) => (
+                  <View key={item.id} style={{ marginTop: 6, flexDirection: "row" }} wrap={false}>
+                    <Text style={{ width: 82, fontFamily: headingFont, fontSize: 8.2, color: "#1E293B" }}>{item.title || "Stack"}</Text>
+                    <Text style={{ flex: 1, fontFamily: bodyFont, fontSize: 8, color: "#64748B" }}>
+                      {skillEvidenceDetails(item).map((entry) => entry.name).join(" / ")}
+                    </Text>
                   </View>
-                  {item.description ? (
-                    <View style={{ marginTop: 5 }}>
-                      {renderDescriptionParts(item.id, section, {
-                        ...styles,
-                        itemDesc: { ...styles.itemDesc, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 },
-                        bulletText: { ...styles.bulletText, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 }
-                      })(item.description)}
-                    </View>
-                  ) : null}
+                ))}
+              </View>
+            ) : (
+              <View key={section.id} style={{ marginTop: 14 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 9 }} minPresenceAhead={90} wrap={false}>
+                  <Text style={{ fontFamily: "Courier-Bold", fontSize: 7.2, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                    {String(sectionNumberById.get(section.id) ?? 0).padStart(2, "0")} / {sectionTitleLabel(section)}
+                  </Text>
+                  <View style={{ marginLeft: 9, height: 0.5, flex: 1, backgroundColor: "#E2E8F0" }} />
                 </View>
-              ))}
-            </View>
-          ))}
+                {section.items.filter((item) => item.visible !== false).map((item) => (
+                  <View key={item.id} style={{ marginBottom: 11 }}>
+                    <View
+                      style={{ flexDirection: "row", justifyContent: "space-between" }}
+                      minPresenceAhead={36}
+                      wrap={false}
+                    >
+                      <View style={{ width: "74%" }}>
+                        <Text style={{ fontFamily: headingFont, fontSize: 10, color: "#16202D" }}>{item.title}</Text>
+                        {item.subtitle ? <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8, color: accent }}>{item.subtitle}</Text> : null}
+                      </View>
+                      <Text style={{ width: "24%", fontFamily: "Courier", fontSize: 7, textAlign: "right", color: "#94A3B8" }}>{fmtDate(item.dateRange)}</Text>
+                    </View>
+                    {item.description ? (
+                      <View style={{ marginTop: 5 }}>
+                        {renderDescriptionParts(item.id, section, {
+                          ...styles,
+                          itemDesc: { ...styles.itemDesc, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 },
+                          bulletText: { ...styles.bulletText, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 }
+                        })(item.description)}
+                      </View>
+                    ) : null}
+                  </View>
+                ))}
+              </View>
+            )
+          )}
         </Page>
       </Document>
     );

@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import CvLivePreview from "@/app/editor/cv-live-preview";
 import CvPdfDocument from "@/app/editor/cv-pdf-document";
 import { parseCvText, profileFromParsedCv } from "@/lib/cv-import";
+import { createEmptyItem, createEmptyProfile, createEmptySection } from "@/lib/cv-profile";
 import { ensurePdfFonts } from "@/lib/pdf-fonts";
 import { compareProfileEvidenceToPdfText } from "@/lib/pdf-semantic-preflight";
 import { cvTemplates } from "@/lib/templates";
@@ -55,6 +56,80 @@ const extractPdfText = async (buffer: Buffer) => {
   } finally {
     await parser.destroy();
   }
+};
+
+const extractPdfPages = async (buffer: Buffer) => {
+  const parser = new PDFParse({ data: buffer });
+  try {
+    return (await parser.getText({ lineEnforce: false })).pages.map((page) => page.text);
+  } finally {
+    await parser.destroy();
+  }
+};
+
+const renderProfilePdf = async (profile: ReturnType<typeof createEmptyProfile>) => {
+  const documentNode = createElement(CvPdfDocument, { profile }) as unknown as Parameters<
+    typeof renderToBuffer
+  >[0];
+  return renderToBuffer(documentNode);
+};
+
+const longDataLedgerProfile = () => {
+  const profile = createEmptyProfile("data-analytics-clarity");
+  profile.name = "Data ledger pagination regression";
+  profile.basics = {
+    name: "Alex Example",
+    headline: "Senior Technical Consultant and Product Founder",
+    email: "alex@example.com",
+    phone: "+44 7700 900000",
+    url: "example.com",
+    location: "London, United Kingdom",
+    summary: Array.from(
+      { length: 75 },
+      (_, index) => `evidence-led summary term ${index + 1}`
+    ).join(" ")
+  };
+
+  const evidence = createEmptySection("custom");
+  evidence.title = "Evidence Snapshot";
+  const evidenceItem = createEmptyItem();
+  evidenceItem.description = Array.from(
+    { length: 9 },
+    (_, index) =>
+      `- Evidence snapshot result ${index + 1} covering delivery scope, reliability improvements, adoption, and measurable outcomes.`
+  ).join("\n");
+  evidence.items = [evidenceItem];
+
+  const experience = createEmptySection("experience");
+  const trackr = createEmptyItem();
+  trackr.title = "Founder and Product Engineer";
+  trackr.subtitle = "Trackr Pro";
+  trackr.dateRange = "Apr 2025 - Present";
+  trackr.description = Array.from(
+    { length: 8 },
+    (_, index) =>
+      `- Trackr delivery result ${index + 1} spanning product architecture, workflow automation, customer discovery, analytics, and launch execution.`
+  ).join("\n");
+
+  const consulting = createEmptyItem();
+  consulting.title = "SENIOR-CONSULTING-CONTINUATION-MARKER";
+  consulting.subtitle = "Example Consulting";
+  consulting.dateRange = "Apr 2019 - Apr 2025";
+  consulting.description = Array.from(
+    { length: 28 },
+    (_, index) =>
+      `- Enterprise implementation result ${index + 1} across regulated platforms, data integration, stakeholder delivery, and service improvement.`
+  ).join("\n");
+  experience.items = [trackr, consulting];
+
+  const skills = createEmptySection("skills");
+  const skill = createEmptyItem();
+  skill.title = "Stack";
+  skill.description = "TypeScript, Next.js, Postgres, Supabase, Apache NiFi, REST APIs";
+  skills.items = [skill];
+
+  profile.sections = [evidence, experience, skills];
+  return profile;
 };
 
 ensurePdfFonts(path.resolve("public"));
@@ -107,4 +182,47 @@ describe("semantic CV export parity", () => {
       }
     }
   });
+
+  it("keeps Data Analytics Clarity sections in the editor-defined order", async () => {
+    const profile = profileFromParsedCv("data-analytics-clarity", parseCvText(IMPORT_FIXTURE));
+    const experience = profile.sections.find((section) => section.type === "experience");
+    const skills = profile.sections.find((section) => section.type === "skills");
+    const projects = profile.sections.find((section) => section.type === "projects");
+    expect(experience).toBeDefined();
+    expect(skills).toBeDefined();
+    expect(projects).toBeDefined();
+    experience!.title = "ORDER-EXPERIENCE";
+    skills!.title = "ORDER-SKILLS";
+    projects!.title = "ORDER-PROJECTS";
+    profile.sections = [experience!, skills!, projects!];
+
+    const buffer = await renderProfilePdf(profile);
+    const pdfText = await extractPdfText(buffer);
+    const liveText = renderToStaticMarkup(
+      createElement(CvLivePreview, { profile, templateName: "Data Analytics Clarity" })
+    ).replace(/<[^>]+>/g, " ");
+
+    for (const [surface, output] of [["PDF", pdfText], ["live preview", liveText]] as const) {
+      const normalizedOutput = output.replace(/\s+/g, "");
+      const experienceIndex = normalizedOutput.indexOf("ORDER-EXPERIENCE");
+      const skillsIndex = normalizedOutput.indexOf("ORDER-SKILLS");
+      const projectsIndex = normalizedOutput.indexOf("ORDER-PROJECTS");
+      expect(experienceIndex, `${surface} output:\n${output}`).toBeGreaterThanOrEqual(0);
+      expect(skillsIndex, `${surface} output:\n${output}`).toBeGreaterThan(experienceIndex);
+      expect(projectsIndex, `${surface} output:\n${output}`).toBeGreaterThan(skillsIndex);
+    }
+  });
+
+  it(
+    "lets long Data Analytics Clarity experience entries continue into remaining page space",
+    async () => {
+      const buffer = await renderProfilePdf(longDataLedgerProfile());
+      const pages = await extractPdfPages(buffer);
+
+      expect(pages.length).toBeGreaterThan(1);
+      expect(pages[0]).toContain("SENIOR-CONSULTING-CONTINUATION-MARKER");
+      expect(pages.slice(1).join(" ")).toContain("Enterprise implementation result 28");
+    },
+    30_000
+  );
 });

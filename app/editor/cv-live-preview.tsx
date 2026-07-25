@@ -1417,8 +1417,11 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
     const accent = profile.style.accentColor || "#334155";
     const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
     const sections = profile.sections.filter(sectionHasVisibleItems).filter((section) => !isSummarySection(section));
-    const skills = sections.filter((section) => section.type === "skills");
-    const mainSections = sections.filter((section) => section.type !== "skills");
+    const sectionNumberById = new Map(
+      sections
+        .filter((section) => section.type !== "skills")
+        .map((section, index) => [section.id, index + 1])
+    );
 
     return (
       <Card className="lg:sticky lg:top-6">
@@ -1454,50 +1457,50 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
               </div>
             ) : null}
 
-            {skills.map((section) => (
-              <section key={section.id} className="border-b border-slate-200 py-5">
-                <h2 className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: accent }}>
-                  {section.title}
-                </h2>
-                <div className="mt-3 space-y-2">
-                  {section.items.filter((item) => item.visible !== false).map((item) => (
-                    <div key={item.id} className="grid grid-cols-[110px_minmax(0,1fr)] gap-5 text-xs">
-                      <span className="font-semibold text-slate-800">{item.title || "Stack"}</span>
-                      <span className="text-slate-500">
-                        {skillEvidenceDetails(item).map((entry) => entry.name).join("  /  ")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-
-            {mainSections.map((section, sectionIndex) => (
-              <section key={section.id} className="pt-6">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>
-                    {String(sectionIndex + 1).padStart(2, "0")} / {section.title}
+            {sections.map((section) =>
+              section.type === "skills" ? (
+                <section key={section.id} className="border-b border-slate-200 py-5">
+                  <h2 className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: accent }}>
+                    {section.title}
                   </h2>
-                  <div className="h-px flex-1 bg-slate-200" />
-                </div>
-                <div className="space-y-5">
-                  {section.items.filter((item) => item.visible !== false).map((item) => (
-                    <div key={item.id} className="grid grid-cols-[minmax(0,1fr)_130px] gap-x-6">
-                      <div>
-                        <h3 className="text-sm font-semibold" style={{ fontFamily: headingFont }}>{item.title}</h3>
-                        {item.subtitle ? <p className="mt-1 text-xs font-medium" style={{ color: accent }}>{item.subtitle}</p> : null}
+                  <div className="mt-3 space-y-2">
+                    {section.items.filter((item) => item.visible !== false).map((item) => (
+                      <div key={item.id} className="grid grid-cols-[110px_minmax(0,1fr)] gap-5 text-xs">
+                        <span className="font-semibold text-slate-800">{item.title || "Stack"}</span>
+                        <span className="text-slate-500">
+                          {skillEvidenceDetails(item).map((entry) => entry.name).join("  /  ")}
+                        </span>
                       </div>
-                      <p className="text-right font-mono text-[10px] text-slate-400">{formatDateRange(item.dateRange, profile.style.dateFormat)}</p>
-                      {item.description ? (
-                        <div className="col-span-2 mt-2 text-xs leading-5 text-slate-600" style={{ fontFamily: bodyFont }}>
-                          {renderDescription(item, section)}
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <section key={section.id} className="pt-6">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>
+                      {String(sectionNumberById.get(section.id) ?? 0).padStart(2, "0")} / {section.title}
+                    </h2>
+                    <div className="h-px flex-1 bg-slate-200" />
+                  </div>
+                  <div className="space-y-5">
+                    {section.items.filter((item) => item.visible !== false).map((item) => (
+                      <div key={item.id} className="grid grid-cols-[minmax(0,1fr)_130px] gap-x-6">
+                        <div>
+                          <h3 className="text-sm font-semibold" style={{ fontFamily: headingFont }}>{item.title}</h3>
+                          {item.subtitle ? <p className="mt-1 text-xs font-medium" style={{ color: accent }}>{item.subtitle}</p> : null}
                         </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
+                        <p className="text-right font-mono text-[10px] text-slate-400">{formatDateRange(item.dateRange, profile.style.dateFormat)}</p>
+                        {item.description ? (
+                          <div className="col-span-2 mt-2 text-xs leading-5 text-slate-600" style={{ fontFamily: bodyFont }}>
+                            {renderDescription(item, section)}
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )
+            )}
           </article>
         </CardContent>
       </Card>
