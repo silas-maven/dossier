@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Sparkles,
   RefreshCw,
@@ -281,10 +281,10 @@ export default function TailorPane({
         <div>
           <div className="flex items-center gap-2">
             <Bot className="h-4 w-4 text-primary" />
-            <h3 className="font-semibold text-sm">AI Workspace</h3>
+            <h3 className="font-semibold text-sm">Optional AI Workspace</h3>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Analyze job fit &amp; rewrite CV sections with AI.
+            Use AI only when you want rewriting help. Core ATS checks stay local.
           </p>
         </div>
         <Button
@@ -473,7 +473,7 @@ export default function TailorPane({
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
             className="w-full h-36 resize-none rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground/50"
-            placeholder="Paste the target job description here — the AI will compare it against your CV..."
+            placeholder="Paste the target job description for optional AI analysis..."
           />
         </div>
 

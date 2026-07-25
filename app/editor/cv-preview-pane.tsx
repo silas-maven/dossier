@@ -2,7 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Download } from "lucide-react";
+import { CheckCircle2, Download, FileCheck2, FileText, Loader2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,8 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import type { CvProfile } from "@/lib/cv-profile";
+import { createAtsDocxBlob } from "@/lib/docx-export";
+import { verifyPdfSemanticParity, type PdfSemanticCheck } from "@/lib/pdf-semantic-preflight";
 import CvLivePreview from "@/app/editor/cv-live-preview";
 import CvPdfDocument from "@/app/editor/cv-pdf-document";
 import { TrackrPromoDialog, hasSeenTrackrPromo, markTrackrPromoSeen } from "@/components/editor/trackr-promo";
@@ -85,6 +87,16 @@ export default function CvPreviewPane({
 }: CvPreviewPaneProps) {
   const [mode, setMode] = useState<PreviewMode>(defaultMode);
   const [trackrPromoOpen, setTrackrPromoOpen] = useState(false);
+  const [pdfGenerating, setPdfGenerating] = useState(false);
+  const [docxGenerating, setDocxGenerating] = useState(false);
+  const [pdfCheck, setPdfCheck] = useState<{
+    snapshot: string;
+    pages: number;
+    bytes: number;
+    blob: Blob;
+    semantic: PdfSemanticCheck;
+  } | null>(null);
+  const [pdfError, setPdfError] = useState<{ snapshot: string; message: string } | null>(null);
   const htmlPreviewProfile = useDebouncedValue(profile, 250);
   const [pdfPreviewProfile, setPdfPreviewProfile] = useState(profile);
   const [pdfSnapshot, setPdfSnapshot] = useState(() => profileSnapshotHash(profile));
@@ -112,19 +124,52 @@ export default function CvPreviewPane({
     setPdfSnapshot(nextSnapshot);
   }, [mode, nextSnapshot, profile]);
 
-  const fileName = useMemo(() => {
+  const fileNameBase = useMemo(() => {
     let rawName = profile.name;
     if (!rawName || rawName === "My CV Profile" || rawName.trim() === "") {
       rawName = profile.basics.name || "CV";
     }
-    const safeName = rawName.replace(/[^\w.-]+/g, "_");
-    return `${safeName}.pdf`;
+    return rawName.replace(/[^\w.-]+/g, "_");
   }, [profile.name, profile.basics.name]);
+  const fileName = `${fileNameBase}.pdf`;
+
+  const generateCheckedPdf = async () => {
+    const snapshot = profileSnapshotHash(profile);
+    if (pdfCheck?.snapshot === snapshot) return pdfCheck;
+
+    setPdfGenerating(true);
+    setPdfError(null);
+    try {
+      const mod = await import("@react-pdf/renderer");
+      const blob = await mod.pdf(<CvPdfDocument profile={profile} />).toBlob();
+      const verification = await verifyPdfSemanticParity(profile, blob);
+      const checked = {
+        snapshot,
+        pages: verification.pages,
+        bytes: blob.size,
+        blob,
+        semantic: verification.semantic
+      };
+      setPdfCheck(checked);
+      return checked;
+    } catch (error: unknown) {
+      setPdfError({
+        snapshot,
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : "The PDF could not be verified."
+      });
+      throw error;
+    } finally {
+      setPdfGenerating(false);
+    }
+  };
 
   const downloadPdf = async () => {
-    const mod = await import("@react-pdf/renderer");
-    const blob = await mod.pdf(<CvPdfDocument profile={profile} />).toBlob();
-    const url = URL.createObjectURL(blob);
+    const checked = await generateCheckedPdf().catch(() => null);
+    if (!checked || !checked.semantic.passed) return;
+    const url = URL.createObjectURL(checked.blob);
     try {
       const a = document.createElement("a");
       a.href = url;
@@ -139,6 +184,33 @@ export default function CvPreviewPane({
     if (!hasSeenTrackrPromo()) {
       markTrackrPromoSeen();
       window.setTimeout(() => setTrackrPromoOpen(true), 600);
+    }
+  };
+
+  const currentPdfCheck = pdfCheck?.snapshot === nextSnapshot ? pdfCheck : null;
+  const currentPdfError = pdfError?.snapshot === nextSnapshot ? pdfError : null;
+
+  const downloadDocx = async () => {
+    setDocxGenerating(true);
+    try {
+      const blob = await createAtsDocxBlob(profile);
+      const url = URL.createObjectURL(blob);
+      try {
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${fileNameBase}_ATS.docx`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+      if (!hasSeenTrackrPromo()) {
+        markTrackrPromoSeen();
+        window.setTimeout(() => setTrackrPromoOpen(true), 600);
+      }
+    } finally {
+      setDocxGenerating(false);
     }
   };
 
@@ -176,11 +248,100 @@ export default function CvPreviewPane({
           </Button>
         </div>
 
-        <Button type="button" variant="secondary" size="sm" onClick={downloadPdf}>
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => void generateCheckedPdf().catch(() => undefined)}
+            disabled={pdfGenerating}
+          >
+            {pdfGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileCheck2 className="h-4 w-4" />}
+            Check PDF
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => void downloadPdf()}
+            disabled={pdfGenerating}
+          >
+            {pdfGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            {currentPdfCheck && !currentPdfCheck.semantic.passed ? "PDF blocked" : "Download PDF"}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => void downloadDocx()}
+            disabled={docxGenerating}
+            title="Single-column ATS-friendly Word export"
+          >
+            {docxGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+            Download ATS DOCX
+          </Button>
+        </div>
       </div>
+
+      {currentPdfError ? (
+        <div className="flex items-start gap-3 rounded-xl border border-red-400/25 bg-red-500/10 px-3 py-2.5 text-xs text-red-100">
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            <strong>Download blocked.</strong> Dossier could not verify the generated PDF: {currentPdfError.message}
+          </span>
+        </div>
+      ) : null}
+
+      {currentPdfCheck ? (
+        <div
+          className={cn(
+            "flex items-start gap-3 rounded-xl border px-3 py-2.5 text-xs",
+            !currentPdfCheck.semantic.passed
+              ? "border-red-400/25 bg-red-500/10 text-red-100"
+              : currentPdfCheck.pages <= 2
+              ? "border-emerald-400/20 bg-emerald-500/8 text-emerald-100"
+              : "border-amber-300/25 bg-amber-400/8 text-amber-100"
+          )}
+        >
+          {currentPdfCheck.semantic.passed && currentPdfCheck.pages <= 2 ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          ) : (
+            <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          )}
+          {!currentPdfCheck.semantic.passed ? (
+            <div className="min-w-0">
+              <p>
+                <strong>Download blocked:</strong>{" "}
+                {currentPdfCheck.semantic.missing.length} of{" "}
+                {currentPdfCheck.semantic.expectedEvidenceCount} evidence points are missing from the extracted PDF.
+              </p>
+              <ul className="mt-2 space-y-1">
+                {currentPdfCheck.semantic.missing.slice(0, 5).map((claim) => (
+                  <li key={claim.id}>
+                    <span className="font-semibold">{claim.source}:</span> {claim.excerpt}
+                  </li>
+                ))}
+              </ul>
+              {currentPdfCheck.semantic.missing.length > 5 ? (
+                <p className="mt-2">
+                  Plus {currentPdfCheck.semantic.missing.length - 5} more missing evidence points.
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <span>
+              <strong>Content verified.</strong> All{" "}
+              {currentPdfCheck.semantic.expectedEvidenceCount} substantive evidence points are present.{" "}
+              <strong>
+                {currentPdfCheck.pages} {currentPdfCheck.pages === 1 ? "page" : "pages"}.
+              </strong>
+              {currentPdfCheck.pages <= 2
+                ? " Within the professional two-page target."
+                : " Over the two-page target; prioritise evidence before shrinking the type."}
+            </span>
+          )}
+        </div>
+      ) : null}
 
       <Dialog>
         <DialogTrigger asChild>

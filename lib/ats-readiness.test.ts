@@ -194,7 +194,7 @@ describe("analyzeAtsReadiness — keyword coverage", () => {
     expect(result.missingKeywords).not.toContain("k8s");
   });
 
-  it("weights skills-section matches above body-only matches", () => {
+  it("weights evidence-backed matches above skills-only mentions", () => {
     const inSkills = makeProfile({
       headline: "Engineer",
       summary: "Engineer.",
@@ -210,7 +210,7 @@ describe("analyzeAtsReadiness — keyword coverage", () => {
     const jd = "rust";
     const skillsScore = groupById(analyzeAtsReadiness(inSkills, lowRiskTemplate, jd).groups, "jobMatch")!.score;
     const bodyScore = groupById(analyzeAtsReadiness(inBodyOnly, lowRiskTemplate, jd).groups, "jobMatch")!.score;
-    expect(skillsScore).toBeGreaterThan(bodyScore);
+    expect(bodyScore).toBeGreaterThan(skillsScore);
   });
 });
 

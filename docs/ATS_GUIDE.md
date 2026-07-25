@@ -38,11 +38,39 @@ A "Balanced" template (like the `hybrid-header-two-zone` family) attempts to pro
 *   **Pros:** Much better for direct human review (e.g., emailing a hiring manager directly).
 *   **Cons:** Older or less sophisticated ATS parsers might still struggle to serialize the text correctly.
 
+## Content Fit Is Part of ATS Readiness
+
+Parser-safe formatting cannot rescue an unfocused CV. Dossier therefore treats content fit as a separate deterministic check:
+
+- Up to 900 visible words for a normal professional CV.
+- Up to 24 evidence bullets.
+- Up to 16 role-relevant skills.
+- A concise profile of up to 120 words.
+- No duplicated or synonymous skill entries.
+- A two-page target, verified against the generated PDF before download.
+
+These are professional defaults, not universal rules. Academic, research, and specialist CVs can require a longer format. The editor reports the exception instead of silently shrinking the type.
+
+Skills mentioned in a list are not scored as strongly as skills supported by experience or project evidence. This prevents keyword stuffing from improving the readiness estimate.
+
+## Local Import, Checks, and Optional AI
+
+PDF, DOCX, TXT, Markdown, and RTF imports are parsed in the browser. The file is validated, converted into detected sections, and held for review before it can replace the current editor content. Import files are not sent through a Dossier API or to Trackr. Scanned or image-only PDFs require OCR and are not supported by the local importer.
+
+The deterministic ATS and job-description checks also run locally and do not require an account, API key, or AI provider. AI rewriting is a separate optional workspace and never blocks editing, checking, PDF export, or DOCX export. Content is sent to an AI provider only when the user explicitly runs an AI action.
+
+## Export Choices
+
+- The designed PDF preserves the selected template and is best when an employer requests PDF or a person will review the document directly.
+- Before a PDF can download, Dossier extracts its text in the browser and compares it with the profile's substantive summaries, role and organisation names, bullets, certifications, projects, tags, and individual skill evidence. A missing evidence point blocks the download and identifies the affected section.
+- The ATS DOCX export deliberately uses a conservative single-column structure, standard headings, native text, ASCII list markers, and no layout tables. It prioritizes reliable parsing over reproducing an expressive template.
+- Both export paths preserve grouped skill evidence rather than exporting category headings alone.
+
 ## Summary: Designing for ATS
 
 When optimizing for an ATS portal submission:
-1.  **Format:** DOCX is generally the safest format for ATS portals because its XML structure is unambiguous. However, a properly generated text-based PDF is also safe.
+1.  **Format:** Follow the employer's requested format. Use Dossier's ATS DOCX for strict portals; use the designed text-based PDF when PDF is accepted.
 2.  **Layout:** Choose a Single Column layout (`classic-single-column` or `structured-single-column`).
 3.  **Content:** Use standard headings and bulleted lists.
 
-Our `Strong ATS` templates mathematically prioritize these rules, enforcing standard reading order and avoiding complex visual overlays that jeopardize text extraction.
+Our parser-friendly templates prioritize these rules. Dossier's score is a transparent readiness estimate, not a score produced by Workday, Greenhouse, Lever, Taleo, iCIMS, Ashby, or an employer.

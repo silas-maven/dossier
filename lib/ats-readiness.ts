@@ -1,4 +1,5 @@
 import type { CvProfile, CvSection, CvItem } from "@/lib/cv-profile";
+import { analyzeCvFit, CV_FIT_LIMITS } from "@/lib/cv-fit";
 import type { CvTemplate } from "@/lib/templates";
 import { containsTerm } from "@/lib/text-match";
 
@@ -15,7 +16,7 @@ export type AtsReadinessCheck = {
 };
 
 export type AtsReadinessGroup = {
-  id: "parser" | "structure" | "evidence" | "jobMatch";
+  id: "parser" | "structure" | "evidence" | "fit" | "jobMatch";
   label: string;
   score: number;
   maxScore: number;
@@ -266,6 +267,21 @@ const skillsText = (profile: CvProfile) =>
     .join(" ")
     .toLowerCase();
 
+const evidenceText = (profile: CvProfile) =>
+  visibleSections(profile)
+    .filter((section) => section.type !== "skills")
+    .flatMap((section) => [
+      section.title,
+      ...visibleItems(section).flatMap((item) => [
+        item.title,
+        item.subtitle,
+        textFromHtml(item.description),
+        item.tags.join(" ")
+      ])
+    ])
+    .join(" ")
+    .toLowerCase();
+
 const scoreChecks = (checks: AtsReadinessCheck[], maxScore: number) =>
   Math.round((checks.filter((check) => check.passed).length / checks.length) * maxScore);
 
@@ -443,6 +459,58 @@ const buildEvidenceGroup = (profile: CvProfile): AtsReadinessGroup => {
   };
 };
 
+const buildFitGroup = (profile: CvProfile): AtsReadinessGroup => {
+  const fit = analyzeCvFit(profile);
+  const checks: AtsReadinessCheck[] = [
+    {
+      id: "visible-word-budget",
+      label: "Visible word budget",
+      passed: fit.visibleWords <= CV_FIT_LIMITS.visibleWords,
+      detail: `${fit.visibleWords}/${CV_FIT_LIMITS.visibleWords} visible words. Keep evidence focused instead of shrinking the type.`
+    },
+    {
+      id: "summary-budget",
+      label: "Concise profile",
+      passed: fit.summaryWords <= CV_FIT_LIMITS.summaryWords,
+      detail: `${fit.summaryWords}/${CV_FIT_LIMITS.summaryWords} profile words.`
+    },
+    {
+      id: "skill-budget",
+      label: "Role-focused skills",
+      passed: fit.skillCount <= CV_FIT_LIMITS.skills,
+      detail: `${fit.skillCount}/${CV_FIT_LIMITS.skills} unique skills. Keep only skills that strengthen the target application.`
+    },
+    {
+      id: "duplicate-skills",
+      label: "No duplicate skills",
+      passed: fit.duplicateSkills.length === 0,
+      detail: fit.duplicateSkills.length
+        ? `Merge repeated or synonymous skills: ${fit.duplicateSkills.slice(0, 4).join(", ")}.`
+        : "Each skill appears once in the skills inventory."
+    },
+    {
+      id: "bullet-budget",
+      label: "Evidence density",
+      passed: fit.bulletCount <= CV_FIT_LIMITS.bullets,
+      detail: `${fit.bulletCount}/${CV_FIT_LIMITS.bullets} evidence bullets.`
+    },
+    {
+      id: "readable-density",
+      label: "Readable density",
+      passed: !fit.issues.some((issue) => issue.id === "font-size"),
+      detail: "Overflow should be fixed by prioritising content, not by making text too small."
+    }
+  ];
+
+  return {
+    id: "fit",
+    label: "Content fit",
+    maxScore: 20,
+    score: scoreChecks(checks, 20),
+    checks
+  };
+};
+
 type JobMatch = {
   group: AtsReadinessGroup;
   hasJob: boolean;
@@ -454,21 +522,31 @@ const buildJobMatch = (profile: CvProfile, jobDescription?: string): JobMatch =>
   const hasJob = terms.length > 0;
   const allText = cvText(profile);
   const skillText = skillsText(profile);
+  const proofText = evidenceText(profile);
   const allStems = tokenStems(allText);
   const skillStems = tokenStems(skillText);
+  const proofStems = tokenStems(proofText);
 
   const matched: string[] = [];
   const missingKeywords: string[] = [];
-  // Skills-section matches are weighted higher than body-only matches.
+  // A term backed by role/project evidence is more valuable than an unsupported
+  // skills-list mention. This prevents keyword stuffing from improving the score.
   let weightedCoverage = 0;
   for (const term of terms) {
     const inSkills = termMatches(term, skillText, skillStems);
-    const inBody = inSkills || termMatches(term, allText, allStems);
-    if (inSkills) {
+    const inEvidence = termMatches(term, proofText, proofStems);
+    const anywhere = inSkills || inEvidence || termMatches(term, allText, allStems);
+    if (inSkills && inEvidence) {
       weightedCoverage += 1;
       matched.push(term);
-    } else if (inBody) {
-      weightedCoverage += 0.7;
+    } else if (inEvidence) {
+      weightedCoverage += 0.85;
+      matched.push(term);
+    } else if (inSkills) {
+      weightedCoverage += 0.65;
+      matched.push(term);
+    } else if (anywhere) {
+      weightedCoverage += 0.45;
       matched.push(term);
     } else {
       missingKeywords.push(term);
@@ -546,7 +624,8 @@ export const analyzeAtsReadiness = (
   const groups: AtsReadinessGroup[] = [
     buildParserGroup(profile, template),
     buildStructureGroup(profile),
-    buildEvidenceGroup(profile)
+    buildEvidenceGroup(profile),
+    buildFitGroup(profile)
   ];
   if (hasJobDescription) groups.push(jobMatch.group);
 
@@ -562,8 +641,8 @@ export const analyzeAtsReadiness = (
     score,
     band,
     summary: hasJobDescription
-      ? "Estimated from parser safety, CV structure, evidence quality, and target-job keyword coverage."
-      : "Estimated from parser safety, CV structure, and evidence quality. Add a job description for role-match scoring.",
+      ? "Estimated from parser safety, structure, evidence, content fit, and target-job coverage."
+      : "Estimated from parser safety, structure, evidence, and content fit. Add a job description for local role-match scoring.",
     disclaimer:
       "This is not a Workday, Greenhouse, Lever, Taleo, iCIMS, or Ashby score. It is Dossier's readiness estimate based on transparent checks.",
     groups,

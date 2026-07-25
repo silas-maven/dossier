@@ -1,11 +1,14 @@
-import { Document, Page, StyleSheet, Text, View, Image } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import type { CvProfile, CvSection } from "@/lib/cv-profile";
 import { contactInline, contactLines } from "@/lib/contact";
 import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
 import { ensurePdfFonts } from "@/lib/pdf-fonts";
-import { parseSkillEntries } from "@/lib/skill-levels";
+import {
+  skillEvidenceDetails,
+  skillEvidenceLabels
+} from "@/lib/skill-levels";
 import {
   resolveTemplateFamily,
   resolveTemplateTheme,
@@ -71,7 +74,7 @@ const renderInlinePdf = (
     </Text>
   ));
 
-const skillEntriesFromItem = (item: CvSection["items"][number]) => parseSkillEntries(item.description || "");
+const skillEntriesFromItem = (item: CvSection["items"][number]) => skillEvidenceDetails(item);
 
 const skillLabel = (section: CvSection, value: string, suppressBullets = false) => {
   const trimmed = value.trim();
@@ -192,7 +195,9 @@ const usesDossierSansByDefault = (variant: TemplateVariant) =>
   variant === "people-soft" ||
   variant === "scanner-compact" ||
   variant === "process-left" ||
-  variant === "mission-impact";
+  variant === "mission-impact" ||
+  variant === "portfolio-grid" ||
+  variant === "data-ledger";
 
 const resolvePdfFontPair = (
   variant: TemplateVariant,
@@ -542,7 +547,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
   const summaryAlign = profile.style.summaryAlign ?? "left";
   const fmtDate = (value: string) => formatDateRange(value, profile.style.dateFormat);
 
-  if (family === "classic-single-column") {
+  if (family === "classic-single-column" && variant === "banded-grey") {
     const email = profile.basics.email?.trim();
     const phone = profile.basics.phone?.trim();
     const location = profile.basics.location?.trim();
@@ -1673,7 +1678,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                   {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                     <View style={{ marginTop: 4 }}>
                       <Text style={{ fontSize: 9.5, color: "#111827", fontFamily: bodyFont, lineHeight: 1.4 }}>
-                        {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join(", ")}
+                        {skillEvidenceLabels(section.items).join(", ")}
                       </Text>
                     </View>
                   ) : (
@@ -1778,7 +1783,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               </View>
               {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ marginTop: 4, flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                  {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
+                  {skillEvidenceLabels(section.items).map((name, idx) => (
                     <View key={idx} style={{ borderWidth: 1, borderColor: "#E5E7EB", borderRadius: 12, paddingHorizontal: 8, paddingVertical: 4 }}>
                       <Text style={{ fontSize: 9, color: "#374151", fontFamily: bodyFont }}>
                         {name}
@@ -1926,10 +1931,22 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                         ))}
                       </View>
                     ) : section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
-                      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
-                        {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
-                          <View key={idx} style={{ backgroundColor: sidebarBg, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 3, borderWidth: 1, borderColor: accent }}>
-                             <Text style={{ fontSize: 8, fontFamily: bodyFont, color: accent }}>{name}</Text>
+                      <View style={{ gap: 6 }}>
+                        {skillEvidenceLabels(section.items).map((name, idx) => (
+                          <View
+                            key={idx}
+                            style={{
+                              backgroundColor: sidebarBg,
+                              borderRadius: 6,
+                              paddingHorizontal: 6,
+                              paddingVertical: 4,
+                              borderWidth: 1,
+                              borderColor: `${accent}88`
+                            }}
+                          >
+                            <Text style={{ fontSize: 7.7, lineHeight: 1.35, fontFamily: bodyFont, color: "#374151" }}>
+                              {name}
+                            </Text>
                           </View>
                         ))}
                       </View>
@@ -1991,7 +2008,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ marginTop: 4 }}>
                   <Text style={{ fontSize: 10, color: "#374151", fontFamily: bodyFont, lineHeight: 1.5, textAlign: "center" }}>
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  •  ")}
+                    {skillEvidenceLabels(section.items).join("  •  ")}
                   </Text>
                 </View>
               ) : (
@@ -2069,7 +2086,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                 </View>
                 {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, paddingHorizontal: 8 }}>
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
+                    {skillEvidenceLabels(section.items).map((name, idx) => (
                       <Text key={idx} style={{ fontSize: 9, color: accent, fontFamily: headingFont, textTransform: "uppercase" }}>
                         {name}
                       </Text>
@@ -2154,14 +2171,23 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
                     {sectionTitleLabel(section)}
                   </Text>
                   <View style={{ gap: 6 }}>
-                    {section.items.map((item) => (
-                      <View key={item.id}>
-                        <Text style={{ fontSize: 9.5, fontFamily: headingFont, color: "#111827" }}>{item.title || ""}</Text>
-                        {item.subtitle ? (
-                          <Text style={{ fontSize: 8.5, fontFamily: bodyFont, color: "#6B7280", marginTop: 2 }}>{item.subtitle}</Text>
-                        ) : null}
-                      </View>
-                    ))}
+                    {section.type === "skills" || section.title.toLowerCase().includes("skills")
+                      ? skillEvidenceLabels(section.items).map((label, index) => (
+                          <Text
+                            key={`${section.id}-${index}`}
+                            style={{ fontSize: 8.5, lineHeight: 1.35, fontFamily: bodyFont, color: "#374151" }}
+                          >
+                            {label}
+                          </Text>
+                        ))
+                      : section.items.map((item) => (
+                          <View key={item.id}>
+                            <Text style={{ fontSize: 9.5, fontFamily: headingFont, color: "#111827" }}>{item.title || ""}</Text>
+                            {item.subtitle ? (
+                              <Text style={{ fontSize: 8.5, fontFamily: bodyFont, color: "#6B7280", marginTop: 2 }}>{item.subtitle}</Text>
+                            ) : null}
+                          </View>
+                        ))}
                   </View>
                 </View>
               ))}
@@ -2262,7 +2288,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ paddingHorizontal: 8 }}>
                   <Text style={{ fontSize: 9.5, color: "#374151", fontFamily: bodyFont, lineHeight: 1.5 }}>
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  |  ")}
+                    {skillEvidenceLabels(section.items).join("  |  ")}
                   </Text>
                 </View>
               ) : (
@@ -2340,7 +2366,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
               {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                 <View style={{ alignItems: "center" }}>
                   <Text style={{ fontSize: 10, color: "#374151", fontFamily: bodyFont, lineHeight: 1.5 }}>
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  •  ")}
+                    {skillEvidenceLabels(section.items).join("  •  ")}
                   </Text>
                 </View>
               ) : (
@@ -2379,9 +2405,302 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
     );
   }
 
+  if (variant === "data-ledger") {
+    const accent = profile.style.accentColor || "#334155";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
+    const skills = sections.filter((section) => section.type === "skills");
+    const mainSections = sections.filter((section) => section.type !== "skills");
+
+    return (
+      <Document>
+        <Page size="A4" style={[styles.page, { paddingHorizontal: 36, paddingVertical: 34, backgroundColor: "#FBFCFD" }]}>
+          <View style={{ borderBottomWidth: 1.4, borderBottomColor: accent, paddingBottom: 13 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <View style={{ width: "68%" }}>
+                <Text style={{ fontFamily: "Courier", fontSize: 7, textTransform: "uppercase", letterSpacing: 1.4, color: accent }}>
+                  Data / evidence ledger
+                </Text>
+                <Text style={{ marginTop: 6, fontFamily: headingFont, fontSize: 21, color: "#16202D" }}>
+                  {profile.basics.name || "Your Name"}
+                </Text>
+                {profile.basics.headline ? (
+                  <Text style={{ marginTop: 4, fontFamily: bodyFont, fontSize: 9.5, color: "#64748B" }}>{profile.basics.headline}</Text>
+                ) : null}
+              </View>
+              <Text style={{ width: "30%", fontFamily: "Courier", fontSize: 7.2, lineHeight: 1.5, textAlign: "right", color: "#94A3B8" }}>
+                {contactInline(profile, "\n")}
+              </Text>
+            </View>
+          </View>
+
+          {profileSummary ? (
+            <View style={{ flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#E2E8F0", paddingVertical: 11 }} wrap={false}>
+              <Text style={{ width: 82, fontFamily: "Courier-Bold", fontSize: 7, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                Signal
+              </Text>
+              <Text style={{ flex: 1, fontFamily: bodyFont, fontSize: 8.8, lineHeight: 1.4, color: "#475569" }}>{profileSummary}</Text>
+            </View>
+          ) : null}
+
+          {skills.map((section) => (
+            <View key={section.id} style={{ borderBottomWidth: 0.5, borderBottomColor: "#E2E8F0", paddingVertical: 10 }}>
+              <Text style={{ fontFamily: "Courier-Bold", fontSize: 7, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                {sectionTitleLabel(section)}
+              </Text>
+              {section.items.filter((item) => item.visible !== false).map((item) => (
+                <View key={item.id} style={{ marginTop: 6, flexDirection: "row" }} wrap={false}>
+                  <Text style={{ width: 82, fontFamily: headingFont, fontSize: 8.2, color: "#1E293B" }}>{item.title || "Stack"}</Text>
+                  <Text style={{ flex: 1, fontFamily: bodyFont, fontSize: 8, color: "#64748B" }}>
+                    {skillEvidenceDetails(item).map((entry) => entry.name).join(" / ")}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))}
+
+          {mainSections.map((section, sectionIndex) => (
+            <View key={section.id} style={{ marginTop: 14 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 9 }} minPresenceAhead={90} wrap={false}>
+                <Text style={{ fontFamily: "Courier-Bold", fontSize: 7.2, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                  {String(sectionIndex + 1).padStart(2, "0")} / {sectionTitleLabel(section)}
+                </Text>
+                <View style={{ marginLeft: 9, height: 0.5, flex: 1, backgroundColor: "#E2E8F0" }} />
+              </View>
+              {section.items.filter((item) => item.visible !== false).map((item) => (
+                <View key={item.id} style={{ marginBottom: 11 }} wrap={false}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View style={{ width: "74%" }}>
+                      <Text style={{ fontFamily: headingFont, fontSize: 10, color: "#16202D" }}>{item.title}</Text>
+                      {item.subtitle ? <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8, color: accent }}>{item.subtitle}</Text> : null}
+                    </View>
+                    <Text style={{ width: "24%", fontFamily: "Courier", fontSize: 7, textAlign: "right", color: "#94A3B8" }}>{fmtDate(item.dateRange)}</Text>
+                  </View>
+                  {item.description ? (
+                    <View style={{ marginTop: 5 }}>
+                      {renderDescriptionParts(item.id, section, {
+                        ...styles,
+                        itemDesc: { ...styles.itemDesc, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 },
+                        bulletText: { ...styles.bulletText, fontFamily: bodyFont, fontSize: 8.2, color: "#475569", lineHeight: 1.35 }
+                      })(item.description)}
+                    </View>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+          ))}
+        </Page>
+      </Document>
+    );
+  }
+
+  if (variant === "executive-brief") {
+    const accent = profile.style.accentColor || "#171717";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
+    const skills = sections.filter((section) => section.type === "skills");
+    const mainSections = sections.filter((section) => section.type !== "skills");
+    const skillNames = skills.flatMap((section) =>
+      section.items
+        .filter((item) => item.visible !== false)
+        .flatMap((item) => skillEvidenceDetails(item).map((entry) => entry.name))
+    );
+
+    return (
+      <Document>
+        <Page size="A4" style={[styles.page, { paddingHorizontal: 36, paddingTop: 0, paddingBottom: 34, backgroundColor: "#FBFAF7" }]}>
+          <View style={{ height: 14, marginHorizontal: -36, marginBottom: 22, backgroundColor: "#171717" }} />
+          <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", borderBottomWidth: 0.7, borderBottomColor: "#D6D3D1", paddingBottom: 14 }}>
+            <View style={{ width: "68%" }}>
+              <Text style={{ fontFamily: bodyFont, fontSize: 7.5, textTransform: "uppercase", letterSpacing: 1.8, color: accent }}>
+                Executive brief
+              </Text>
+              <Text style={{ marginTop: 6, fontFamily: headingFont, fontSize: 22, color: "#171717" }}>
+                {profile.basics.name || "Your Name"}
+              </Text>
+              {profile.basics.headline ? (
+                <Text style={{ marginTop: 5, fontFamily: bodyFont, fontSize: 10, color: "#57534E" }}>
+                  {profile.basics.headline}
+                </Text>
+              ) : null}
+            </View>
+            <Text style={{ width: "30%", fontFamily: bodyFont, fontSize: 8, lineHeight: 1.45, textAlign: "right", color: "#78716C" }}>
+              {contactInline(profile, "\n")}
+            </Text>
+          </View>
+
+          {profileSummary ? (
+            <View style={{ marginTop: 14, flexDirection: "row", backgroundColor: "#F3F1ED", borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: "#E7E5E4", padding: 10 }} wrap={false}>
+              <Text style={{ width: 108, fontFamily: headingFont, fontSize: 8, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                Leadership mandate
+              </Text>
+              <Text style={{ flex: 1, fontFamily: bodyFont, fontSize: 9, lineHeight: 1.45, color: "#44403C" }}>
+                {profileSummary}
+              </Text>
+            </View>
+          ) : null}
+
+          {skillNames.length ? (
+            <View style={{ marginTop: 12, flexDirection: "row", flexWrap: "wrap", gap: 8, borderBottomWidth: 0.5, borderBottomColor: "#E7E5E4", paddingBottom: 10 }}>
+              {skillNames.map((skill) => (
+                <Text key={skill} style={{ fontFamily: bodyFont, fontSize: 7.5, textTransform: "uppercase", letterSpacing: 0.7, color: "#78716C" }}>
+                  {skill}
+                </Text>
+              ))}
+            </View>
+          ) : null}
+
+          {mainSections.map((section) => (
+            <View key={section.id} style={{ marginTop: 16 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 9 }} minPresenceAhead={90} wrap={false}>
+                <Text style={{ fontFamily: headingFont, fontSize: 8.5, textTransform: "uppercase", letterSpacing: 1.2, color: accent }}>
+                  {sectionTitleLabel(section)}
+                </Text>
+                <View style={{ marginLeft: 10, height: 0.5, flex: 1, backgroundColor: "#D6D3D1" }} />
+              </View>
+              {section.items.filter((item) => item.visible !== false).map((item) => (
+                <View key={item.id} style={{ flexDirection: "row", marginBottom: 12 }} wrap={false}>
+                  <Text style={{ width: 92, paddingTop: 1, fontFamily: bodyFont, fontSize: 8, color: "#A8A29E" }}>
+                    {fmtDate(item.dateRange)}
+                  </Text>
+                  <View style={{ flex: 1, borderLeftWidth: 0.6, borderLeftColor: "#D6D3D1", paddingLeft: 13 }}>
+                    <Text style={{ fontFamily: headingFont, fontSize: 10.5, color: "#1C1917" }}>{item.title}</Text>
+                    {item.subtitle ? (
+                      <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 8.5, color: accent }}>{item.subtitle}</Text>
+                    ) : null}
+                    {item.description ? (
+                      <View style={{ marginTop: 5 }}>
+                        {renderDescriptionParts(item.id, section, {
+                          ...styles,
+                          itemDesc: { ...styles.itemDesc, fontFamily: bodyFont, fontSize: 8.5, color: "#57534E", lineHeight: 1.35 },
+                          bulletText: { ...styles.bulletText, fontFamily: bodyFont, fontSize: 8.5, color: "#57534E", lineHeight: 1.35 }
+                        })(item.description)}
+                      </View>
+                    ) : null}
+                  </View>
+                </View>
+              ))}
+            </View>
+          ))}
+        </Page>
+      </Document>
+    );
+  }
+
+  if (variant === "portfolio-grid") {
+    const accent = profile.style.accentColor || "#EA580C";
+    const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
+    const skills = sections.filter((section) => section.type === "skills");
+    const workSections = sections.filter((section) => section.type === "experience" || section.type === "projects");
+    const supportingSections = sections.filter(
+      (section) => section.type !== "skills" && section.type !== "experience" && section.type !== "projects"
+    );
+    const workItems = workSections.flatMap((section) =>
+      section.items.filter((item) => item.visible !== false).map((item) => ({ item, section }))
+    );
+
+    return (
+      <Document>
+        <Page size="A4" style={[styles.page, { padding: 0, flexDirection: "row", backgroundColor: "#F5F1E9" }]}>
+          <View style={{ width: "33%", height: "100%", backgroundColor: "#1D1D1B", paddingHorizontal: 22, paddingVertical: 30, color: "#FFFFFF" }}>
+            <Text style={{ fontFamily: bodyFont, fontSize: 7.5, textTransform: "uppercase", letterSpacing: 1.8, color: "#A8A29E" }}>
+              Selected practice
+            </Text>
+            <Text style={{ marginTop: 14, fontFamily: headingFont, fontSize: 22, lineHeight: 0.95, color: "#FFFFFF" }}>
+              {profile.basics.name || "Your Name"}
+            </Text>
+            <View style={{ marginTop: 14, width: 34, height: 3, backgroundColor: accent }} />
+            {profile.basics.headline ? (
+              <Text style={{ marginTop: 15, fontFamily: headingFont, fontSize: 10.5, lineHeight: 1.3, color: "#E7E5E4" }}>
+                {profile.basics.headline}
+              </Text>
+            ) : null}
+            <Text style={{ marginTop: 16, fontFamily: bodyFont, fontSize: 7.8, lineHeight: 1.55, color: "#A8A29E" }}>
+              {contactInline(profile, "\n")}
+            </Text>
+            {profileSummary ? (
+              <Text style={{ marginTop: 18, fontFamily: bodyFont, fontSize: 8.5, lineHeight: 1.45, color: "#D6D3D1" }}>
+                {profileSummary}
+              </Text>
+            ) : null}
+            {skills.map((section) => (
+              <View key={section.id} style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: "#44403C", paddingTop: 12 }}>
+                <Text style={{ fontFamily: bodyFont, fontSize: 7, textTransform: "uppercase", letterSpacing: 1.2, color: "#78716C" }}>
+                  {sectionTitleLabel(section)}
+                </Text>
+                <View style={{ marginTop: 8, flexDirection: "row", flexWrap: "wrap", gap: 5 }}>
+                  {section.items
+                    .filter((item) => item.visible !== false)
+                    .flatMap((item) => skillEvidenceDetails(item))
+                    .map((entry) => (
+                      <Text key={entry.name} style={{ borderWidth: 0.5, borderColor: "#57534E", borderRadius: 7, paddingHorizontal: 5, paddingVertical: 3, fontFamily: bodyFont, fontSize: 7.2, color: "#D6D3D1" }}>
+                        {entry.name}
+                      </Text>
+                    ))}
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <View style={{ width: "67%", paddingHorizontal: 22, paddingVertical: 30 }}>
+            <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", borderBottomWidth: 0.6, borderBottomColor: "#D6D3D1", paddingBottom: 8 }}>
+              <Text style={{ fontFamily: headingFont, fontSize: 9, textTransform: "uppercase", letterSpacing: 1.3, color: accent }}>
+                Selected work
+              </Text>
+              <Text style={{ fontFamily: bodyFont, fontSize: 6.8, textTransform: "uppercase", letterSpacing: 0.8, color: "#A8A29E" }}>
+                Brief - Contribution - Result
+              </Text>
+            </View>
+            <View style={{ marginTop: 12, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+              {workItems.map(({ item, section }, index) => (
+                <View
+                  key={item.id}
+                  style={{
+                    width: index === 0 ? "100%" : "48.5%",
+                    marginBottom: 10,
+                    borderWidth: 0.6,
+                    borderColor: "#D6D3D1",
+                    backgroundColor: "#FFFEFC",
+                    padding: 10
+                  }}
+                  wrap={false}
+                >
+                  <Text style={{ fontFamily: bodyFont, fontSize: 7, textTransform: "uppercase", letterSpacing: 1, color: accent }}>
+                    {fmtDate(item.dateRange) || `0${index + 1}`}
+                  </Text>
+                  <Text style={{ marginTop: 5, fontFamily: headingFont, fontSize: 10.5, color: "#1C1917" }}>{item.title}</Text>
+                  {item.subtitle ? <Text style={{ marginTop: 2, fontFamily: bodyFont, fontSize: 7.8, color: "#78716C" }}>{item.subtitle}</Text> : null}
+                  {item.description ? (
+                    <View style={{ marginTop: 6 }}>
+                      {renderDescriptionParts(item.id, section, {
+                        ...styles,
+                        itemDesc: { ...styles.itemDesc, fontFamily: bodyFont, fontSize: 8, color: "#57534E", lineHeight: 1.35 },
+                        bulletText: { ...styles.bulletText, fontFamily: bodyFont, fontSize: 8, color: "#57534E", lineHeight: 1.35 }
+                      })(item.description)}
+                    </View>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+            {supportingSections.map((section) => (
+              <View key={section.id} style={{ marginTop: 10, borderTopWidth: 0.6, borderTopColor: "#D6D3D1", paddingTop: 9 }}>
+                <Text style={{ fontFamily: headingFont, fontSize: 8, textTransform: "uppercase", letterSpacing: 1.1, color: accent }}>
+                  {sectionTitleLabel(section)}
+                </Text>
+                {section.items.filter((item) => item.visible !== false).map((item) => (
+                  <View key={item.id} style={{ marginTop: 7, flexDirection: "row", justifyContent: "space-between" }} wrap={false}>
+                    <Text style={{ fontFamily: headingFont, fontSize: 8.5, color: "#292524" }}>{item.title}</Text>
+                    <Text style={{ fontFamily: bodyFont, fontSize: 7.5, color: "#A8A29E" }}>{item.subtitle || fmtDate(item.dateRange)}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </View>
+        </Page>
+      </Document>
+    );
+  }
+
   if (variant === "mission-impact") {
     const headline = profile.basics.headline?.trim();
-    const contact = contactInline(profile);
     const accent = profile.style.accentColor || "#166534"; // mission-forest
     const sidebarBg = profile.style.sidebarColor || "#F0FDF4";
     const { headingFont, bodyFont } = resolvePdfFontPair(variant, profile.style.fontFamily);
@@ -2417,7 +2736,7 @@ export default function CvPdfDocument({ profile }: CvPdfDocumentProps) {
 
                   <View style={{ gap: 8 }}>
 
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
+                    {skillEvidenceLabels(section.items).map((name, idx) => (
 
                       <View key={idx}>
 

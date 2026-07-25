@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   Eye,
@@ -29,6 +29,9 @@ import {
   templateExperienceLevelOptions,
   templateFamilyDefinitions,
   templateFamilyOptions,
+  getTemplateIndustryGroup,
+  templateIndustryGroupDefinitions,
+  templateIndustryGroups,
   templateLayoutOptions,
   templateThemeLabels
 } from "@/lib/templates";
@@ -87,25 +90,21 @@ function TemplatePreviewImage({
   template: CvTemplate;
   priority?: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
-
   return (
-    <div className="absolute inset-0">
-      {!loaded ? (
-        <div className="absolute inset-0 animate-pulse bg-[linear-gradient(180deg,#172235_0%,#0d1524_100%)]" />
-      ) : null}
-      <Image
-        src={template.previewImage}
-        alt={`${template.name} preview`}
-        fill
-        priority={priority}
-        sizes="(max-width: 768px) 84vw, (max-width: 1280px) 34vw, 22vw"
-        className={cn(
-          "object-cover object-top transition duration-500",
-          loaded ? "scale-100 opacity-100" : "scale-[1.02] opacity-0"
-        )}
-        onLoad={() => setLoaded(true)}
-      />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.12),transparent_42%),#09111f] p-5">
+      <div className="relative mx-auto h-full max-w-[230px] overflow-hidden rounded-[3px] bg-[#fbfaf7] shadow-[0_22px_55px_rgba(0,0,0,0.48)]">
+        <Image
+          src={template.previewImage}
+          alt={`Rendered first page of the ${template.name} CV template`}
+          fill
+          sizes="230px"
+          className="object-cover object-top"
+          priority={priority}
+        />
+      </div>
+      <span className="absolute right-3 top-3 rounded-full border border-white/10 bg-[#080d16]/82 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.14em] text-white/65 backdrop-blur">
+        Actual PDF
+      </span>
     </div>
   );
 }
@@ -154,7 +153,7 @@ function TemplateCard({
           <div className="absolute inset-x-0 bottom-0 p-4">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-white/78 backdrop-blur-sm">
-                {template.category}
+                {template.industry}
               </span>
               <span
                 className={cn(
@@ -320,6 +319,7 @@ export default function TemplateCarousel({
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedLayouts, setSelectedLayouts] = useState<string[]>([]);
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const templateIndustryOptions = useMemo(
@@ -342,45 +342,14 @@ export default function TemplateCarousel({
   );
 
   const gallerySections = useMemo(() => {
-    const used = new Set<string>();
-    const pull = (predicate: (template: CvTemplate) => boolean) => {
-      const matches = filteredTemplates.filter((template) => !used.has(template.id) && predicate(template));
-      matches.forEach((template) => used.add(template.id));
-      return matches;
-    };
-
-    return [
-      {
-        id: "recommended",
-        label: "Recommended",
-        description: "The safest starting points for most users: low parser-risk layout, clean hierarchy, and broad role coverage.",
-        templates: pull((template) => template.shelf === "Top Rated")
-      },
-      {
-        id: "parser-safe",
-        label: "parser-friendly",
-        description: "Single-column and conservative layouts for application portals and automated parsing.",
-        templates: pull((template) => template.atsMode === "safe" || template.parserRisk === "Low")
-      },
-      {
-        id: "executive-corporate",
-        label: "Executive / Corporate",
-        description: "Structured templates for consulting, finance, programme delivery, and senior stakeholder-facing roles.",
-        templates: pull((template) => template.shelf === "Corporate" || template.experienceLevel === "Executive")
-      },
-      {
-        id: "creative-human",
-        label: "Creative / Human-first",
-        description: "More visual PDFs for direct recruiter review, networking, and brand-forward applications.",
-        templates: pull((template) => template.shelf === "Creative" || template.atsMode === "human-first")
-      },
-      {
-        id: "other",
-        label: "More matches",
-        description: "Additional templates that match the current filters.",
-        templates: pull(() => true)
-      }
-    ].filter((section) => section.templates.length > 0);
+    return templateIndustryGroups
+      .map((group) => ({
+        id: group,
+        label: templateIndustryGroupDefinitions[group].label,
+        description: templateIndustryGroupDefinitions[group].description,
+        templates: filteredTemplates.filter((template) => getTemplateIndustryGroup(template) === group)
+      }))
+      .filter((section) => section.templates.length > 0);
   }, [filteredTemplates]);
 
   const activeFilters = [
@@ -437,25 +406,37 @@ export default function TemplateCarousel({
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Refine</p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground">Filter the gallery</h2>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground"
-            onClick={() => {
-              setSelectedFamily("All");
-              setSelectedIndustries([]);
-              setSelectedLayouts([]);
-              setSelectedExperienceLevels([]);
-              setSearchQuery("");
-            }}
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => {
+                setSelectedFamily("All");
+                setSelectedIndustries([]);
+                setSelectedLayouts([]);
+                setSelectedExperienceLevels([]);
+                setSearchQuery("");
+              }}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setFiltersOpen((current) => !current)}
+              aria-expanded={filtersOpen}
+            >
+              {filtersOpen ? "Hide filters" : "Show filters"}
+            </Button>
+          </div>
         </div>
 
-        <div className="mt-6 space-y-6">
+        <div className={cn("mt-6 space-y-6", filtersOpen ? "block" : "hidden", "lg:block")}>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Family</p>
             <div className="mt-3 space-y-2">

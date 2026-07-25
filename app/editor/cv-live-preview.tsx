@@ -4,7 +4,7 @@ import type { CvProfile, CvSection } from "@/lib/cv-profile";
 import { contactInline, contactLines } from "@/lib/contact";
 import { formatDateRange } from "@/lib/date-format";
 import { parseDescriptionBlocks, type InlineRun } from "@/lib/description-format";
-import { parseSkillEntries } from "@/lib/skill-levels";
+import { skillEvidenceDetails, skillEvidenceLabels } from "@/lib/skill-levels";
 import { resolveTemplateTheme, resolveTemplateVariant } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
@@ -268,7 +268,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                     {usesSkillPills ? (
                       <div className="mt-2 space-y-3">
                         {section.items.filter((item) => item.visible !== false).map((item) => {
-                          const entries = parseSkillEntries(item.description);
+                          const entries = skillEvidenceDetails(item);
                           if (entries.length === 0) return null;
                           return (
                             <div key={item.id}>
@@ -300,7 +300,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         {section.items
                           .filter((item) => item.visible !== false)
                           .flatMap((item) =>
-                            parseSkillEntries(item.description).map((entry, index) => (
+                            skillEvidenceDetails(item).map((entry, index) => (
                               <div key={`${item.id}-${index}`}>
                                 <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
                                 <div className="mt-1 h-[3px] w-full bg-foreground/90" />
@@ -366,12 +366,14 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         <div key={item.id}>
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
-                              <p className="break-words font-semibold text-foreground">{item.title || "Role / Degree"}</p>
+                              {item.title ? <p className="break-words font-semibold text-foreground">{item.title}</p> : null}
                               {item.subtitle ? <p className="break-words text-sm text-muted-foreground">{item.subtitle}</p> : null}
                             </div>
-                            <p className="shrink-0 text-xs text-muted-foreground">
-                              {formatDateRange(item.dateRange, profile.style.dateFormat) || "Date range"}
-                            </p>
+                            {item.dateRange ? (
+                              <p className="shrink-0 text-xs text-muted-foreground">
+                                {formatDateRange(item.dateRange, profile.style.dateFormat)}
+                              </p>
+                            ) : null}
                           </div>
                           {renderDescription(item, section)}
                           {item.tags.length > 0 ? <p className="mt-1 text-xs text-muted-foreground">{item.tags.join(" • ")}</p> : null}
@@ -469,7 +471,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                       {section.items
                         .filter((item) => item.visible !== false)
                         .flatMap((item) =>
-                          parseSkillEntries(item.description).map((entry, index) => (
+                          skillEvidenceDetails(item).map((entry, index) => (
                             <div key={`${item.id}-${index}`}>
                               <p className="text-xs text-foreground">{skillLabel(section, entry.name)}</p>
                               <div className="mt-1 h-[2px] w-full bg-foreground/70" />
@@ -513,12 +515,14 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                           <div key={item.id}>
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0 flex-1">
-                                <p className="break-words font-semibold text-foreground">{item.title || "Role / Degree"}</p>
+                                {item.title ? <p className="break-words font-semibold text-foreground">{item.title}</p> : null}
                                 {item.subtitle ? <p className="break-words text-sm text-muted-foreground">{item.subtitle}</p> : null}
                               </div>
-                              <p className="shrink-0 text-xs text-muted-foreground">
-                                {formatDateRange(item.dateRange, profile.style.dateFormat) || "Date range"}
-                              </p>
+                              {item.dateRange ? (
+                                <p className="shrink-0 text-xs text-muted-foreground">
+                                  {formatDateRange(item.dateRange, profile.style.dateFormat)}
+                                </p>
+                              ) : null}
                             </div>
                             {renderDescription(item, section)}
                             {item.tags.length > 0 ? <p className="mt-1 text-xs text-muted-foreground">{item.tags.join(" • ")}</p> : null}
@@ -598,9 +602,9 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                               <p>{formatDateRange(item.dateRange, profile.style.dateFormat) || ""}</p>
                             </div>
                             <div>
-                              <p className="break-words font-medium text-foreground">
-                                {item.title || "Role / Degree"}
-                              </p>
+                              {item.title ? (
+                                <p className="break-words font-medium text-foreground">{item.title}</p>
+                              ) : null}
                               {item.subtitle ? (
                                 <p className="break-words text-sm text-muted-foreground">{item.subtitle}</p>
                               ) : null}
@@ -628,7 +632,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                       {section.items
                         .filter((item) => item.visible !== false)
                         .flatMap((item) =>
-                          parseSkillEntries(item.description).map((entry, index) => (
+                          skillEvidenceDetails(item).map((entry, index) => (
                             <div key={`${item.id}-${index}`}>
                               <p className="text-sm text-foreground">{skillLabel(section, entry.name, true)}</p>
                               <div className="mt-1 flex items-center gap-1">
@@ -702,7 +706,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                   {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                     <div className="mt-2">
                       <p className="text-sm text-foreground leading-relaxed" style={{ fontFamily: bodyFont }}>
-                        {section.items.filter(item => item.visible !== false).map(item => (item.title || "").trim()).filter(Boolean).join(", ")}
+                        {skillEvidenceLabels(section.items).join(" • ")}
                       </p>
                     </div>
                   ) : (
@@ -809,7 +813,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                 </h3>
                 {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
+                    {skillEvidenceLabels(section.items).map((name, idx) => (
                       <span key={idx} className="px-2.5 py-1 text-xs border rounded-full text-muted-foreground border-border bg-muted/20" style={{ fontFamily: bodyFont }}>
                         {name}
                       </span>
@@ -950,11 +954,15 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                           ))}
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
-                          {section.items.filter(item => item.visible !== false).map((item) => (
-                            <span key={item.id} className="px-2 py-1 text-[10px] border rounded bg-background" style={{ borderColor: accent, color: accent, fontFamily: bodyFont }}>
-                              {item.title}
-                            </span>
+                        <div className="space-y-2">
+                          {skillEvidenceLabels(section.items).map((label, index) => (
+                            <p
+                              key={`${section.id}-${index}`}
+                              className="rounded border bg-background px-2 py-1.5 text-[10px] leading-relaxed text-muted-foreground"
+                              style={{ borderColor: `${accent}66`, fontFamily: bodyFont }}
+                            >
+                              {label}
+                            </p>
                           ))}
                         </div>
                       )}
@@ -1011,7 +1019,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                   
                   {section.title.toLowerCase().includes("skills") || section.type === "skills" ? (
                     <div className="text-center text-sm text-gray-700 leading-relaxed" style={{ fontFamily: bodyFont }}>
-                      {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  •  ")}
+                      {skillEvidenceLabels(section.items).join("  •  ")}
                     </div>
                   ) : (
                     <div className="space-y-5">
@@ -1088,7 +1096,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                   
                   {section.title.toLowerCase().includes("skills") || section.type === "skills" ? (
                     <div className="flex flex-wrap gap-2 px-2">
-                      {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).map((name, idx) => (
+                      {skillEvidenceLabels(section.items).map((name, idx) => (
                         <span key={idx} className="text-[10px] font-medium uppercase" style={{ color: accent }}>
                           {name}
                         </span>
@@ -1171,14 +1179,24 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                       {section.title}
                     </h3>
                     <div className="space-y-2">
-                      {section.items.filter(item => item.visible !== false).map((item) => (
-                        <div key={item.id}>
-                          <h4 className="text-[11px] font-medium text-gray-900">{item.title}</h4>
-                          {item.subtitle ? (
-                            <div className="text-[10px] text-gray-500 mt-0.5" style={{ fontFamily: bodyFont }}>{item.subtitle}</div>
-                          ) : null}
-                        </div>
-                      ))}
+                      {section.type === "skills" || section.title.toLowerCase().includes("skills")
+                        ? skillEvidenceLabels(section.items).map((label, index) => (
+                            <p
+                              key={`${section.id}-${index}`}
+                              className="text-[10px] leading-relaxed text-gray-700"
+                              style={{ fontFamily: bodyFont }}
+                            >
+                              {label}
+                            </p>
+                          ))
+                        : section.items.filter(item => item.visible !== false).map((item) => (
+                            <div key={item.id}>
+                              <h4 className="text-[11px] font-medium text-gray-900">{item.title}</h4>
+                              {item.subtitle ? (
+                                <div className="text-[10px] text-gray-500 mt-0.5" style={{ fontFamily: bodyFont }}>{item.subtitle}</div>
+                              ) : null}
+                            </div>
+                          ))}
                     </div>
                   </section>
                 ))}
@@ -1277,7 +1295,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                 {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                   <div style={{ padding: "0 12px" }}>
                     <p style={{ fontSize: "0.95rem", color: "#374151", fontFamily: bodyFont, lineHeight: 1.6 }}>
-                      {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  |  ")}
+                      {skillEvidenceLabels(section.items).join("  |  ")}
                     </p>
                   </div>
                 ) : (
@@ -1358,7 +1376,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                 {section.type === "skills" || section.title.toLowerCase().includes("skills") ? (
                   <div style={{ textAlign: "center" }}>
                     <p style={{ fontSize: "1rem", color: "#374151", fontFamily: bodyFont, lineHeight: 1.6 }}>
-                      {section.items.filter(i => i.visible !== false).flatMap(i => [i.title, ...parseSkillEntries(i.description).map(e => e.name)].filter(Boolean)).join("  •  ")}
+                      {skillEvidenceLabels(section.items).join("  •  ")}
                     </p>
                   </div>
                 ) : (
@@ -1395,9 +1413,301 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
     );
   }
 
+  if (variant === "data-ledger") {
+    const accent = profile.style.accentColor || "#334155";
+    const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
+    const sections = profile.sections.filter(sectionHasVisibleItems).filter((section) => !isSummarySection(section));
+    const skills = sections.filter((section) => section.type === "skills");
+    const mainSections = sections.filter((section) => section.type !== "skills");
+
+    return (
+      <Card className="lg:sticky lg:top-6">
+        <CardHeader>
+          <CardTitle>Live Preview</CardTitle>
+          <CardDescription>{templateName}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <article className="overflow-hidden rounded-xl border bg-[#fbfcfd] p-9 text-[#16202d]">
+            <header className="border-b-2 pb-5" style={{ borderColor: accent }}>
+              <div className="flex items-start justify-between gap-8">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: accent }}>
+                    Data / evidence ledger
+                  </p>
+                  <h1 className="mt-2 text-[2rem] font-semibold leading-none" style={{ fontFamily: headingFont }}>
+                    {profile.basics.name || "Your Name"}
+                  </h1>
+                  {profile.basics.headline ? (
+                    <p className="mt-2 text-sm text-slate-500" style={{ fontFamily: bodyFont }}>{profile.basics.headline}</p>
+                  ) : null}
+                </div>
+                <p className="max-w-[240px] whitespace-pre-line text-right font-mono text-[10px] leading-5 text-slate-400">
+                  {contactInline(profile, "\n")}
+                </p>
+              </div>
+            </header>
+
+            {profileSummary ? (
+              <div className="grid grid-cols-[110px_minmax(0,1fr)] gap-5 border-b border-slate-200 py-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: accent }}>Signal</p>
+                <p className="text-sm leading-6 text-slate-600" style={{ fontFamily: bodyFont }}>{profileSummary}</p>
+              </div>
+            ) : null}
+
+            {skills.map((section) => (
+              <section key={section.id} className="border-b border-slate-200 py-5">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: accent }}>
+                  {section.title}
+                </h2>
+                <div className="mt-3 space-y-2">
+                  {section.items.filter((item) => item.visible !== false).map((item) => (
+                    <div key={item.id} className="grid grid-cols-[110px_minmax(0,1fr)] gap-5 text-xs">
+                      <span className="font-semibold text-slate-800">{item.title || "Stack"}</span>
+                      <span className="text-slate-500">
+                        {skillEvidenceDetails(item).map((entry) => entry.name).join("  /  ")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            {mainSections.map((section, sectionIndex) => (
+              <section key={section.id} className="pt-6">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>
+                    {String(sectionIndex + 1).padStart(2, "0")} / {section.title}
+                  </h2>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+                <div className="space-y-5">
+                  {section.items.filter((item) => item.visible !== false).map((item) => (
+                    <div key={item.id} className="grid grid-cols-[minmax(0,1fr)_130px] gap-x-6">
+                      <div>
+                        <h3 className="text-sm font-semibold" style={{ fontFamily: headingFont }}>{item.title}</h3>
+                        {item.subtitle ? <p className="mt-1 text-xs font-medium" style={{ color: accent }}>{item.subtitle}</p> : null}
+                      </div>
+                      <p className="text-right font-mono text-[10px] text-slate-400">{formatDateRange(item.dateRange, profile.style.dateFormat)}</p>
+                      {item.description ? (
+                        <div className="col-span-2 mt-2 text-xs leading-5 text-slate-600" style={{ fontFamily: bodyFont }}>
+                          {renderDescription(item, section)}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </article>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (variant === "executive-brief") {
+    const accent = profile.style.accentColor || "#171717";
+    const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
+    const sections = profile.sections.filter(sectionHasVisibleItems).filter((section) => !isSummarySection(section));
+    const skills = sections.filter((section) => section.type === "skills");
+    const mainSections = sections.filter((section) => section.type !== "skills");
+
+    return (
+      <Card className="lg:sticky lg:top-6">
+        <CardHeader>
+          <CardTitle>Live Preview</CardTitle>
+          <CardDescription>{templateName}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <article className="overflow-hidden rounded-xl border bg-[#fbfaf7] text-[#171717]">
+            <div className="h-5 bg-[#171717]" />
+            <div className="px-10 pb-10 pt-8">
+              <header className="grid grid-cols-[minmax(0,1fr)_230px] items-end gap-8 border-b border-black/20 pb-5">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em]" style={{ color: accent }}>
+                    Executive brief
+                  </p>
+                  <h1 className="mt-2 text-[2rem] font-semibold leading-none" style={{ fontFamily: headingFont }}>
+                    {profile.basics.name || "Your Name"}
+                  </h1>
+                  {profile.basics.headline ? (
+                    <p className="mt-2 text-sm text-black/65" style={{ fontFamily: bodyFont }}>
+                      {profile.basics.headline}
+                    </p>
+                  ) : null}
+                </div>
+                <p className="whitespace-pre-line text-right text-[11px] leading-5 text-black/55" style={{ fontFamily: bodyFont }}>
+                  {contactInline(profile, "\n")}
+                </p>
+              </header>
+
+              {profileSummary ? (
+                <section className="my-6 grid grid-cols-[150px_minmax(0,1fr)] gap-6 border-y border-black/10 bg-black/[0.025] px-4 py-4">
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent, fontFamily: headingFont }}>
+                    Leadership mandate
+                  </h2>
+                  <p className="text-sm leading-6 text-black/70" style={{ fontFamily: bodyFont }}>
+                    {profileSummary}
+                  </p>
+                </section>
+              ) : null}
+
+              {skills.length ? (
+                <div className="mb-7 flex flex-wrap gap-x-4 gap-y-2 border-b border-black/10 pb-5">
+                  {skills.flatMap((section) =>
+                    section.items
+                      .filter((item) => item.visible !== false)
+                      .flatMap((item) => skillEvidenceDetails(item))
+                      .map((entry) => (
+                        <span key={entry.name} className="text-[11px] font-medium uppercase tracking-[0.12em] text-black/55">
+                          {entry.name}
+                        </span>
+                      ))
+                  )}
+                </div>
+              ) : null}
+
+              <div className="space-y-7">
+                {mainSections.map((section) => (
+                  <section key={section.id}>
+                    <div className="mb-4 flex items-center gap-4">
+                      <h2 className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: accent, fontFamily: headingFont }}>
+                        {section.style.uppercaseTitle ? section.title.toUpperCase() : section.title}
+                      </h2>
+                      <div className="h-px flex-1 bg-black/15" />
+                    </div>
+                    <div className="space-y-5">
+                      {section.items.filter((item) => item.visible !== false).map((item) => (
+                        <div key={item.id} className="grid grid-cols-[120px_minmax(0,1fr)] gap-6">
+                          <div className="text-[11px] leading-5 text-black/45" style={{ fontFamily: bodyFont }}>
+                            {formatDateRange(item.dateRange, profile.style.dateFormat)}
+                          </div>
+                          <div className="border-l border-black/15 pl-5">
+                            <h3 className="text-sm font-semibold" style={{ fontFamily: headingFont }}>{item.title}</h3>
+                            {item.subtitle ? (
+                              <p className="mt-1 text-xs font-medium" style={{ color: accent, fontFamily: bodyFont }}>{item.subtitle}</p>
+                            ) : null}
+                            {item.description ? (
+                              <div className="mt-2 text-xs leading-5 text-black/65" style={{ fontFamily: bodyFont }}>
+                                {renderDescription(item, section)}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </div>
+          </article>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (variant === "portfolio-grid") {
+    const accent = profile.style.accentColor || "#EA580C";
+    const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
+    const sections = profile.sections.filter(sectionHasVisibleItems).filter((section) => !isSummarySection(section));
+    const skills = sections.filter((section) => section.type === "skills");
+    const workSections = sections.filter((section) => section.type === "experience" || section.type === "projects");
+    const supportingSections = sections.filter(
+      (section) => section.type !== "skills" && section.type !== "experience" && section.type !== "projects"
+    );
+
+    return (
+      <Card className="lg:sticky lg:top-6">
+        <CardHeader>
+          <CardTitle>Live Preview</CardTitle>
+          <CardDescription>{templateName}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <article className="overflow-hidden rounded-xl border bg-[#f5f1e9] text-[#1d1d1b]">
+            <div className="grid grid-cols-[34%_66%]">
+              <aside className="min-h-full bg-[#1d1d1b] p-7 text-white">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-white/45">Selected practice</p>
+                <h1 className="mt-4 text-[2rem] font-semibold leading-[0.95]" style={{ fontFamily: headingFont }}>
+                  {profile.basics.name || "Your Name"}
+                </h1>
+                <div className="mt-5 h-1 w-12" style={{ backgroundColor: accent }} />
+                {profile.basics.headline ? (
+                  <p className="mt-5 text-sm leading-5 text-white/75" style={{ fontFamily: bodyFont }}>{profile.basics.headline}</p>
+                ) : null}
+                <p className="mt-6 whitespace-pre-line text-[10px] leading-5 text-white/45" style={{ fontFamily: bodyFont }}>
+                  {contactInline(profile, "\n")}
+                </p>
+                {profileSummary ? (
+                  <p className="mt-7 text-xs leading-5 text-white/65" style={{ fontFamily: bodyFont }}>{profileSummary}</p>
+                ) : null}
+                {skills.map((section) => (
+                  <section key={section.id} className="mt-8 border-t border-white/15 pt-5">
+                    <h2 className="text-[10px] uppercase tracking-[0.2em] text-white/40">{section.title}</h2>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {section.items
+                        .filter((item) => item.visible !== false)
+                        .flatMap((item) => skillEvidenceDetails(item))
+                        .map((entry) => (
+                          <span key={entry.name} className="rounded-full border border-white/15 px-2 py-1 text-[10px] text-white/70">
+                            {entry.name}
+                          </span>
+                        ))}
+                    </div>
+                  </section>
+                ))}
+              </aside>
+
+              <div className="p-7">
+                <div className="flex items-end justify-between gap-4 border-b border-black/15 pb-3">
+                  <h2 className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: accent }}>
+                    Selected work
+                  </h2>
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-black/35">Brief · Contribution · Result</span>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-4">
+                  {workSections.flatMap((section) =>
+                    section.items.filter((item) => item.visible !== false).map((item, index) => (
+                      <section
+                        key={item.id}
+                        className={cn(
+                          "border border-black/10 bg-white/55 p-4",
+                          index === 0 && "col-span-2"
+                        )}
+                      >
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>
+                          {item.dateRange || `0${index + 1}`}
+                        </p>
+                        <h3 className="mt-2 text-sm font-semibold leading-tight" style={{ fontFamily: headingFont }}>{item.title}</h3>
+                        {item.subtitle ? <p className="mt-1 text-[11px] text-black/45">{item.subtitle}</p> : null}
+                        {item.description ? (
+                          <div className="mt-3 text-[11px] leading-5 text-black/65" style={{ fontFamily: bodyFont }}>
+                            {renderDescription(item, section)}
+                          </div>
+                        ) : null}
+                      </section>
+                    ))
+                  )}
+                </div>
+                {supportingSections.map((section) => (
+                  <section key={section.id} className="mt-6 border-t border-black/15 pt-4">
+                    <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>{section.title}</h2>
+                    {section.items.filter((item) => item.visible !== false).map((item) => (
+                      <div key={item.id} className="mt-3 flex items-baseline justify-between gap-4 text-xs">
+                        <span className="font-medium">{item.title}</span>
+                        <span className="text-black/40">{item.subtitle || item.dateRange}</span>
+                      </div>
+                    ))}
+                  </section>
+                ))}
+              </div>
+            </div>
+          </article>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (variant === "mission-impact") {
     const headline = profile.basics.headline?.trim();
-    const contact = contactInline(profile);
     const accent = profile.style.accentColor || "#166534"; // mission-forest
     const sidebarBg = profile.style.sidebarColor || "#F0FDF4";
     const { headingFont, bodyFont } = resolveLiveFontStack(profile.style.fontFamily);
@@ -1436,14 +1746,23 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                     </h2>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {section.items.map((item) => (
-                      <div key={item.id}>
-                        <h3 style={{ fontSize: "0.95rem", fontFamily: headingFont, color: "#111827" }}>{item.title || ""}</h3>
-                        {item.subtitle ? (
-                          <p style={{ fontSize: "0.85rem", fontFamily: bodyFont, color: "#4B5563", marginTop: 2 }}>{item.subtitle}</p>
-                        ) : null}
-                      </div>
-                    ))}
+                    {section.type === "skills" || section.title.toLowerCase().includes("skills")
+                      ? skillEvidenceLabels(section.items).map((label, index) => (
+                          <p
+                            key={`${section.id}-skill-${index}`}
+                            style={{ fontSize: "0.9rem", fontFamily: bodyFont, color: "#111827", lineHeight: 1.45 }}
+                          >
+                            {label}
+                          </p>
+                        ))
+                      : section.items.map((item) => (
+                          <div key={item.id}>
+                            <h3 style={{ fontSize: "0.95rem", fontFamily: headingFont, color: "#111827" }}>{item.title || ""}</h3>
+                            {item.subtitle ? (
+                              <p style={{ fontSize: "0.85rem", fontFamily: bodyFont, color: "#4B5563", marginTop: 2 }}>{item.subtitle}</p>
+                            ) : null}
+                          </div>
+                        ))}
                   </div>
                 </div>
               ))}
@@ -1566,7 +1885,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                             <div key={item.id}>
                               {item.title ? <p className="text-sm font-medium">{item.title}</p> : null}
                               <div className="mt-1 space-y-2">
-                                {parseSkillEntries(item.description).map((entry, index) => (
+                                {skillEvidenceDetails(item).map((entry, index) => (
                                   <div key={`${item.id}-${index}`}>
                                     <p
                                       className="text-muted-foreground"
@@ -1638,7 +1957,7 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                         {section.items
                           .filter((item) => item.visible !== false)
                           .flatMap((item, itemIndex) =>
-                            parseSkillEntries(item.description).map((entry, entryIndex) => (
+                            skillEvidenceDetails(item).map((entry, entryIndex) => (
                               <p
                                 key={`${item.id}-${itemIndex}-${entryIndex}`}
                                 className="break-words text-muted-foreground"
@@ -1657,25 +1976,31 @@ export default function CvLivePreview({ profile, templateName }: CvLivePreviewPr
                             <div key={item.id}>
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0 flex-1">
-                                  <p
-                                    className="break-words font-medium text-foreground"
-                                    style={{ fontSize: `${Math.max(12, section.style.bodyFontSize + 4)}px` }}
-                                  >
-                                    {item.title || "Role / Degree"}
-                                  </p>
-                                  <p
-                                    className="break-words text-muted-foreground"
-                                    style={{ fontSize: `${Math.max(11, section.style.bodyFontSize + 3)}px` }}
-                                  >
-                                    {item.subtitle || "Company / School"}
-                                  </p>
+                                  {item.title ? (
+                                    <p
+                                      className="break-words font-medium text-foreground"
+                                      style={{ fontSize: `${Math.max(12, section.style.bodyFontSize + 4)}px` }}
+                                    >
+                                      {item.title}
+                                    </p>
+                                  ) : null}
+                                  {item.subtitle ? (
+                                    <p
+                                      className="break-words text-muted-foreground"
+                                      style={{ fontSize: `${Math.max(11, section.style.bodyFontSize + 3)}px` }}
+                                    >
+                                      {item.subtitle}
+                                    </p>
+                                  ) : null}
                                 </div>
-                                <p
-                                  className="shrink-0 text-right text-muted-foreground"
-                                  style={{ fontSize: `${Math.max(10, section.style.bodyFontSize + 2)}px` }}
-                                >
-                                  {formatDateRange(item.dateRange, profile.style.dateFormat) || "Date range"}
-                                </p>
+                                {item.dateRange ? (
+                                  <p
+                                    className="shrink-0 text-right text-muted-foreground"
+                                    style={{ fontSize: `${Math.max(10, section.style.bodyFontSize + 2)}px` }}
+                                  >
+                                    {formatDateRange(item.dateRange, profile.style.dateFormat)}
+                                  </p>
+                                ) : null}
                               </div>
                               {renderDescription(item, section)}
                               {item.tags.length > 0 ? (

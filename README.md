@@ -12,17 +12,17 @@ A privacy-focused resume builder for managing multiple profiles and templates.
 - **Template Engine:** Swap between single-column (ATS-friendly) and modern two-column layouts instantly.
 - **Structured Data:** Edit sections (Experience, Projects, Education) independently.
 - **Live Preview:** See changes in real-time.
-- **One-Click Export:** Clean PDF generation (Puppeteer/React-PDF).
+- **One-Click Export:** Designed PDF plus conservative single-column ATS DOCX.
 
 ## Tech Stack
 - **Framework:** Next.js (App Router)
 - **State/Storage:** Zustand + IDB (IndexedDB)
 - **Styling:** Tailwind CSS + shadcn/ui
-- **PDF Generation:** @react-pdf/renderer
+- **Document Generation:** @react-pdf/renderer and docx
 - **AI Integration:** OpenAI/Anthropic API (optional, on-demand only)
 
 ## Roadmap
 1.  **Core Data Model:** Define the JSON schema for a resume.
 2.  **Editor UI:** Section-based editing with drag-and-drop reordering.
 3.  **Template System:** Implement "Modern" and "Classic" templates.
-4.  **Export Pipeline:** PDF rendering.
+4.  **Export Pipeline:** Designed PDF rendering and ATS-safe DOCX generation.

@@ -26,13 +26,13 @@ export default function TemplatesPickClient() {
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Choose your CV style</h1>
             <p className="mt-2 text-xs text-muted-foreground">
-              Local autosave is active. Your CV stays in this browser unless you export it.
+              Free to use · no account required · optional AI · local autosave
             </p>
           </div>
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Compare parser-friendly and human-first layouts by use case. Pick a style first, then let the builder
-          guide the content and AI review.
+          Start with your industry, then choose a parser-friendly upload format or a more expressive direct-send
+          format. The builder and ATS checks work without AI.
         </p>
 
         <div className="mt-8">

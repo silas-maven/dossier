@@ -51,26 +51,27 @@ export function TrackrPromoDialog({ open, onOpenChange }: TrackrPromoDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Made your CV? Now what?</DialogTitle>
-          <DialogDescription>Trackr Pro is the privacy-first layer for everything after the CV:</DialogDescription>
+          <DialogTitle>Your CV is ready.</DialogTitle>
+          <DialogDescription>
+            Dossier handles the document. Trackr Pro is the separate app by the same maker for everything after it.
+          </DialogDescription>
         </DialogHeader>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span>
-              Advanced analysis of your <strong className="text-foreground">application strength</strong>
+              Keep every application, deadline, contact, and next action in one place
             </span>
           </li>
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span>
-              <strong className="text-foreground">Live and mock interviews</strong> built around the roles
-              you applied for
+              Review your <strong className="text-foreground">application strength</strong> and prepare for interviews
             </span>
           </li>
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span>Browse and save any job in one click with the Trackr browser extension</span>
+            <span>Save roles from the web with the Trackr browser extension</span>
           </li>
         </ul>
         <DialogFooter className="mt-2 gap-2 sm:gap-2">
@@ -79,7 +80,7 @@ export function TrackrPromoDialog({ open, onOpenChange }: TrackrPromoDialogProps
           </Button>
           <Button asChild size="sm">
             <a href={trackrUrl("pdf_download")} target="_blank" rel="noopener noreferrer">
-              Explore Trackr Pro
+              Continue with Trackr Pro
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
@@ -99,8 +100,8 @@ export function TrackrSideLink() {
       className="group flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 transition hover:border-white/20 hover:bg-white/[0.06]"
     >
       <span className="flex flex-col">
-        <span className="text-sm font-medium text-white/90">Track your applications</span>
-        <span className="text-xs text-white/55">Keep tabs on every job you apply to with Trackr Pro.</span>
+        <span className="text-sm font-medium text-white/90">Your CV is one part of the search</span>
+        <span className="text-xs text-white/55">Continue in Trackr Pro — a separate application by the same maker.</span>
       </span>
       <ExternalLink className="h-4 w-4 shrink-0 text-white/50 transition group-hover:text-white/80" />
     </a>

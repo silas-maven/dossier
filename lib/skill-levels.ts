@@ -3,6 +3,13 @@ export type SkillEntry = {
   level: number;
 };
 
+type SkillEvidenceItem = {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  visible?: boolean;
+};
+
 export const DEFAULT_SKILL_LEVEL = 4;
 export const MIN_SKILL_LEVEL = 1;
 export const MAX_SKILL_LEVEL = 5;
@@ -78,6 +85,42 @@ export const parseSkillEntries = (description: string): SkillEntry[] => {
     return true;
   });
 };
+
+const uniqueSkillEntries = (entries: SkillEntry[]) => {
+  const seen = new Set<string>();
+  return entries.filter((entry) => {
+    const key = entry.name.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+export const skillEvidenceDetails = (item: SkillEvidenceItem): SkillEntry[] =>
+  uniqueSkillEntries([
+    ...parseSkillEntries(item.description || ""),
+    ...(item.tags || [])
+      .map((tag) => normalizeSkillName(tag))
+      .filter(Boolean)
+      .map((name) => ({ name, level: DEFAULT_SKILL_LEVEL }))
+  ]);
+
+export const skillEvidenceLabel = (item: SkillEvidenceItem) => {
+  const title = normalizeSkillName(item.title || "");
+  const details = skillEvidenceDetails(item)
+    .map((entry) => entry.name)
+    .filter((name) => name.toLowerCase() !== title.toLowerCase());
+
+  if (title && details.length) return `${title}: ${details.join(", ")}`;
+  if (title) return title;
+  return details.join(", ");
+};
+
+export const skillEvidenceLabels = (items: SkillEvidenceItem[]) =>
+  items
+    .filter((item) => item.visible !== false)
+    .map(skillEvidenceLabel)
+    .filter(Boolean);
 
 export const serializeSkillEntries = (entries: SkillEntry[]) =>
   entries

@@ -69,6 +69,68 @@ const generalScenario: SeedScenario = {
   ]
 };
 
+const focusedScenario = (input: {
+  name: string;
+  headline: string;
+  summary: string;
+  role: string;
+  company: string;
+  bullets: [string, string];
+  previousRole: string;
+  previousBullets: [string, string];
+  skills: string;
+  educationTitle?: string;
+  certifications?: string[];
+  projects?: SeedScenario["projects"];
+}): SeedScenario => ({
+  basics: {
+    name: input.name,
+    headline: input.headline,
+    email: `${input.name.toLowerCase().split(" ")[0]}@example.com`,
+    phone: "+44 7700 900888",
+    url: "https://example.com",
+    location: "London, UK",
+    summary: input.summary
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: input.role,
+      subtitle: input.company,
+      dateRange: "2022 - Present",
+      description: `- ${input.bullets[0]}\n- ${input.bullets[1]}`,
+      tags: [],
+      visible: true
+    },
+    {
+      id: "exp-2",
+      title: input.previousRole,
+      subtitle: input.company,
+      dateRange: "2019 - 2022",
+      description: `- ${input.previousBullets[0]}\n- ${input.previousBullets[1]}`,
+      tags: [],
+      visible: true
+    }
+  ],
+  skills: input.skills,
+  projects: input.projects,
+  education: [
+    {
+      ...generalScenario.education[0]!,
+      title: input.educationTitle ?? generalScenario.education[0]!.title
+    }
+  ],
+  certifications: input.certifications?.map((title, index) => ({
+    id: `cert-${index + 1}`,
+    title,
+    subtitle: "",
+    dateRange: "",
+    description: "",
+    tags: [],
+    visible: true
+  }))
+});
+
 const scenarios: Record<string, SeedScenario> = {
   "Software Engineering": generalScenario,
   "Product Management": {
@@ -354,7 +416,215 @@ const scenarios: Record<string, SeedScenario> = {
     ],
     skills: "Renewal management, Adoption planning, QBRs, CRM hygiene, Stakeholder communication",
     education: generalScenario.education
-  }
+  },
+  Legal: focusedScenario({
+    name: "Amelia Example",
+    headline: "Commercial counsel for technology and regulated services",
+    summary:
+      "Commercial counsel advising product, sales, and leadership teams on complex contracts, governance, privacy, and operational risk.",
+    role: "Senior Legal Counsel",
+    company: "Northbridge Group",
+    bullets: [
+      "Negotiated technology and services agreements worth more than £18M while reducing average review time by 28%.",
+      "Advised executive stakeholders on privacy, regulatory, and product-launch risk across the UK and EU."
+    ],
+    previousRole: "Legal Counsel",
+    previousBullets: [
+      "Built contract playbooks and fallback positions used across sales and procurement.",
+      "Managed external counsel and matter reporting across four jurisdictions."
+    ],
+    skills: "Commercial contracts, Data privacy, Corporate governance, Regulatory advice, Negotiation",
+    educationTitle: "LL.B. Law",
+    certifications: ["Solicitor - England & Wales"]
+  }),
+  Sales: focusedScenario({
+    name: "Marcus Example",
+    headline: "Enterprise account executive for complex B2B sales",
+    summary:
+      "Enterprise seller with a record of building pipeline, navigating multi-stakeholder deals, and growing strategic accounts.",
+    role: "Enterprise Account Executive",
+    company: "SignalCloud",
+    bullets: [
+      "Closed £2.8M in annual contract value at 118% of quota across financial-services accounts.",
+      "Built a £6.2M qualified pipeline and improved win rate from 24% to 34%."
+    ],
+    previousRole: "Account Executive",
+    previousBullets: [
+      "Won the region's largest new logo through a six-month consultative sales cycle.",
+      "Created mutual action plans that reduced late-stage deal slippage by 22%."
+    ],
+    skills: "Enterprise sales, Pipeline management, MEDDPICC, Negotiation, Salesforce, Account planning"
+  }),
+  Marketing: focusedScenario({
+    name: "Nadia Example",
+    headline: "Growth marketer connecting campaigns to pipeline",
+    summary:
+      "Growth marketer with experience across demand generation, lifecycle, content, and performance programmes for B2B products.",
+    role: "Growth Marketing Lead",
+    company: "Northstar Labs",
+    bullets: [
+      "Generated £3.1M in sourced pipeline while reducing blended cost per lead by 26%.",
+      "Built a lifecycle programme that increased trial-to-paid conversion from 14% to 20%."
+    ],
+    previousRole: "Campaign Manager",
+    previousBullets: [
+      "Led integrated launches across paid, partner, email, and content channels.",
+      "Introduced campaign reporting that connected channel spend to opportunity value."
+    ],
+    skills: "Demand generation, Lifecycle marketing, HubSpot, Paid media, Content strategy, Attribution"
+  }),
+  "Human Resources": focusedScenario({
+    name: "Leila Example",
+    headline: "People partner for scaling organisations",
+    summary:
+      "People partner supporting leaders through growth, employee relations, organisational change, and people-program delivery.",
+    role: "Senior People Partner",
+    company: "Brightline Group",
+    bullets: [
+      "Supported a 420-person organisation through restructuring while maintaining 92% regrettable-talent retention.",
+      "Redesigned manager enablement and reduced employee-relations case duration by 31%."
+    ],
+    previousRole: "HR Business Partner",
+    previousBullets: [
+      "Advised leaders on performance, policy, workforce planning, and complex cases.",
+      "Implemented an HRIS workflow that cut onboarding administration by 40%."
+    ],
+    skills: "Employee relations, Organisational design, Workforce planning, HRIS, Policy, Coaching"
+  }),
+  "Talent Acquisition": focusedScenario({
+    name: "Noah Example",
+    headline: "Talent acquisition partner for technical hiring",
+    summary:
+      "Recruiter experienced in technical and go-to-market hiring, sourcing strategy, stakeholder partnership, and funnel improvement.",
+    role: "Senior Talent Partner",
+    company: "Foundry Systems",
+    bullets: [
+      "Filled 64 roles across engineering and product while reducing median time-to-fill from 52 to 38 days.",
+      "Built sourcing experiments that increased qualified underrepresented candidates by 36%."
+    ],
+    previousRole: "Technical Recruiter",
+    previousBullets: [
+      "Managed 18 concurrent requisitions with a 91% offer-acceptance rate.",
+      "Created interviewer training and scorecards used across five departments."
+    ],
+    skills: "Technical recruiting, Sourcing, Greenhouse, LinkedIn Recruiter, Funnel analytics, Interview design"
+  }),
+  Healthcare: focusedScenario({
+    name: "Sofia Example",
+    headline: "Registered nurse focused on safe, coordinated care",
+    summary:
+      "Registered nurse with experience in acute care, patient education, multidisciplinary coordination, and quality improvement.",
+    role: "Senior Staff Nurse",
+    company: "Riverside NHS Trust",
+    bullets: [
+      "Coordinated care for a 28-bed unit while maintaining 98% medication-audit compliance.",
+      "Introduced discharge education that reduced avoidable readmissions by 12%."
+    ],
+    previousRole: "Staff Nurse",
+    previousBullets: [
+      "Delivered evidence-based care across complex medical and surgical caseloads.",
+      "Mentored six newly qualified nurses through preceptorship."
+    ],
+    skills: "Clinical assessment, Care planning, Medication safety, Patient education, Documentation",
+    educationTitle: "B.Sc. Adult Nursing",
+    certifications: ["NMC Registered Nurse", "Immediate Life Support"]
+  }),
+  Education: focusedScenario({
+    name: "Daniel Example",
+    headline: "Lecturer and programme lead in digital practice",
+    summary:
+      "Educator combining inclusive teaching, curriculum design, research-informed practice, and programme leadership.",
+    role: "Senior Lecturer",
+    company: "Westbridge University",
+    bullets: [
+      "Redesigned a 240-student module and increased first-time pass rates by 11 percentage points.",
+      "Led programme review and accreditation evidence across a team of 14 lecturers."
+    ],
+    previousRole: "Lecturer",
+    previousBullets: [
+      "Delivered seminars, assessment, supervision, and student-support interventions.",
+      "Published applied research and presented findings at two sector conferences."
+    ],
+    skills: "Curriculum design, Assessment, Research, Student support, Programme leadership",
+    educationTitle: "Ph.D. Education"
+  }),
+  Nonprofit: focusedScenario({
+    name: "Aisha Example",
+    headline: "Programme leader for community and youth services",
+    summary:
+      "Mission-driven programme leader experienced in service delivery, partnerships, grants, safeguarding, and measurable community outcomes.",
+    role: "Head of Programmes",
+    company: "FuturePath Foundation",
+    bullets: [
+      "Expanded youth-employment services from two to six boroughs, supporting 1,400 participants annually.",
+      "Secured £1.2M in grant renewals through stronger outcomes reporting and funder relationships."
+    ],
+    previousRole: "Programme Manager",
+    previousBullets: [
+      "Managed delivery partners, safeguarding, budgets, and frontline performance.",
+      "Introduced beneficiary feedback that increased programme completion by 17%."
+    ],
+    skills: "Programme delivery, Fundraising, Partnerships, Safeguarding, Impact measurement"
+  }),
+  "Executive Leadership": focusedScenario({
+    name: "Elliot Example",
+    headline: "Operations executive leading scale and transformation",
+    summary:
+      "Executive leader with responsibility for multi-region operations, transformation, commercial performance, and organisational capability.",
+    role: "Chief Operating Officer",
+    company: "Northbridge Services",
+    bullets: [
+      "Led a three-year operating-model transformation that increased EBITDA by £9.4M.",
+      "Scaled service delivery across five markets while improving customer retention to 94%."
+    ],
+    previousRole: "Operations Director",
+    previousBullets: [
+      "Owned a £42M budget and a 380-person organisation across operations and customer delivery.",
+      "Integrated two acquisitions while maintaining service levels and key-talent retention."
+    ],
+    skills: "Operating strategy, Transformation, P&L ownership, Board reporting, Organisational design"
+  }),
+  "Design & Creative": focusedScenario({
+    name: "Maya Example",
+    headline: "Product designer shaping complex digital services",
+    summary:
+      "Product designer combining research, systems thinking, interaction design, and cross-functional delivery for high-stakes services.",
+    role: "Senior Product Designer",
+    company: "Common Thread Studio",
+    bullets: [
+      "Redesigned onboarding for a regulated platform and increased successful completion by 23%.",
+      "Built a shared design system adopted across four product squads and 30 core workflows."
+    ],
+    previousRole: "Product Designer",
+    previousBullets: [
+      "Led discovery, prototyping, and usability testing for B2B and consumer products.",
+      "Translated research into service blueprints and measurable product experiments."
+    ],
+    skills: "Product design, User research, Figma, Prototyping, Design systems, Service design",
+    educationTitle: "B.A. Interaction Design",
+    projects: [
+      {
+        id: "proj-1",
+        title: "Accessible account recovery",
+        subtitle: "Service redesign",
+        dateRange: "2025",
+        description:
+          "- Simplified a high-friction support journey across web and assisted channels.\n- Increased successful self-service recovery by 31%.",
+        tags: ["Service design", "Accessibility"],
+        visible: true
+      },
+      {
+        id: "proj-2",
+        title: "Design system adoption",
+        subtitle: "Cross-product platform",
+        dateRange: "2024",
+        description:
+          "- Defined contribution standards and migration guidance.\n- Reduced duplicate component work across four squads.",
+        tags: ["Design systems", "Governance"],
+        visible: true
+      }
+    ]
+  })
 };
 
 export const seedExampleProfile = (templateId: string): CvProfile => {

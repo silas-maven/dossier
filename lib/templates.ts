@@ -23,7 +23,10 @@ export const templateVariants = [
   "process-left",
   "credentials-top",
   "academic-traditional",
-  "mission-impact"
+  "mission-impact",
+  "executive-brief",
+  "portfolio-grid",
+  "data-ledger"
 ] as const;
 
 export const templateFamilies = [
@@ -70,6 +73,59 @@ export type TemplateShelf = (typeof templateShelves)[number];
 export type TemplateParserRisk = "Low" | "Moderate";
 export type TemplateLayout = (typeof templateLayouts)[number];
 export type TemplateExperienceLevel = (typeof templateExperienceLevels)[number];
+
+export const templateIndustryGroups = [
+  "technology-data",
+  "product-delivery",
+  "professional-services",
+  "growth-revenue",
+  "people-customer",
+  "credentials-mission",
+  "creative-portfolio"
+] as const;
+
+export type TemplateIndustryGroup = (typeof templateIndustryGroups)[number];
+
+export const templateIndustryGroupDefinitions: Record<
+  TemplateIndustryGroup,
+  { label: string; description: string; industries: string[] }
+> = {
+  "technology-data": {
+    label: "Technology & Data",
+    description: "Engineering, analytics, platforms, systems, and technical delivery.",
+    industries: ["Software Engineering", "Data & Analytics"]
+  },
+  "product-delivery": {
+    label: "Product, Projects & Operations",
+    description: "Roadmaps, programmes, implementation, process, and operational outcomes.",
+    industries: ["Product Management", "Project & Program Management", "Operations"]
+  },
+  "professional-services": {
+    label: "Finance, Legal & Consulting",
+    description: "Conservative formats for analysis, matters, cases, governance, and executive work.",
+    industries: ["Consulting", "Finance & Analysis", "Legal", "Executive Leadership", "General"]
+  },
+  "growth-revenue": {
+    label: "Sales & Marketing",
+    description: "Performance-led formats for revenue, pipeline, campaigns, channels, and growth.",
+    industries: ["Sales", "Marketing"]
+  },
+  "people-customer": {
+    label: "People & Customer",
+    description: "Human-centred formats for HR, recruiting, customer success, and relationship outcomes.",
+    industries: ["Human Resources", "Talent Acquisition", "Customer Success"]
+  },
+  "credentials-mission": {
+    label: "Health, Education & Mission",
+    description: "Credential and impact-led formats for regulated, academic, and mission-driven work.",
+    industries: ["Healthcare", "Education", "Nonprofit"]
+  },
+  "creative-portfolio": {
+    label: "Creative & Portfolio",
+    description: "Case-study formats for design, brand, content, and creative operations.",
+    industries: ["Design & Creative"]
+  }
+};
 
 export type CvTemplate = {
   id: string;
@@ -173,7 +229,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Professional",
     description: "Single-column engineering resume tuned for shipped systems, stack clarity, and measurable delivery.",
-    previewImage: "/card-images/gutter-minimal.jpg",
+    previewImage: "/template-previews/software-engineering-lean.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Backend", "Frontend", "Full-stack", "Platform"],
@@ -204,7 +260,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Professional",
     description: "Two-zone PM layout for roadmap ownership, product judgment, and cross-functional execution with a modern product-led feel.",
-    previewImage: "/card-images/skills-right-pink.jpg",
+    previewImage: "/template-previews/product-management-delivery.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Product Manager", "Growth PM", "Platform PM", "Founding PM"],
@@ -235,7 +291,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Executive",
     description: "Navy two-zone delivery layout for stakeholder-heavy programs with cadence, governance, and implementation scope.",
-    previewImage: "/card-images/sidebar-navy-right.jpg",
+    previewImage: "/template-previews/technical-pm-delivery.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Technical PM", "Program Manager", "Implementation Lead", "Delivery Manager"],
@@ -266,7 +322,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Executive",
     description: "Clean consulting template for structured problem solving, client impact, analysis, and executive-ready bullets.",
-    previewImage: "/card-images/banded-grey.jpg",
+    previewImage: "/template-previews/consulting-case-brief.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Management Consulting", "Strategy", "Transformation", "Advisory"],
@@ -297,7 +353,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Executive",
     description: "Conservative finance layout built for scan speed, metrics density, and tool visibility without visual clutter.",
-    previewImage: "/card-images/blue-rules.jpg",
+    previewImage: "/template-previews/finance-analyst-structured.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["FP&A", "Financial Analyst", "Commercial Finance", "Corporate Strategy"],
@@ -318,19 +374,19 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "data-analytics-clarity",
-    variant: "boxed-header-dots",
-    family: "sidebar-human-first",
+    variant: "data-ledger",
+    family: "structured-single-column",
     theme: "modern-slate",
-    atsMode: "balanced",
+    atsMode: "safe",
     name: "Data Analytics Clarity",
     category: "Data",
     industry: "Data & Analytics",
     shelf: "Parser-Safe",
     experienceLevel: "Student",
-    description: "Structured split layout for SQL, BI, experimentation, dashboards, and decision-ready reporting.",
-    previewImage: "/card-images/boxed-header-dots.jpg",
-    parserRisk: "Moderate",
-    layout: "Split Column",
+    description: "Technical evidence ledger for SQL, BI, experimentation, data products, and decision-ready reporting.",
+    previewImage: "/template-previews/data-analytics-clarity.webp",
+    parserRisk: "Low",
+    layout: "Single Column",
     bestFor: ["Data Analyst", "BI Analyst", "Insights", "Analytics Engineer"],
     guidance: [
       "Make every role show a decision or process that improved because of your analysis.",
@@ -340,12 +396,12 @@ export const cvTemplates: CvTemplate[] = [
     guidanceProfileId: "software-engineering",
     recommendedIndustries: ["Data & Analytics", "Software Engineering"],
     capabilities: {
-      sidebar: true,
-      ratings: true,
+      sidebar: false,
+      ratings: false,
       photo: false,
-      accentRail: false
+      accentRail: true
     },
-    recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
+    recommendedFormat: "DOCX first, text-based PDF also safe"
   }),
   buildTemplate({
     id: "operations-execution",
@@ -359,7 +415,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Professional",
     description: "Warm split-column operations layout for process design, SLA improvement, service quality, and delivery reliability.",
-    previewImage: "/card-images/sidebar-tan-dots.jpg",
+    previewImage: "/template-previews/operations-execution.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Operations Manager", "Process Improvement", "Service Delivery", "Business Operations"],
@@ -390,7 +446,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Professional",
     description: "Two-column customer success layout with an operational sidebar for adoption, renewals, tooling, and portfolio context.",
-    previewImage: "/card-images/sidebar-light.jpg",
+    previewImage: "/template-previews/customer-success-renewal.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Customer Success", "Account Management", "Implementation", "Onboarding"],
@@ -411,7 +467,7 @@ export const cvTemplates: CvTemplate[] = [
   }),
   buildTemplate({
     id: "legal-counsel-brief",
-    isPublic: false,
+    isPublic: true,
     variant: "legal-formal",
     family: "classic-single-column",
     theme: "legal-charcoal",
@@ -422,7 +478,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Executive",
     description: "Formal single-column legal CV for bar admissions, practice areas, representative matters, and conservative screening.",
-    previewImage: "/card-images/banded-grey.jpg",
+    previewImage: "/template-previews/legal-counsel-brief.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Legal Counsel", "Attorney", "Compliance", "Corporate Law"],
@@ -454,7 +510,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Professional",
     description: "Results-first sales CV built around quota attainment, revenue, pipeline, deal size, and account growth proof.",
-    previewImage: "/card-images/blue-rules.jpg",
+    previewImage: "/template-previews/sales-revenue-driver.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Account Executive", "Sales Manager", "Business Development", "Revenue"],
@@ -486,7 +542,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Top Rated",
     experienceLevel: "Professional",
     description: "Polished marketing CV for campaign wins, channel ownership, performance metrics, tools, and growth proof.",
-    previewImage: "/card-images/skills-right-pink.jpg",
+    previewImage: "/template-previews/marketing-campaign-performance.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Growth Marketing", "Campaign Manager", "Lifecycle", "Content & Demand Gen"],
@@ -518,7 +574,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Professional",
     description: "Calm, readable HR CV for people partnering, employee relations, policy, HRIS, compliance, and people-program outcomes.",
-    previewImage: "/card-images/sidebar-light.jpg",
+    previewImage: "/template-previews/human-resources-people-partner.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["HR Business Partner", "People Operations", "Employee Relations", "HR Manager"],
@@ -550,7 +606,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Parser-Safe",
     experienceLevel: "Professional",
     description: "Fast-scan recruiting CV for sourcing strategy, requisition volume, funnel metrics, tools, and hiring outcomes.",
-    previewImage: "/card-images/gutter-minimal.jpg",
+    previewImage: "/template-previews/talent-acquisition-recruiter.webp",
     parserRisk: "Moderate",
     layout: "Single Column",
     bestFor: ["Recruiter", "Talent Acquisition", "Sourcing", "People Operations"],
@@ -582,7 +638,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Corporate",
     experienceLevel: "Professional",
     description: "Ordered operations CV for process wins, SLA improvement, tools, service quality, and operational reliability.",
-    previewImage: "/card-images/sidebar-tan-dots.jpg",
+    previewImage: "/template-previews/operations-process-lead.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Operations Manager", "Process Improvement", "Service Delivery", "Business Operations"],
@@ -614,7 +670,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Parser-Safe",
     experienceLevel: "Professional",
     description: "Credential-forward healthcare CV for care delivery, compliance, licenses, certifications, patient safety, and clinical operations.",
-    previewImage: "/card-images/banded-grey.jpg",
+    previewImage: "/template-previews/healthcare-care-delivery.webp",
     parserRisk: "Low",
     layout: "Single Column",
     bestFor: ["Nursing", "Care Coordination", "Clinical Operations", "Healthcare Administration"],
@@ -646,7 +702,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Parser-Safe",
     experienceLevel: "Professional",
     description: "Clean education CV for teaching, research, service, curriculum work, credentials, and academic contribution.",
-    previewImage: "/card-images/gutter-minimal.jpg",
+    previewImage: "/template-previews/education-academic-practice.webp",
     parserRisk: "Moderate",
     layout: "Single Column",
     bestFor: ["Teaching", "Academic Practice", "Research", "Student Support"],
@@ -678,7 +734,7 @@ export const cvTemplates: CvTemplate[] = [
     shelf: "Creative",
     experienceLevel: "Professional",
     description: "Warm but restrained nonprofit CV for mission delivery, program wins, fundraising, partnerships, and service outcomes.",
-    previewImage: "/card-images/sidebar-light.jpg",
+    previewImage: "/template-previews/nonprofit-mission-delivery.webp",
     parserRisk: "Moderate",
     layout: "Split Column",
     bestFor: ["Programme Delivery", "Fundraising", "Partnerships", "Mission Operations"],
@@ -698,36 +754,68 @@ export const cvTemplates: CvTemplate[] = [
     recommendedFormat: "PDF for direct review, DOCX fallback for upload portals"
   }),
   buildTemplate({
+    id: "creative-portfolio-grid",
+    isPublic: true,
+    variant: "portfolio-grid",
+    family: "sidebar-human-first",
+    theme: "campaign-coral",
+    atsMode: "human-first",
+    name: "Creative Portfolio Grid",
+    category: "Creative",
+    industry: "Design & Creative",
+    shelf: "Creative",
+    experienceLevel: "Professional",
+    description: "Editorial portfolio CV for selected work, creative direction, outcomes, and a compact capability index.",
+    previewImage: "/template-previews/creative-portfolio-grid.webp",
+    parserRisk: "Moderate",
+    layout: "Split Column",
+    bestFor: ["Product Design", "Brand Design", "Creative Direction", "Content Design"],
+    guidance: [
+      "Lead with two or three selected outcomes instead of a decorative software list.",
+      "Use project entries as compact case studies: brief, contribution, and result.",
+      "Keep a separate single-column export for strict application portals."
+    ],
+    guidanceProfileId: "marketing-performance",
+    recommendedIndustries: ["Design & Creative", "Marketing"],
+    capabilities: {
+      sidebar: true,
+      ratings: false,
+      photo: false,
+      accentRail: true
+    },
+    recommendedFormat: "PDF for portfolios and direct review, ATS-safe template for portals"
+  }),
+  buildTemplate({
     id: "banded-grey",
     isPublic: true,
-    variant: "banded-grey",
+    variant: "executive-brief",
     family: "classic-single-column",
     theme: "classic-ink",
-    atsMode: "safe",
-    name: "Banded Grey",
-    category: "Classic",
-    industry: "General",
-    shelf: "Top Rated",
-    experienceLevel: "Professional",
-    description: "Centered header with soft section bands and a traditional single-column reading order.",
-    previewImage: "/card-images/banded-grey.jpg",
+    atsMode: "balanced",
+    name: "Executive Leadership Brief",
+    category: "Leadership",
+    industry: "Executive Leadership",
+    shelf: "Corporate",
+    experienceLevel: "Executive",
+    description: "Board-ready leadership brief with an executive mandate, selected impact, and restrained chronology.",
+    previewImage: "/template-previews/banded-grey.webp",
     parserRisk: "Low",
     layout: "Single Column",
-    bestFor: ["General applications", "Career pivots", "Traditional employers"],
+    bestFor: ["Executive Leadership", "Transformation", "Director", "Chief of Staff"],
     guidance: [
-      "Use standard headings and keep the strongest experience near the top of page one.",
-      "This is the safest all-purpose layout when you want clean chronology without extra design risk.",
-      "Keep summary and skills concise so experience owns most of the page."
+      "Open with leadership scope, operating context, and the change you were accountable for.",
+      "Use a short selected-impact strip before the full chronology.",
+      "Keep governance, budget, team size, and commercial outcomes explicit."
     ],
     guidanceProfileId: "general-professional",
-    recommendedIndustries: ["General", "Finance & Analysis", "Consulting"],
+    recommendedIndustries: ["Executive Leadership", "Consulting", "Operations"],
     capabilities: {
       sidebar: false,
       ratings: false,
       photo: false,
       accentRail: false
     },
-    recommendedFormat: "DOCX first, text-based PDF also safe"
+    recommendedFormat: "Text-based PDF for direct review, DOCX fallback for portals"
   }),
   buildTemplate({
     id: "gutter-minimal",
@@ -1050,3 +1138,8 @@ export const templateLayoutOptions = Array.from(templateLayouts);
 export const templateExperienceLevelOptions = Array.from(templateExperienceLevels);
 export const templateFamilyOptions = Array.from(templateFamilies);
 export const publicCvTemplates = cvTemplates.filter((template) => template.isPublic !== false);
+
+export const getTemplateIndustryGroup = (template: CvTemplate): TemplateIndustryGroup =>
+  templateIndustryGroups.find((group) =>
+    templateIndustryGroupDefinitions[group].industries.includes(template.industry)
+  ) ?? "professional-services";

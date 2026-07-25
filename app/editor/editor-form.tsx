@@ -15,8 +15,12 @@ import EditorContentPanel, {
 import EditorPreviewPanel from "@/components/editor/editor-preview-panel";
 import EditorMobileTabs, { type EditorPanelTab } from "@/components/editor/editor-mobile-tabs";
 import AtsReadinessCard from "@/components/editor/ats-readiness-card";
+import CvImportDropzone from "@/components/editor/cv-import-dropzone";
+import ImportReviewCard from "@/components/editor/import-review-card";
 
 import type { AiCvSuggestion } from "@/lib/ai/types";
+import { parseCvFileInBrowser, type BrowserCvImport } from "@/lib/client-cv-import";
+import { profileFromParsedCv } from "@/lib/cv-import";
 import {
   createEmptyItem,
   createEmptyProfile,
@@ -294,9 +298,8 @@ export default function EditorForm({
 
   const [profile, setProfile] = useState<CvProfile>(() => createEmptyProfile(templateId));
   const [isHydrated, setIsHydrated] = useState(false);
-  const [importCandidate, setImportCandidate] = useState<CvProfile | null>(null);
+  const [importCandidate, setImportCandidate] = useState<BrowserCvImport | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
-  const [importWarning, setImportWarning] = useState<string | null>(null);
   const [importLoading, setImportLoading] = useState(false);
   const [undoProfile, setUndoProfile] = useState<CvProfile | null>(null);
   const [copiedTemplateId, setCopiedTemplateId] = useState(false);
@@ -399,7 +402,6 @@ export default function EditorForm({
 
   const startSeed = () => {
     setImportError(null);
-    setImportWarning(null);
     setUndoProfile(profile);
     setProfile(normalizeProfileForTemplate(seedExampleProfile(templateId), templateId));
     setImportCandidate(null);
@@ -407,43 +409,16 @@ export default function EditorForm({
 
   const startImportClick = () => {
     setImportError(null);
-    setImportWarning(null);
     fileInputRef.current?.click();
   };
 
   const handleImportFile = async (file: File) => {
     setImportError(null);
-    setImportWarning(null);
     setImportLoading(true);
     setImportCandidate(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("templateId", templateId);
-
-      const res = await fetch("/api/parse-cv", { method: "POST", body: formData });
-      const json = (await res.json().catch(() => ({}))) as {
-        profile?: CvProfile;
-        error?: string;
-        warnings?: string[];
-      };
-      if (!res.ok) {
-        throw new Error(json.error || "Import failed");
-      }
-      if (!json.profile) throw new Error("Import failed");
-
-      // Auto-apply: populate the actual editor fields immediately.
-      setUndoProfile(profile);
-      const applied = normalizeProfileShape(templateId, {
-        ...json.profile,
-        id: profile.id,
-        name: file.name.replace(/\.[^/.]+$/, ""),
-        templateId
-      });
-      setProfile(applied);
-      setImportWarning(json.warnings?.[0] ?? null);
-      setImportCandidate(null);
+      setImportCandidate(await parseCvFileInBrowser(file));
     } catch (err: unknown) {
       const message =
         err instanceof Error && err.message
@@ -455,11 +430,56 @@ export default function EditorForm({
     }
   };
 
+  const updateImportCandidateSection = (
+    sectionIndex: number,
+    type: CvSectionType,
+    title: string
+  ) => {
+    setImportCandidate((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        parsed: {
+          ...current.parsed,
+          sections: current.parsed.sections.map((section, index) =>
+            index === sectionIndex ? { ...section, type, title } : section
+          )
+        }
+      };
+    });
+  };
+
+  const applyImportCandidate = () => {
+    if (!importCandidate) return;
+    const imported = profileFromParsedCv(templateId, importCandidate.parsed);
+    setUndoProfile(profile);
+    setProfile(
+      normalizeProfileShape(templateId, {
+        ...imported,
+        id: profile.id,
+        name: importCandidate.fileName.replace(/\.[^/.]+$/, ""),
+        templateId
+      })
+    );
+    setImportCandidate(null);
+  };
+
   const undoLastImport = () => {
     if (!undoProfile) return;
     setProfile(undoProfile);
     setUndoProfile(null);
   };
+
+  const importPreviewProfile = useMemo(() => {
+    if (!importCandidate) return profile;
+    const imported = profileFromParsedCv(templateId, importCandidate.parsed);
+    return normalizeProfileShape(templateId, {
+      ...imported,
+      id: profile.id,
+      name: importCandidate.fileName.replace(/\.[^/.]+$/, ""),
+      templateId
+    });
+  }, [importCandidate, profile, templateId]);
 
   const persistProfileToLocal = (
     nextProfile: CvProfile,
@@ -1047,7 +1067,7 @@ export default function EditorForm({
         <div className="flex items-center gap-2">
           {!tailorMode && (
             <span className="hidden text-xs text-muted-foreground sm:inline">
-              Match score, rewrite &amp; tailor with AI
+              Optional AI review — the builder and ATS checks work without it
             </span>
           )}
           <Button
@@ -1057,11 +1077,11 @@ export default function EditorForm({
             className={cn(
               "font-semibold",
               tailorMode
-                ? "ring-2 ring-blue-400/50"
-                : "ai-pulse border border-blue-400/40 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-100 shadow-sm hover:from-blue-500/30 hover:to-indigo-500/30 hover:text-white"
+                ? "ring-2 ring-blue-400/40"
+                : "border border-blue-400/25 bg-blue-500/10 text-blue-100 hover:bg-blue-500/15 hover:text-white"
             )}
           >
-            {tailorMode ? "AI Workspace" : "Open AI Workspace"}
+            {tailorMode ? "Close AI review" : "Optional AI review"}
           </Button>
         </div>
       </div>
@@ -1086,7 +1106,7 @@ export default function EditorForm({
           )}
         >
           <div className="mb-4 space-y-4">
-            <AtsReadinessCard profile={importCandidate ?? profile} template={selectedTemplate} />
+            <AtsReadinessCard profile={importPreviewProfile} template={selectedTemplate} />
             <details className="rounded-2xl border border-border/70 bg-card/80 p-4">
               <summary className="cursor-pointer text-sm font-semibold text-foreground">
                 Advanced formatting
@@ -1136,15 +1156,6 @@ export default function EditorForm({
                     <span className="flex flex-wrap gap-2">
                       <Button type="button" variant="secondary" size="sm" onClick={startSeed}>
                         Seed example CV
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={startImportClick}
-                        disabled={importLoading}
-                      >
-                        {importLoading ? "Importing..." : "Import CV File"}
                       </Button>
                     </span>
                   </CardTitle>
@@ -1202,7 +1213,7 @@ export default function EditorForm({
                       Local autosave
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Dossier saves this profile in your browser while you edit. Use PDF export when you are ready to apply.
+                      Dossier saves this profile in your browser while you edit. Export a designed PDF or a single-column ATS DOCX when you are ready to apply.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="secondary" onClick={saveLocalNow}>
@@ -1222,6 +1233,19 @@ export default function EditorForm({
                       event.target.value = "";
                     }}
                   />
+                  <CvImportDropzone
+                    loading={importLoading}
+                    onChoose={startImportClick}
+                    onFile={(file) => void handleImportFile(file)}
+                  />
+                  {importCandidate ? (
+                    <ImportReviewCard
+                      candidate={importCandidate}
+                      onCancel={() => setImportCandidate(null)}
+                      onApply={applyImportCandidate}
+                      onSectionChange={updateImportCandidateSection}
+                    />
+                  ) : null}
                   <label className="block space-y-1">
                     <span className="text-sm font-medium">Profile name</span>
                     <input
@@ -1235,14 +1259,10 @@ export default function EditorForm({
                     />
                   </label>
                   <p className="text-xs text-muted-foreground">
-                    Local mode active. Data stays in your browser.
+                    Profiles and imported files stay in this browser. Optional AI only receives content when you explicitly run it.
                     {!isHydrated ? " (loading...)" : ""}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Import accepts PDF, DOCX, TXT, Markdown, and RTF. DOCX is usually the safest ATS format.
-                  </p>
                   {importError ? <p className="text-xs text-red-700">{importError}</p> : null}
-                  {importWarning ? <p className="text-xs text-amber-400">{importWarning}</p> : null}
                   {undoProfile ? (
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-xs text-muted-foreground">Import applied.</p>
@@ -1960,7 +1980,7 @@ export default function EditorForm({
 
         {tailorMode ? (
           <TailorPane
-            profile={importCandidate ?? profile}
+            profile={importPreviewProfile}
             template={selectedTemplate}
             onApplySuggestion={applyAiSuggestion}
             className={cn(
@@ -1970,7 +1990,7 @@ export default function EditorForm({
           />
         ) : (
           <EditorPreviewPanel
-            profile={importCandidate ?? profile}
+            profile={importPreviewProfile}
             templateName={templateName}
             className={cn(
               activePanelTab === "preview" ? "block" : "hidden",
